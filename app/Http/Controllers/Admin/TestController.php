@@ -9,6 +9,7 @@ use App\Planet\Form;
 use App\Planet\Table;
 use App\Models\Post;
 use App\Models\Category;
+use Quark;
 
 class TestController extends Controller
 {
@@ -20,7 +21,9 @@ class TestController extends Controller
      */
     public function index(Request $request)
     {
-        $result = Helper::htmlToImage('https://www.taobao.com',750,null,'','D:\\Software\\phantomjs\\bin\\phantomjs');
-        echo($result);
+        $form = Quark::form();
+        $form->text('username','用户名');
+        $form->text('nickname','昵称');
+        return $this->success('获取成功！','',$form);
     }
 }

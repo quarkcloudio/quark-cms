@@ -1767,6 +1767,7 @@ class Helper
     }
 
     // web页面生成图片，必须安装phantomjs程序(https://github.com/ariya/phantomjs),windows下需要指定$phantomjs的绝对路径，如果截图出现乱码请安装相应的字体
+    // $result = Helper::htmlToImage('https://www.taobao.com',750,null,'','D:\\Software\\phantomjs\\bin\\phantomjs');
     static function htmlToImage($source,$width = null,$height = null,$path = '',$phantomjs = '')
     {
         if(empty($source)) {
