@@ -8,16 +8,11 @@ use App\Models\Category;
 use App\Models\Post;
 use App\Services\Helper;
 use DB;
-use Quark;
 
 class IndexController extends Controller
 {
     public function index(Request $request)
     {
-        $quark = Quark::form()->text('nickname');
-
-        return $quark;
-
         $id      = $request->input('id');
         $name    = $request->input('name');
 

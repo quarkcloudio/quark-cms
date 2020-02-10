@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "a5d2deaa5b8c10a813a32e1d5820d2f8",
+    "content-hash": "98aead352f5b5940f5141111c9884083",
     "packages": [
         {
             "name": "aliyuncs/oss-sdk-php",
@@ -4316,6 +4316,65 @@
             "time": "2018-10-13T15:16:03+00:00"
         },
         {
+            "name": "quarkcms/quark-admin",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/quarkcms/quark-admin.git",
+                "reference": "9853c94ee6b00048308ae905a51e5323ad047b00"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/quarkcms/quark-admin/zipball/9853c94ee6b00048308ae905a51e5323ad047b00",
+                "reference": "9853c94ee6b00048308ae905a51e5323ad047b00",
+                "shasum": "",
+                "mirrors": [
+                    {
+                        "url": "https://mirrors.aliyun.com/composer/dists/%package%/%reference%.%type%",
+                        "preferred": true
+                    }
+                ]
+            },
+            "require": {
+                "ext-fileinfo": "*",
+                "php": ">=7.1"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "aliases": {
+                        "Quark": "Quarkcms\\QuarkAdmin\\Facades\\Quark"
+                    },
+                    "providers": [
+                        "Quarkcms\\QuarkAdmin\\QuarkServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Quarkcms\\QuarkAdmin\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "tangtanglove",
+                    "email": "dai_hang_love@126.com"
+                }
+            ],
+            "description": "laravel admin",
+            "keywords": [
+                "laravel",
+                "laravel-admin",
+                "quark-admin",
+                "sdk"
+            ],
+            "time": "2020-02-10T08:33:04+00:00"
+        },
+        {
             "name": "ralouphie/getallheaders",
             "version": "3.0.3",
             "source": {
@@ -6438,65 +6497,6 @@
                 "serialize"
             ],
             "time": "2019-08-22T07:33:08+00:00"
-        },
-        {
-            "name": "tangtanglove/quark-admin",
-            "version": "dev-master",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/tangtanglove/quark-admin.git",
-                "reference": "c2557ee70f875ddc2eddbf4154199cdb8f91389d"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/tangtanglove/quark-admin/zipball/c2557ee70f875ddc2eddbf4154199cdb8f91389d",
-                "reference": "c2557ee70f875ddc2eddbf4154199cdb8f91389d",
-                "shasum": "",
-                "mirrors": [
-                    {
-                        "url": "https://mirrors.aliyun.com/composer/dists/%package%/%reference%.%type%",
-                        "preferred": true
-                    }
-                ]
-            },
-            "require": {
-                "ext-fileinfo": "*",
-                "php": ">=7.1"
-            },
-            "type": "library",
-            "extra": {
-                "laravel": {
-                    "aliases": {
-                        "Quark": "Tangtanglove\\QuarkAdmin\\Facades\\Quark"
-                    },
-                    "providers": [
-                        "Tangtanglove\\QuarkAdmin\\QuarkServiceProvider"
-                    ]
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Tangtanglove\\QuarkAdmin\\": "src"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "tangtanglove",
-                    "email": "dai_hang_love@126.com"
-                }
-            ],
-            "description": "laravel admin",
-            "keywords": [
-                "laravel",
-                "laravel-admin",
-                "quark-admin",
-                "sdk"
-            ],
-            "time": "2020-02-10T06:27:14+00:00"
         },
         {
             "name": "tijsverkoyen/css-to-inline-styles",
@@ -8945,7 +8945,7 @@
     "aliases": [],
     "minimum-stability": "dev",
     "stability-flags": {
-        "tangtanglove/quark-admin": 20
+        "quarkcms/quark-admin": 20
     },
     "prefer-stable": true,
     "prefer-lowest": false,

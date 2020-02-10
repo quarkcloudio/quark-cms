@@ -26,8 +26,8 @@
         "overtrue/pinyin": "^4.0",
         "overtrue/socialite": "^2.0",
         "overtrue/wechat": "^4.1",
+        "quarkcms/quark-admin": "dev-master",
         "spatie/laravel-permission": "^3.0",
-        "tangtanglove/quark-admin": "dev-master",
         "topthink/think-image": "^1.0"
     },
     "require-dev": {
