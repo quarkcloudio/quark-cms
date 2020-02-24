@@ -22,8 +22,11 @@ class TestController extends Controller
     public function index(Request $request)
     {
         $form = Quark::form();
+
         $form->text('username','用户名');
         $form->text('nickname','昵称');
+        $form->setAction('api/admin/test/index');
+
         return $this->success('获取成功！','',$form);
     }
 }

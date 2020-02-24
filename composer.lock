@@ -4321,12 +4321,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/quarkcms/quark-admin.git",
-                "reference": "9853c94ee6b00048308ae905a51e5323ad047b00"
+                "reference": "4eacade56311dad6013c2416032a9b847d4d635a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/quarkcms/quark-admin/zipball/9853c94ee6b00048308ae905a51e5323ad047b00",
-                "reference": "9853c94ee6b00048308ae905a51e5323ad047b00",
+                "url": "https://api.github.com/repos/quarkcms/quark-admin/zipball/4eacade56311dad6013c2416032a9b847d4d635a",
+                "reference": "4eacade56311dad6013c2416032a9b847d4d635a",
                 "shasum": "",
                 "mirrors": [
                     {
@@ -4343,10 +4343,10 @@
             "extra": {
                 "laravel": {
                     "aliases": {
-                        "Quark": "Quarkcms\\QuarkAdmin\\Facades\\Quark"
+                        "Quark": "Quarkcms\\QuarkAdmin\\Facades\\QuarkAdmin"
                     },
                     "providers": [
-                        "Quarkcms\\QuarkAdmin\\QuarkServiceProvider"
+                        "Quarkcms\\QuarkAdmin\\QuarkAdminServiceProvider"
                     ]
                 }
             },
@@ -4372,7 +4372,7 @@
                 "quark-admin",
                 "sdk"
             ],
-            "time": "2020-02-10T08:33:04+00:00"
+            "time": "2020-02-10T09:25:00+00:00"
         },
         {
             "name": "ralouphie/getallheaders",

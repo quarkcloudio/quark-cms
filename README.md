@@ -31,4 +31,4 @@
 
 ## 官方支持
 
-github地址:https://github.com/tangtanglove/quark
+github地址:https://github.com/quarkcms/quark-cms
