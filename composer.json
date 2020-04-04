@@ -1,20 +1,19 @@
 {
-    "name": "laravel/laravel",
+    "name": "quarkcms/quark-cms",
     "type": "project",
-    "description": "The Laravel Framework.",
+    "description": "The Quark CMS.",
     "keywords": [
         "framework",
-        "laravel"
+        "quarkcms",
+        "laravelcms"
     ],
     "license": "MIT",
     "require": {
         "php": "^7.2",
-        "aliyuncs/oss-sdk-php": "^2.0",
         "anam/phantommagick": "^2.0",
         "caffeinated/modules": "^6.1",
         "endroid/qrcode": "^2.5",
         "fideloper/proxy": "^4.0",
-        "gregwar/captcha": "^1.0",
         "guzzlehttp/guzzle": "^6.3",
         "intervention/image": "^2.5",
         "laravel/framework": "^6.2",
@@ -27,7 +26,6 @@
         "overtrue/socialite": "^2.0",
         "overtrue/wechat": "^4.1",
         "quarkcms/quark-admin": "dev-master",
-        "spatie/laravel-permission": "^3.0",
         "topthink/think-image": "^1.0"
     },
     "require-dev": {
