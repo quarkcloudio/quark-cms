@@ -7,8 +7,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
-use App\Models\Admin;
-use App\Models\Config;
+use QuarkCMS\QuarkAdmin\Models\Admin;
+use QuarkCMS\QuarkAdmin\Models\Config;
 use Illuminate\Support\Facades\Route;
 use App\Services\Helper;
 
@@ -44,7 +44,7 @@ class AppServiceInit
         }
 
         if(!(strpos(Route::currentRouteName(),'api/admin') !== false)) {
-            if(Helper::config('WEB_SITE_OPEN') != 1) {
+            if(web_config('WEB_SITE_OPEN') != 1) {
                 echo '网站关闭！';
                 die();
             }

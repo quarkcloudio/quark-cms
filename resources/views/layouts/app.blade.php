@@ -8,11 +8,11 @@
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <meta name="description" content="{{$helper::config('WEB_SITE_DESCRIPTION')}} - @yield('description')">
-    <meta name="keyword" content="{{$helper::config('WEB_SITE_KEYWORDS')}} - @yield('keyword')">
+    <meta name="description" content="{{web_config('WEB_SITE_DESCRIPTION')}} - @yield('description')">
+    <meta name="keyword" content="{{web_config('WEB_SITE_KEYWORDS')}} - @yield('keyword')">
     <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
     <meta name="generator" content="tangtanglove">
-    <title>{{$helper::config('WEB_SITE_NAME')}} - @yield('title')</title>
+    <title>{{web_config('WEB_SITE_NAME')}} - @yield('title')</title>
 
     <style>
       .bd-placeholder-img {
@@ -46,7 +46,7 @@
     @section('header')
     <header class="blog-header py-3">
         <nav class="navbar navbar-expand-md fixed-top bg-white border-bottom box-shadow">
-            <a class="navbar-brand text-dark" href="#">{{$helper::config('WEB_SITE_NAME')}}</a>
+            <a class="navbar-brand text-dark" href="#">{{web_config('WEB_SITE_NAME')}}</a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -106,7 +106,7 @@
     </main>
     @section('footer')
     <footer class="blog-footer">
-        <p>{{$helper::config('WEB_SITE_COPYRIGHT')}} {!!$helper::config('WEB_SITE_SCRIPT')!!}</p>
+        <p>{{web_config('WEB_SITE_COPYRIGHT')}} {!!web_config('WEB_SITE_SCRIPT')!!}</p>
     </footer>
     @show
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>

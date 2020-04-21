@@ -19,11 +19,12 @@ class CreateMenusTable extends Migration
             $table->string('name');
             $table->string('guard_name');
             $table->string('icon')->nullable()->default('');
+            $table->string('type')->nullable()->default('default');
             $table->integer('pid')->default(0);
             $table->integer('sort')->default(0)->nullable();
             $table->string('path')->nullable()->default('');
-            $table->integer('show')->default(1);
-            $table->tinyInteger('status')->default(1);
+            $table->boolean('show')->default(1);
+            $table->boolean('status')->default(1);
             $table->timestamps();
         });
     }

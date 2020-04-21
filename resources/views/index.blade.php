@@ -13,7 +13,7 @@
             @banners($banner,'IndexBanner')
                 <a href="{{$banner['url']}}">
                     <div class="carousel-item active">
-                        <img class="d-block w-100" src="{{ $helper::getPicture($banner['cover_id']) }}" alt="First slide">
+                        <img class="d-block w-100" src="{{ get_picture($banner['cover_id']) }}" alt="First slide">
                     </div>
                 </a>
             @endbanners
@@ -42,7 +42,7 @@
                 <a href="/article/detail?id={{$article['id']}}" class="stretched-link">查看更多</a> 
             </div>
             <div class="col-auto d-none d-lg-block">
-                <img class="bd-placeholder-img" width="200" height="246" src="{{ $helper::getPicture($article['cover_id']) }}" alt="First slide">
+                <img class="bd-placeholder-img" width="200" height="246" src="{{ get_picture($article['cover_id']) }}" alt="First slide">
             </div>
         </div>
     </div>

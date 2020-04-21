@@ -25,7 +25,7 @@
         "overtrue/pinyin": "^4.0",
         "overtrue/socialite": "^2.0",
         "overtrue/wechat": "^4.1",
-        "quarkcms/quark-admin": "dev-master",
+        "quarkcms/quark-admin": "^0.0.2",
         "topthink/think-image": "^1.0"
     },
     "require-dev": {
@@ -52,6 +52,9 @@
         "classmap": [
             "database/seeds",
             "database/factories"
+        ],
+        "files": [
+            "helpers.php"
         ]
     },
     "autoload-dev": {

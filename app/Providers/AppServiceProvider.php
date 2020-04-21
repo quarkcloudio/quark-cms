@@ -6,7 +6,6 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Auth;
 use EasyWeChat\Factory;
-use App\Services\Helper;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -33,9 +32,9 @@ class AppServiceProvider extends ServiceProvider
 
             $jsApi = '';
 
-            if(Helper::isWechat()) {
-                if(Helper::wechatConfig() != false) {
-                    $app = Factory::officialAccount(Helper::wechatConfig());
+            if(is_wechat()) {
+                if(wechat_config() != false) {
+                    $app = Factory::officialAccount(wechat_config());
                     $jsApi = $app->jssdk->buildConfig(array('onMenuShareTimeline','onMenuShareAppMessage'), $debug = false, $beta = false, $json = true);
                 } 
             }
