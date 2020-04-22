@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Models\Post;
+use App\Models\Category;
+use QuarkCMS\QuarkAdmin\Models\Admin;
 use QuarkCMS\QuarkAdmin\Controllers\QuarkController;
 use Quark;
 
@@ -21,8 +23,9 @@ class ArticleController extends QuarkController
         $grid = Quark::grid(new Post)->title($this->title);
         $grid->column('id','ID');
         $grid->column('title','标题')->link();
+        $grid->column('level','排序')->editable()->sorter()->width(100);
         $grid->column('author','作者');
-        // $grid->column('category_title','分类');
+        $grid->column('category.title','分类');
         $grid->column('created_at','发布时间');
         $grid->column('status','状态')->editable('switch',[
             'on'  => ['value' => 1, 'text' => '正常'],
@@ -58,10 +61,18 @@ class ArticleController extends QuarkController
         })->style('select',['width'=>120]);
 
         $grid->search(function($search) {
-            $search->equal('status', '所选状态')->select([''=>'全部',1=>'正常',2=>'已禁用'])->placeholder('选择状态')->width(110);
+            $categorys = Category::where('type','ARTICLE')->get();
+            $options[''] = '全部';
+            foreach ($categorys as $key => $value) {
+                $options[$value['id']] = $value['title'];
+            }
+
+            $search->equal('category_id', '文章分类')->select($options)->placeholder('选择分类')->width(110);
             $search->where('title', '搜索内容',function ($query) {
                 $query->where('title', 'like', "%{input}%");
             })->placeholder('搜索内容');
+
+            $search->equal('status', '所选状态')->select([''=>'全部',1=>'正常',2=>'已禁用'])->placeholder('选择状态')->width(110)->advanced();
             $search->between('created_at', '发布时间')->datetime()->advanced();
         })->expand(false);
 
@@ -71,117 +82,85 @@ class ArticleController extends QuarkController
     }
 
     /**
-     * Form页面模板
+     * 表单页面
      * 
      * @param  Request  $request
      * @return Response
      */
-    public function form($data = [])
+    protected function form()
     {
-        $categorys         = Category::where('type','ARTICLE')->get()->toArray();
-        $categoryTrees     = Helper::listToTree($categorys);
-        $categoryTreeLists = Helper::treeToOrderList($categoryTrees,0,'title');
+        $form = Quark::form(new Post);
 
-        // 模板数据
-        $getCategorys = [];
+        $title = $form->isCreating() ? '创建'.$this->title : '编辑'.$this->title;
+        $form->title($title);
 
-        $getCategorys[0]['name'] = '请选择分类';
-        $getCategorys[0]['value'] = '0';
+        $form->tab('基本', function ($form) {
+            $form->id('id','ID');
 
-        foreach ($categoryTreeLists as $key => $categoryTreeList) {
-            $getCategorys[$key+1]['name'] = $categoryTreeList['title'];
-            $getCategorys[$key+1]['value'] = $categoryTreeList['id'];
-        }
+            $form->text('title','标题')
+            ->rules(['required','max:190'],['required'=>'标题必须填写','max'=>'名称不能超过190个字符']);
 
-        $checkboxList = [
-            [
-                'name'=>'首页推荐',
-                'value'=>1,
-            ],
-            [
-                'name'=>'频道推荐',
-                'value'=>2,
-            ],
-            [
-                'name'=>'列表推荐',
-                'value'=>4,
-            ],
-            [
-                'name'=>'详情推荐',
-                'value'=>8,
-            ],
-        ];
+            $form->textArea('description','描述')
+            ->rules(['max:190'],['max'=>'名称不能超过190个字符']);
 
-        $radioList = [
-            [
-                'name'=>'无图',
-                'value'=>1,
-            ],
-            [
-                'name'=>'单图（小）',
-                'value'=>2,
-            ],
-            [
-                'name'=>'多图',
-                'value'=>3,
-            ],
-            [
-                'name'=>'单图（大）',
-                'value'=>4,
-            ],
-        ];
+            $form->text('author','作者');
 
-        if(isset($data['id'])) {
-            $action = 'admin/'.$this->controllerName().'/save';
-        } else {
-            $action = 'admin/'.$this->controllerName().'/store';
-        }
+            $form->text('source','来源');
 
-        $baseControls = [
-            ID::make('ID','id'),
-            Input::make('标题','title')->style(['width'=>400]),
-            TextArea::make('描述','description')->style(['width'=>400]),
-            Input::make('标签','tags')->style(['width'=>400]),
-            Input::make('作者','author')->style(['width'=>200]),
-            Input::make('来源','source')->style(['width'=>200]),
-            Checkbox::make('推荐位','position')->list($checkboxList),
-            Radio::make('展现形式','show_type')->list($radioList)->value(1),
-            Image::make('封面图','cover_ids')->mode('multiple'),
-            Select::make('分类','category_id')->style(['width'=>200])->option($getCategorys)->value('0'),
-            SwitchButton::make('允许评论','comment_status')->checkedText('是')->unCheckedText('否')->value(true),
-            Editor::make('内容','content'),
-            DatePicker::make('创建时间','created_at')->format("YYYY-MM-DD HH:mm:ss"),
-            SwitchButton::make('状态','status')->checkedText('正常')->unCheckedText('禁用')->value(true),
-            Button::make('提交')
-            ->type('primary')
-            ->style(['width'=>100,'float'=>'left','marginLeft'=>200])
-            ->onClick('submit',null,$action),
-        ];
+            $form->checkbox('position','推荐位')->options([
+                1 => '首页推荐',
+                2 => '频道推荐',
+                3 => '列表推荐',
+                4 => '详情推荐'
+            ]);
 
-        $extendControls = [
-            Input::make('别名','name')->style(['width'=>200]),
-            InputNumber::make('排序','level')->extra('越大越靠前')->max(10000)->value(1),
-            InputNumber::make('浏览量','view')->value(0),
-            InputNumber::make('评论量','comment')->value(0),
-            Input::make('访问密码','password')->style(['width'=>200]),
-            File::make('附件','file_id'),
-            SwitchButton::make('状态','status')->checkedText('正常')->unCheckedText('禁用')->value(true),
-            Button::make('提交')
-            ->type('primary')
-            ->style(['width'=>100,'float'=>'left','marginLeft'=>200])
-            ->onClick('submit',null,$action),
-        ];
+            $form->radio('show_type','展现形式')->options([
+                1 => '无图',
+                2 => '单图（小）',
+                3 => '多图',
+                4 => '单图（大）'
+            ]);
 
-        $tabPane = [
-            TabPane::make('基本',1)->controls($baseControls),
-            TabPane::make('扩展',2)->controls($extendControls)
-        ];
+            $form->image('cover_ids','封面图')->mode('multiple');
 
-        $tabs = Tabs::make('tab')->defaultActiveKey(1)->tabPanes($tabPane);
+            $getCategorys = Category::where('type','ARTICLE')->get();
+            foreach ($getCategorys as $key => $value) {
+                $categorys[$value['id']] = $value['title'];
+            }
 
-        $result = $this->formBuilder($tabs,$data);
+            $form->select('category_id','分类目录')
+            ->options($categorys)
+            ->rules(['required'],['required'=>'请选择分类'])
+            ->width(200);
 
-        return $result;
+            $form->editor('content','内容');
+
+            $form->switch('status','状态')->options([
+                'on'  => '是',
+                'off' => '否'
+            ])->default(true);
+
+        })->tab('扩展', function ($form) {
+            $form->text('name','缩略名');
+
+            $form->number('level','排序')->value(0);
+            $form->number('view','浏览量')->value(0);
+            $form->number('comment','评论量')->value(0);
+
+            $form->text('password','访问密码');
+            $form->file('file_id','附件');
+
+            $form->switch('comment_status','允许评论')->options([
+                'on'  => '是',
+                'off' => '否'
+            ])->default(true);
+        });
+
+        $form->saving(function ($form) {
+            $form->request['adminid'] = ADMINID;
+        });
+
+        return $form;
     }
 
     // /**

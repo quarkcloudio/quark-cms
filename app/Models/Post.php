@@ -48,5 +48,10 @@ class Post extends Model
         'status'
     ];
 
+    public function category()
+    {
+        return $this->hasOne('App\Models\Category', 'id', 'category_id');
+    }
+
     protected $dates = ['delete_at'];
 }
