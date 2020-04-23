@@ -19,21 +19,14 @@ Route::group([
     $router->get('admin/upgrade/updateDatabase', 'UpgradeController@updateDatabase')->name('api/admin/upgrade/updateDatabase');
     $router->get('admin/upgrade/finish', 'UpgradeController@finish')->name('api/admin/upgrade/finish');
 
-    $router->get('admin/example/index', 'ExampleController@index')->name('api/admin/example/index');
-    $router->get('admin/example/show', 'ExampleController@show')->name('api/admin/example/show');
-    $router->get('admin/example/create', 'ExampleController@create')->name('api/admin/example/create');
-    $router->post('admin/example/store', 'ExampleController@store')->name('api/admin/example/store');
-    $router->get('admin/example/edit', 'ExampleController@edit')->name('api/admin/example/edit');
-    $router->post('admin/example/update', 'ExampleController@update')->name('api/admin/example/update');
-    $router->any('admin/example/action', 'ExampleController@action')->name('api/admin/example/action');
-    $router->post('admin/example/destroy', 'ExampleController@destroy')->name('api/admin/example/destroy');
-
     $router->get('admin/article/index', 'ArticleController@index')->name('api/admin/article/index');
+    $router->get('admin/article/show', 'ArticleController@show')->name('api/admin/article/show');
     $router->get('admin/article/create', 'ArticleController@create')->name('api/admin/article/create');
     $router->post('admin/article/store', 'ArticleController@store')->name('api/admin/article/store');
     $router->get('admin/article/edit', 'ArticleController@edit')->name('api/admin/article/edit');
-    $router->post('admin/article/save', 'ArticleController@save')->name('api/admin/article/save');
-    $router->post('admin/article/changeStatus', 'ArticleController@changeStatus')->name('api/admin/article/changeStatus');
+    $router->post('admin/article/update', 'ArticleController@update')->name('api/admin/article/update');
+    $router->any('admin/article/action', 'ArticleController@action')->name('api/admin/article/action');
+    $router->post('admin/article/destroy', 'ArticleController@destroy')->name('api/admin/article/destroy');
     $router->get('admin/article/myPublished', 'ArticleController@myPublished')->name('api/admin/article/myPublished');
     
     $router->get('admin/article/categoryIndex', 'ArticleController@categoryIndex')->name('api/admin/article/categoryIndex');

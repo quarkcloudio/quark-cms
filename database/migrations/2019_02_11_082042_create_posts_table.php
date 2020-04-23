@@ -31,14 +31,14 @@ class CreatePostsTable extends Migration
             $table->integer('level')->default(0)->nullable();
             $table->string('type')->default('ARTICLE')->comment('文章类型（ARTICLE/PAGE/LINK等）');
             $table->tinyInteger('show_type')->default(1)->comment('文章展示形式（1：无图，2：单图-小，3：多图，4：单图-大）');
-            $table->tinyInteger('position')->default('0')->nullable()->comment('推荐位');
+            $table->string('position')->default('')->nullable()->comment('推荐位');
             $table->string('link')->nullable()->comment('外部连接')->default('');
             $table->longText('content');
             $table->integer('comment')->default(0)->nullable()->comment('评论数量');
             $table->integer('view')->default(0)->nullable()->comment('浏览数量');
             $table->string('page_tpl')->nullable()->comment('page类型时模板名称')->default('');
             $table->string('comment_status')->default('open');
-            $table->tinyInteger('status')->default(1);
+            $table->boolean('status')->default(1);
             $table->integer('file_id')->nullable()->default(0);
             $table->timestamps();
             $table->softDeletes();
