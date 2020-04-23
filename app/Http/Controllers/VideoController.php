@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Category;
 use App\Models\Video;
-use App\Services\Helper;
 use DB;
 
 class VideoController extends Controller
@@ -37,7 +36,7 @@ class VideoController extends Controller
 
         // 获取文章内图片
         foreach ($videos as $key => $value) {
-            $videos[$key]->content_pictures = Helper::getContentPicture($value->content);
+            $videos[$key]->content_pictures = get_content_picture($value->content);
         }
         
         $data['videos'] = $videos;
@@ -73,7 +72,7 @@ class VideoController extends Controller
 
         // 获取视频内图片
         foreach ($videos as $key => $value) {
-            $videos[$key]->content_pictures = Helper::getContentPicture($value->content);
+            $videos[$key]->content_pictures = get_content_picture($value->content);
         }
 
         $data['videos'] = $videos;

@@ -1,4 +1,3 @@
-@inject('helper', 'App\Services\Helper')
 <!-- 引入模板布局 -->
 @extends('layouts.app')
 <!-- 定义标题 -->

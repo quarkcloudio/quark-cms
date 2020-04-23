@@ -6,10 +6,11 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
 use App\Services\Helper;
-use App\Models\Picture;
+use QuarkCMS\QuarkAdmin\Models\Picture;
 use OSS\OssClient;
 use OSS\Core\OssException;
 use Intervention\Image\ImageManager;
+use Str;
 
 class PictureController extends Controller
 {
@@ -25,21 +26,21 @@ class PictureController extends Controller
         $height = $request->input('h',100);
         
         if(empty($id)) {
-            $this->error('参数错误！');
+            error('参数错误！');
         }
 
-        if(Helper::config('OSS_OPEN') == 'on') {
-            $this->error('云存储暂不此操作！');
+        if(web_config('OSS_OPEN') == 'on') {
+            error('云存储暂不此操作！');
         }
 
         $picture = Picture::where('id',$id)->first();
  
         if(!empty($picture)) {
             $imagePath = storage_path('app/').$picture->path;
-            $getPath = Helper::createThumb($imagePath,'',$width,$height,1);
+            $getPath = make_thumb($imagePath,'',$width,$height,1);
 
             $fileContent = file_get_contents($getPath);
-            $fileMime    = Helper::detectFileMimeType($getPath);
+            $fileMime    = get_file_mime($getPath);
             return response($fileContent, '200')->header('Content-Type', $fileMime);
         }
     }
@@ -52,7 +53,7 @@ class PictureController extends Controller
      */
     public function upload(Request $request)
     {
-        $ossOpen = Helper::config('OSS_OPEN');
+        $ossOpen = web_config('OSS_OPEN');
 
         if($ossOpen == 'on') {
             $driver = 'oss';
@@ -90,7 +91,7 @@ class PictureController extends Controller
         $fileArray = explode(',',$file);
 
         if(empty($fileArray)) {
-            return $this->error('格式错误！');
+            return error('格式错误！');
         }
 
         $fileHeader = $fileArray[0];
@@ -116,14 +117,14 @@ class PictureController extends Controller
                 $fileType = '.bmp';
                 break;
             default:
-                return $this->error('只能上传jpg,jpeg,png,jpe,gif,bmp格式图片');
+                return error('只能上传jpg,jpeg,png,jpe,gif,bmp格式图片');
                 break;
         }
 
         // 图片名称
-        $name = Helper::makeRand(40,true).$fileType;
+        $name = Str::random(40).$fileType;
 
-        $ossOpen = Helper::config('OSS_OPEN');
+        $ossOpen = web_config('OSS_OPEN');
 
         if($ossOpen == 'on') {
             $driver = 'oss';
@@ -135,12 +136,12 @@ class PictureController extends Controller
             case 'oss':
 
                 // 阿里云上传
-                $accessKeyId = Helper::config('OSS_ACCESS_KEY_ID');
-                $accessKeySecret = Helper::config('OSS_ACCESS_KEY_SECRET');
-                $endpoint = Helper::config('OSS_ENDPOINT');
-                $bucket = Helper::config('OSS_BUCKET');
+                $accessKeyId = web_config('OSS_ACCESS_KEY_ID');
+                $accessKeySecret = web_config('OSS_ACCESS_KEY_SECRET');
+                $endpoint = web_config('OSS_ENDPOINT');
+                $bucket = web_config('OSS_BUCKET');
                 // 设置自定义域名。
-                $myDomain = Helper::config('OSS_MYDOMAIN');
+                $myDomain = web_config('OSS_MYDOMAIN');
         
                 try {
                     $ossClient = new OssClient($accessKeyId, $accessKeySecret, $endpoint);
@@ -177,7 +178,7 @@ class PictureController extends Controller
                 } catch (OssException $e) {
                     $ossResult = $e->getMessage();
                     // 返回数据
-                    return $this->error('上传失败！');
+                    return error('上传失败！');
                 }
     
                 // 数据
@@ -242,14 +243,14 @@ class PictureController extends Controller
                     $result['size'] = $size;
 
                 } else {
-                    return $this->error('上传失败！');
+                    return error('上传失败！');
                 }
 
                 break;
         }
 
         // 返回数据
-        return $this->success('上传成功！','',$result);
+        return success('上传成功！','',$result);
     }
 
     /**
@@ -261,7 +262,7 @@ class PictureController extends Controller
     public function urlUpload(Request $request)
     {
         $url = $request->input('url');
-        return Helper::uploadPictureFromUrl($url);
+        return download_picture_to_storage($url);
     }
 
     /**
@@ -279,7 +280,7 @@ class PictureController extends Controller
         $entension = $file->getClientOriginalExtension();
 
         if (!in_array(strtolower($entension), ['jpeg','jpg', 'png', 'gif'])) {
-            return $this->error('只能上传jpg、png、gif格式的图片！');
+            return error('只能上传jpg、png、gif格式的图片！');
         }
 
         $hasPicture = Picture::where('md5',$md5)->where('name',$name)->first();
@@ -324,7 +325,7 @@ class PictureController extends Controller
         $result['size'] = $size;
 
         // 返回数据
-        return $this->success('上传成功！','',$result);
+        return success('上传成功！','',$result);
     }
 
     /**
@@ -340,15 +341,15 @@ class PictureController extends Controller
         $entension = $file->getClientOriginalExtension();
         
         if (!in_array(strtolower($entension), ['jpeg','jpg', 'png', 'gif'])) {
-            return $this->error('只能上传jpg、png、gif格式的图片！');
+            return error('只能上传jpg、png、gif格式的图片！');
         }
 
-        $accessKeyId = Helper::config('OSS_ACCESS_KEY_ID');
-        $accessKeySecret = Helper::config('OSS_ACCESS_KEY_SECRET');
-        $endpoint = Helper::config('OSS_ENDPOINT');
-        $bucket = Helper::config('OSS_BUCKET');
+        $accessKeyId = web_config('OSS_ACCESS_KEY_ID');
+        $accessKeySecret = web_config('OSS_ACCESS_KEY_SECRET');
+        $endpoint = web_config('OSS_ENDPOINT');
+        $bucket = web_config('OSS_BUCKET');
         // 设置自定义域名。
-        $myDomain = Helper::config('OSS_MYDOMAIN');
+        $myDomain = web_config('OSS_MYDOMAIN');
 
         try {
             $ossClient = new OssClient($accessKeyId, $accessKeySecret, $endpoint);
@@ -376,7 +377,7 @@ class PictureController extends Controller
             print $e->getMessage();
         }
 
-        $object = 'pictures/'.Helper::makeRand(40,true).'.'.$file->getClientOriginalExtension();
+        $object = 'pictures/'.Str::random(40).'.'.$file->getClientOriginalExtension();
         $content = file_get_contents($file->getRealPath());
 
         $md5 = md5($content);
@@ -394,7 +395,7 @@ class PictureController extends Controller
             } catch (OssException $e) {
                 $ossResult = $e->getMessage();
                 // 返回数据
-                return $this->error('上传失败！');
+                return error('上传失败！');
             }
 
             // 数据
@@ -440,7 +441,7 @@ class PictureController extends Controller
         $result['size'] = $size;
 
         // 返回数据
-        return $this->success('上传成功！','',$result);
+        return success('上传成功！','',$result);
     }
 
     /**

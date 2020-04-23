@@ -404,21 +404,6 @@ if(!function_exists('filter_emoji')) {
 }
 
 /**
- * 过滤Emoji
- * @author tangtanglove <dai_hang_love@126.com>
- */
-if(!function_exists('filter_emoji')) {
-    function filter_emoji($str)
-    {
-        $str = preg_replace_callback('/./u',function (array $match) {
-            return strlen($match[0]) >= 4 ? '' : $match[0];
-        },$str);
-
-        return $str;
-    }
-}
-
-/**
  * 返回公众号配置
  * @author tangtanglove <dai_hang_love@126.com>
  */
@@ -828,8 +813,8 @@ if(!function_exists('import')) {
  * 获取当前地理位置
  * @author tangtanglove <dai_hang_love@126.com>
  */
-if(!function_exists('address')) {
-    function address($ip='', $latitude='', $longitude='') {
+if(!function_exists('get_address')) {
+    function get_address($ip='', $latitude='', $longitude='') {
 
         $getAddress = [];
         if(!empty($ip)) {
@@ -1005,8 +990,8 @@ if(!function_exists('printer')) {
 * @param string    $glue     分割符
 * @return string   处理后的字符串
 */
-if(!function_exists('hideStr')) {
-    function hideStr($string, $bengin=0, $len = 4, $type = 0, $glue = "@") {
+if(!function_exists('hide_str')) {
+    function hide_str($string, $bengin=0, $len = 4, $type = 0, $glue = "@") {
         if (empty($string))
             return false;
         $array = array();
@@ -1033,11 +1018,11 @@ if(!function_exists('hideStr')) {
             $string = implode("", array_reverse($array));
         } else if ($type == 2) {
             $array = explode($glue, $string);
-            $array[0] = hideStr($array[0], $bengin, $len, 1);
+            $array[0] = hide_str($array[0], $bengin, $len, 1);
             $string = implode($glue, $array);
         } else if ($type == 3) {
             $array = explode($glue, $string);
-            $array[1] = hideStr($array[1], $bengin, $len, 0);
+            $array[1] = hide_str($array[1], $bengin, $len, 0);
             $string = implode($glue, $array);
         } else if ($type == 4) {
             $left = $bengin;

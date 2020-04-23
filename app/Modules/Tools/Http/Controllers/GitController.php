@@ -4,7 +4,6 @@ namespace App\Modules\Tools\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Services\Helper;
 
 class GitController extends Controller
 {
@@ -19,7 +18,7 @@ class GitController extends Controller
         $version = $request->input('version');
 
         if(empty($version)) {
-            return $this->error('版本错误！');
+            return error('版本错误！');
         }
 
         print '当前用户：'.shell_exec('whoami').'<br>';

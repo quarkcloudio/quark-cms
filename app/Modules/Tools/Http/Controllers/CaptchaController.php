@@ -4,11 +4,11 @@ namespace App\Modules\Tools\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Services\Helper;
 use Gregwar\Captcha\CaptchaBuilder;
 use Gregwar\Captcha\PhraseBuilder;
 use Session;
 use Cache;
+use Str;
 
 class CaptchaController extends Controller
 {
@@ -21,7 +21,7 @@ class CaptchaController extends Controller
     {
         $phrase = new PhraseBuilder;
         // 设置验证码位数
-        $code = Helper::makeRand(4);
+        $code = Str::random(4);
         // 生成验证码图片的Builder对象，配置相应属性
         $builder = new CaptchaBuilder($code, $phrase);
         // 设置背景颜色

@@ -5,10 +5,10 @@ namespace App\Modules\Tools\Http\Controllers;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
-use App\Services\Helper;
-use App\Models\File;
+use QuarkCMS\QuarkAdmin\Models\File;
 use OSS\OssClient;
 use OSS\Core\OssException;
+use Str;
 
 class FileController extends Controller
 {
@@ -20,7 +20,7 @@ class FileController extends Controller
      */
     public function uploadFile(Request $request)
     {
-        $ossOpen = Helper::config('OSS_OPEN');
+        $ossOpen = web_config('OSS_OPEN');
 
         if($ossOpen == 'on') {
             $driver = 'oss';
@@ -102,7 +102,7 @@ class FileController extends Controller
         $result['size'] = $size;
 
         // 返回数据
-        return $this->success('上传成功！','',$result);
+        return success('上传成功！','',$result);
     }
 
     /**
@@ -116,12 +116,12 @@ class FileController extends Controller
         $file = $request->file('file');
         $uid  = $request->input('uid');
 
-        $accessKeyId = Helper::config('OSS_ACCESS_KEY_ID');
-        $accessKeySecret = Helper::config('OSS_ACCESS_KEY_SECRET');
-        $endpoint = Helper::config('OSS_ENDPOINT');
-        $bucket = Helper::config('OSS_BUCKET');
+        $accessKeyId = web_config('OSS_ACCESS_KEY_ID');
+        $accessKeySecret = web_config('OSS_ACCESS_KEY_SECRET');
+        $endpoint = web_config('OSS_ENDPOINT');
+        $bucket = web_config('OSS_BUCKET');
         // 设置自定义域名。
-        $myDomain = Helper::config('OSS_MYDOMAIN');
+        $myDomain = web_config('OSS_MYDOMAIN');
 
         try {
             $ossClient = new OssClient($accessKeyId, $accessKeySecret, $endpoint);
@@ -149,7 +149,7 @@ class FileController extends Controller
             print $e->getMessage();
         }
 
-        $object = 'files/'.Helper::makeRand(40,true).'.'.$file->getClientOriginalExtension();
+        $object = 'files/'.Str::random(40).'.'.$file->getClientOriginalExtension();
         $content = file_get_contents($file->getRealPath());
 
         $md5 = md5($content);
@@ -167,7 +167,7 @@ class FileController extends Controller
             } catch (OssException $e) {
                 $ossResult = $e->getMessage();
                 // 返回数据
-                return $this->error('上传失败！');
+                return error('上传失败！');
             }
 
             // 数据
@@ -215,6 +215,6 @@ class FileController extends Controller
         $result['size'] = $size;
 
         // 返回数据
-        return $this->success('上传成功！','',$result);
+        return success('上传成功！','',$result);
     }
 }

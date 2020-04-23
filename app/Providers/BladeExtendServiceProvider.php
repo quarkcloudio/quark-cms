@@ -5,8 +5,7 @@ namespace App\Providers;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Http\Request;
-use App\Services\Helper;
-use Db;
+use DB;
 
 class BladeExtendServiceProvider extends ServiceProvider
 {
@@ -42,7 +41,7 @@ class BladeExtendServiceProvider extends ServiceProvider
             // 读取导航
             $parseStr .= '$__NAVIGATIONS__ = App\Models\Navigation::where(\'status\',1)->orderBy(\'sort\', \'asc\')->get()->toArray();';
             // 数组转换成tree
-            $parseStr .= '$__NAVIGATIONSTREE__ = App\Services\Helper::listToTree($__NAVIGATIONS__,\'id\',\'pid\',\'_child\','.$pid.');';
+            $parseStr .= '$__NAVIGATIONSTREE__ = list_to_tree($__NAVIGATIONS__,\'id\',\'pid\',\'_child\','.$pid.');';
             $parseStr .= ' foreach($__NAVIGATIONSTREE__ as $key=>'.$obj.') { ?>';
             
             return $parseStr;
@@ -359,7 +358,7 @@ class BladeExtendServiceProvider extends ServiceProvider
             $parseStr .= 'foreach ($__GOODS__ as $__KEY__ => $__VALUE__) {
                 $__COVERIDS__ = json_decode($__VALUE__[\'cover_ids\'], true);
                 foreach ($__COVERIDS__ as $__COVERKEY__ => $__COVERVALUE__) {
-                    $__GOODS__[$__KEY__][\'cover_paths\'][$__COVERKEY__] =  App\Services\Helper::getPicture($__COVERVALUE__);
+                    $__GOODS__[$__KEY__][\'cover_paths\'][$__COVERKEY__] =  get_picture($__COVERVALUE__);
                 }
                 $__GOODS__[$__KEY__][\'spu_data\'] =  json_decode($__COVERVALUE__[\'spu_data\'], true);
 

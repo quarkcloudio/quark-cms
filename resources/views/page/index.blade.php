@@ -1,4 +1,3 @@
-@inject('helper', 'App\Services\Helper')
 <!-- 引入模板布局 -->
 @extends('layouts.app')
 <!-- 定义标题 -->
@@ -13,7 +12,7 @@
             @banners($banner,'IndexBanner')
                 <a href="{{$banner['url']}}">
                     <div class="carousel-item active">
-                        <img class="d-block w-100" src="{{ $helper::getPicture($banner['cover_id']) }}" alt="First slide">
+                        <img class="d-block w-100" src="{{ get_picture($banner['cover_id']) }}" alt="First slide">
                     </div>
                 </a>
             @endbanners

@@ -7,7 +7,6 @@ use Illuminate\Http\Request;
 use App\Models\PostCate;
 use App\Models\Post;
 use App\Models\PostRelationships;
-use App\Services\Helper;
 use DB;
 
 class SearchController extends Controller
@@ -50,7 +49,7 @@ class SearchController extends Controller
         
         // 获取文章内图片
         foreach ($items as $key => $value) {
-            $items[$key]->content_pictures = Helper::getContentPicture($value->content);
+            $items[$key]->content_pictures = get_content_picture($value->content);
         }
 
         $data['items'] = $items;

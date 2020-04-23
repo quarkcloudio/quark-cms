@@ -8,7 +8,6 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\Comment;
 use App\Models\Post;
 use App\User;
-use App\Services\Helper;
 use App\Models\GroupbuyGoods;
 use App\Models\GroupbuyShop;
 use App\Models\GroupbuyOrder;
@@ -48,7 +47,7 @@ class CommentController extends Controller
                     // 获取评论用户昵称
                     $user = User::where('id',$comment['uid'])->first();
                     $comments[$key]['nickname'] = $user->nickname;
-                    $comments[$key]['cover_path'] = Helper::getPicture($user->cover_id);
+                    $comments[$key]['cover_path'] = get_picture($user->cover_id);
                     $comments[$key]['user'] = $user;
 
                     // 官方回复
@@ -68,7 +67,7 @@ class CommentController extends Controller
                 ->where('object_id',$objectId)
                 ->count();
 
-                return $this->success('获取成功！','',$comments,$count);
+                return success('获取成功！','',$comments,$count);
 
             default:
                 break;
@@ -120,11 +119,11 @@ class CommentController extends Controller
         if($comments) {
             $rateSum = 0;
             foreach ($comments as $key => $comment) {
-                $comments[$key]['user_cover_path'] = Helper::getPicture($comment['user_cover_id']);
+                $comments[$key]['user_cover_path'] = get_picture($comment['user_cover_id']);
                 $coverIds = json_decode($comment['cover_ids'], true);
                 if($coverIds) {
                     foreach ($coverIds as $key1 => $coverId) {
-                        $comments[$key]['cover_paths'][$key1] = Helper::getPicture($coverId);
+                        $comments[$key]['cover_paths'][$key1] = get_picture($coverId);
                     }
                 }
                 
@@ -164,7 +163,7 @@ class CommentController extends Controller
         $data['comments'] = $comments;
         $data['commentCount'] = $commentCount;
         $data['rateAvg'] = $rateAvg;
-        return $this->success('获取成功','',$data);
+        return success('获取成功','',$data);
     }
 
 	/**
@@ -176,16 +175,16 @@ class CommentController extends Controller
         $id = $request->input('id');
 
         if (empty($id)) {
-            return $this->error('参数错误！');
+            return error('参数错误！');
         }
 
         $comment = Comment::where('id', $id)
         ->where('status',1)
         ->first();
 
-        $data = Helper::mobileAdaptor($comment);
+        $data = mobile_adaptor($comment);
 
-        return $this->success('获取成功','',$data);
+        return success('获取成功','',$data);
     }
 
 	/**
@@ -202,15 +201,15 @@ class CommentController extends Controller
         $cover_ids  = $request->input('cover_ids');
        
         if (empty($objectId) || empty($type)) {
-            return $this->error('参数错误！');
+            return error('参数错误！');
         }
 
         if(empty($content)) {
-            return $this->error('请填写评论内容！');
+            return error('请填写评论内容！');
         }
 
         if(empty(UID)) {
-            return $this->error('请先登录！');
+            return error('请先登录！');
         }
         $user = Auth::user();
         $data['uid'] = $user->id;
@@ -251,9 +250,9 @@ class CommentController extends Controller
         }
 
         if($result) {
-            return $this->success('评论成功');
+            return success('评论成功');
         } else {
-            return $this->error('操作失败');
+            return error('操作失败');
         }
     }
 
@@ -267,16 +266,16 @@ class CommentController extends Controller
         $type       = $request->input('type');
 
         if (empty($id) || empty($type)) {
-            return $this->error('参数错误！');
+            return error('参数错误！');
         }
 
         $user = Auth::user();
         if(empty($user)) {
-            return $this->error('请先登录！');
+            return error('请先登录！');
         }
 
         if(Session::get('comment_id'.$id)) {
-            return $this->error('您已经顶过了！');
+            return error('您已经顶过了！');
         }
 
         if($type == 'DING') {
@@ -287,9 +286,9 @@ class CommentController extends Controller
 
         if($result) {
             Session::put('comment_id'.$id,1);
-            return $this->success('操作成功！');
+            return success('操作成功！');
         } else {
-            return $this->error('错误！');
+            return error('错误！');
         }
     }
 
@@ -302,21 +301,21 @@ class CommentController extends Controller
         $id   = $request->input('id');
 
         if (empty($id)) {
-            return $this->error('参数错误！');
+            return error('参数错误！');
         }
 
         $user = Auth::user();
         if(empty($user)) {
-            return $this->error('请先登录！');
+            return error('请先登录！');
         }
 
         // 定义对象
         $result = Comment::where('id',$id)->where('uid',$user->id)->delete();
 
         if($result) {
-            return $this->success('操作成功！');
+            return success('操作成功！');
         } else {
-            return $this->error('错误！');
+            return error('错误！');
         }
     }
 }

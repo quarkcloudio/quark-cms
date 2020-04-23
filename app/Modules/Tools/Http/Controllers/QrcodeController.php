@@ -4,7 +4,6 @@ namespace App\Modules\Tools\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Services\Helper;
 
 class QrcodeController extends Controller
 {
@@ -20,6 +19,6 @@ class QrcodeController extends Controller
             return '参数错误！';
         }
         
-        Helper::createQrCode($text);
+        qrcode($text);
     }
 }

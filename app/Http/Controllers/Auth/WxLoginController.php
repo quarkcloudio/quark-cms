@@ -5,10 +5,10 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Services\Helper;
 use App\Models\User;
 use App\Models\ActionLog;
 use EasyWeChat\Factory;
+use Str;
 
 class WxLoginController extends Controller
 {
@@ -38,9 +38,9 @@ class WxLoginController extends Controller
         $result = Auth::logout();
 
         if($result !== false) {
-            return $this->success('已退出！');
+            return success('已退出！');
         } else {
-            return $this->error('错误！');
+            return error('错误！');
         }
     }
 
@@ -53,7 +53,7 @@ class WxLoginController extends Controller
     {
         $targetUrl   = $request->input('targetUrl');
 
-        $app = Factory::officialAccount(Helper::wechatConfig());
+        $app = Factory::officialAccount(wechat_config());
         $oauth = $app->oauth;
 
         $user = Auth::user();
@@ -69,9 +69,9 @@ class WxLoginController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function callback()
+    public function callback(Request $request)
     {
-        $app = Factory::officialAccount(Helper::wechatConfig());
+        $app = Factory::officialAccount(wechat_config());
         $oauth = $app->oauth;
 
         // 获取 OAuth 授权结果用户信息
@@ -89,15 +89,15 @@ class WxLoginController extends Controller
         if(empty($user)) {
 
             // 组合数组
-            $data['username'] = Helper::makeRand(8) . '-' . time(); // 临时用户名
-            $data['email'] = Helper::makeRand(8) . '-' . time(); // 临时邮箱
-            $data['phone'] = Helper::makeRand(8) . '-' . time(); // 临时手机号
-            $data['nickname'] = Helper::filterEmoji($wechatUser['nickname']);
+            $data['username'] = Str::random(8).'-'.time(); // 临时用户名
+            $data['email'] = Str::random(8).'-'.time(); // 临时邮箱
+            $data['phone'] = Str::random(8).'-'.time(); // 临时手机号
+            $data['nickname'] = filter_emoji($wechatUser['nickname']);
             $data['sex'] = $wechatUser['original']['sex'];
             $data['password'] = bcrypt(env('APP_KEY'));
 
             // 将微信头像保存到服务器
-            $avatarInfo = Helper::uploadPictureFromUrl($wechatUser['avatar']);
+            $avatarInfo = download_picture_to_storage($wechatUser['avatar']);
 
             if($avatarInfo['status'] == 'error') {
                 return $avatarInfo;
@@ -109,21 +109,21 @@ class WxLoginController extends Controller
             if(isset($wechatUser['original']['unionid'])) {
                 $data['wechat_unionid'] = $wechatUser['original']['unionid'];
             }
-            $data['last_login_ip'] = Helper::clientIp();
+            $data['last_login_ip'] =  $request->getClientIp();
             $data['last_login_time'] = date('Y-m-d H:i:s');
 
             $uid = User::insertGetId($data);
 
             if(empty($uid)) {
-                return $this->error('创建用户错误！');
+                return error('创建用户错误！');
             }
 
-            $updateData['phone'] = $updateData['email'] = $updateData['username'] = Helper::makeRand(8) . '-' . $uid;
+            $updateData['phone'] = $updateData['email'] = $updateData['username'] = Str::random(8).'-'.$uid;
 
             $updateResult = User::where('id',$uid)->update($updateData);
 
             if(empty($updateResult)) {
-                return $this->error('更新临时用户名错误！');
+                return error('更新临时用户名错误！');
             }
 
         } else {
@@ -153,22 +153,22 @@ class WxLoginController extends Controller
             $phone = $request->input('phone');
 
             if(empty($phone)) {
-                return $this->error('请填写手机号！');
+                return error('请填写手机号！');
             }
 
             $hasPhone = User::where('phone',$phone)->first();
 
             if($hasPhone) {
-                return $this->error('此手机号已经注册过了！');
+                return error('此手机号已经注册过了！');
             }
 
             $data['phone'] = $phone;
             $result = User::where('id',$uid)->update($data);
 
             if($result) {
-                return $this->success('绑定成功！');
+                return success('绑定成功！');
             } else {
-                return $this->error('错误！');
+                return error('错误！');
             }
         } else {
             $user = User::where('id',$uid)->first();
@@ -187,22 +187,22 @@ class WxLoginController extends Controller
             $phone = $request->input('phone');
 
             if(empty($phone)) {
-                return $this->error('请填写手机号！');
+                return error('请填写手机号！');
             }
 
             $hasPhone = User::where('phone',$phone)->first();
 
             if($hasPhone) {
-                return $this->error('此手机号已经注册过了！');
+                return error('此手机号已经注册过了！');
             }
 
             $data['phone'] = $phone;
             $result = User::where('id',$uid)->update($data);
 
             if($result) {
-                return $this->success('绑定成功！');
+                return success('绑定成功！');
             } else {
-                return $this->error('错误！');
+                return error('错误！');
             }
         } else {
             $user = User::where('id',$uid)->first();

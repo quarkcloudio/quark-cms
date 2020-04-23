@@ -1,4 +1,3 @@
-@inject('helper', 'App\Services\Helper')
 <!-- 引入模板布局 -->
 @extends('layouts.app')
 <!-- 定义标题 -->
@@ -13,7 +12,7 @@
             @banners($banner,'IndexBanner')
                 <a href="{{$banner['url']}}">
                     <div class="carousel-item active">
-                        <img class="d-block w-100" src="{{ $helper::getPicture($banner['cover_id']) }}" alt="First slide">
+                        <img class="d-block w-100" src="{{ get_picture($banner['cover_id']) }}" alt="First slide">
                     </div>
                 </a>
             @endbanners
@@ -34,7 +33,7 @@
      <h3 class="pb-4 mb-4 font-italic border-bottom"> 搜索“{{ $query }}”的结果 </h3>
      @foreach($items as $key => $item)
      <div class="blog-post"> 
-      <h2 class="blog-post-title"><a href="{{ $_GET['module'] }}/detail?id={{$item->id}}">{{ $helper::msubstr($item->title,0,30) }}</a></h2> 
+      <h2 class="blog-post-title"><a href="{{ $_GET['module'] }}/detail?id={{$item->id}}">{{ msubstr($item->title,0,30) }}</a></h2> 
       <p class="blog-post-meta">{{date('Y-m-d',strtotime($item->created_at))}}</p> 
         <p>
             {!!strip_tags($item->description)!!}

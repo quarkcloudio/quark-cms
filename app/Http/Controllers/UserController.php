@@ -5,11 +5,12 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\User;
-use App\Services\Helper;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Sms;
 use Hash;
 use Session;
+use Str;
+use Mail;
 
 class UserController extends Controller
 {
@@ -41,9 +42,9 @@ class UserController extends Controller
             $result = User::where('id',$id)->update($data);
 
             if($result) {
-                return $this->success('操作成功！');
+                return success('操作成功！');
             } else {
-                return $this->error('操作失败！');
+                return error('操作失败！');
             }
         } else {
             $id = auth('web')->user()->id;
@@ -78,21 +79,21 @@ class UserController extends Controller
             $user = User::where('id',$id)->first();
 
             if(strpos($user->name,'-ID') === false) {
-                return $this->error('您的用户名不能修改！');
+                return error('您的用户名不能修改！');
             }
 
             if(empty($username)) {
-                return $this->error('用户名不能为空！');
+                return error('用户名不能为空！');
             }
     
             if(6>mb_strlen($username,'utf-8') || 20<mb_strlen($username,'utf-8')) {
-                return $this->error('用户名必须在6-20个字符之间');
+                return error('用户名必须在6-20个字符之间');
             }
 
             $hasUser = User::where('name',$username)->first();
 
             if($hasUser) {
-                return $this->error('用户名已经存在！');
+                return error('用户名已经存在！');
             }
 
             $data['name'] = $username;
@@ -100,9 +101,9 @@ class UserController extends Controller
             $result = User::where('id',$id)->update($data);
 
             if($result) {
-                return $this->success('操作成功！','/user/safety');
+                return success('操作成功！','/user/safety');
             } else {
-                return $this->error('操作失败！');
+                return error('操作失败！');
             }
         } else {
             $id = auth('web')->user()->id;
@@ -125,26 +126,26 @@ class UserController extends Controller
             $repassword = $request->input('repassword');
 
             if(empty($oldpassword)) {
-                return $this->error('原密码不能为空！');
+                return error('原密码不能为空！');
             }
 
             if($password != $repassword) {
-                $this->error('两次输入的密码不一致！');
+                error('两次输入的密码不一致！');
             }
 
             if(empty($password)) {
-                return $this->error('密码不能为空！');
+                return error('密码不能为空！');
             }
     
             if(6>mb_strlen($password,'utf-8') || 20<mb_strlen($password,'utf-8')) {
-                return $this->error('密码必须在6-20个字符之间');
+                return error('密码必须在6-20个字符之间');
             }
 
             $user = User::where('id',$id)->first();
 
             // 检验原密码是否正确
             if(!Hash::check($oldpassword, $user->password)) {
-                return $this->error('原密码不正确！');
+                return error('原密码不正确！');
             }
 
             $data['password'] = bcrypt($password);
@@ -152,9 +153,9 @@ class UserController extends Controller
             $result = User::where('id',$id)->update($data);
 
             if($result) {
-                return $this->success('操作成功！','/user/safety');
+                return success('操作成功！','/user/safety');
             } else {
-                return $this->error('操作失败！');
+                return error('操作失败！');
             }
         } else {
             $id = auth('web')->user()->id;
@@ -178,15 +179,15 @@ class UserController extends Controller
             $repassword = $request->input('repassword');
 
             if(empty($phone)) {
-                return $this->error('手机号不能为空！');
+                return error('手机号不能为空！');
             }
 
             if(!preg_match("/^1[345789]\d{9}$/", $phone)) {
-                return $this->error('手机号格式错误！');
+                return error('手机号格式错误！');
             }
 
             if(empty($code)) {
-                return $this->error('手机验证码不能为空！');
+                return error('手机验证码不能为空！');
             }
 
             $sms = Sms::where('phone',$phone)->orderBy('id','desc')->first();
@@ -195,24 +196,24 @@ class UserController extends Controller
     
                 // 更新错误次数
                 Sms::where('id',$sms->id)->increment('error_times');
-                return $this->error('手机验证码错误！');
+                return error('手机验证码错误！');
             }
     
             // 验证码有效时间6分钟，最多允许6次错误
             if(((time() - strtotime($sms->created_at)) > 3600) || ($sms->error_times)>6) {
-                return $this->error('手机验证码已经失效，请重新获取！');
+                return error('手机验证码已经失效，请重新获取！');
             }
 
             if($password != $repassword) {
-                $this->error('两次输入的密码不一致！');
+                error('两次输入的密码不一致！');
             }
 
             if(empty($password)) {
-                return $this->error('密码不能为空！');
+                return error('密码不能为空！');
             }
     
             if(6>mb_strlen($password,'utf-8') || 20<mb_strlen($password,'utf-8')) {
-                return $this->error('密码必须在6-20个字符之间');
+                return error('密码必须在6-20个字符之间');
             }
 
             $user = User::where('id',$id)->first();
@@ -222,9 +223,9 @@ class UserController extends Controller
             $result = User::where('id',$id)->update($data);
 
             if($result) {
-                return $this->success('操作成功！','/user/user/profile');
+                return success('操作成功！','/user/user/profile');
             } else {
-                return $this->error('操作失败！');
+                return error('操作失败！');
             }
         } else {
             $id = auth('web')->user()->id;
@@ -244,34 +245,44 @@ class UserController extends Controller
             $email = $request->input('email');
 
             if(empty($email)) {
-                return $this->error('邮箱不能为空！');
+                return error('邮箱不能为空！');
             }
 
             if(!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-                return $this->error('邮箱格式错误！');
+                return error('邮箱格式错误！');
             }
 
-            $title = Helper::getConfig('WEB_SITE_NAME').'邮箱修改';
-            $token = md5($email.Helper::createRand(10));
+            $title = web_config('WEB_SITE_NAME').'邮箱修改';
+            $token = md5($email.Str::random(10));
             Session::put('token',$token);
             Session::put('email',$email);
 
             $hasEmail = User::where('email',$email)->first();
 
             if(!empty($hasEmail)) {
-                return $this->error('此邮箱已经注册！');
+                return error('此邮箱已经注册！');
             }
 
             $url = url('user/changeEmail?token='.$token);
 
             $content = '请打开如下链接：'.$url.'，进行邮箱修改。如非本人操作，请忽略。';
 
-            $result = Helper::sendEmail($title,$email,$content);
+            config([
+                'mail.host' => web_config('EMAIL_HOST'),
+                'mail.port' => web_config('EMAIL_PORT'),
+                'mail.from' => ['address' => web_config('EMAIL_USERNAME'),'name' => web_config('WEB_SITE_NAME')],
+                'mail.username' => web_config('EMAIL_USERNAME'),
+                'mail.password' => web_config('EMAIL_PASSWORD')
+            ]);
 
-            if($result) {
-                return $this->success('邮件已发送，请登录邮箱完成修改！');
-            } else {
-                return $this->error('邮件发送失败！');
+            Mail::raw($content, function ($message) use($email, $title) {
+                $message ->to($email)->subject($subject);
+            });
+    
+            if(count(Mail::failures()) < 1) {
+                return success('邮件已发送，请登录邮箱完成修改！');
+            }else{
+                return error('邮件发送失败！');
             }
         } else {
             $id = auth('web')->user()->id;
@@ -291,13 +302,13 @@ class UserController extends Controller
         $token = $request->input('token');
 
         if(empty($token)) {
-            return $this->error('参数错误！');
+            return error('参数错误！');
         }
 
         $getToken = Session::get('token');
 
         if($token != $getToken) {
-            return $this->error('修改失败，请重新修改！');
+            return error('修改失败，请重新修改！');
         }
 
         $data['email'] = Session::get('email');
@@ -329,21 +340,21 @@ class UserController extends Controller
             $code = $request->input('code');
     
             if(empty($phone)) {
-                return $this->error('手机号不能为空！');
+                return error('手机号不能为空！');
             }
     
             if(!preg_match("/^1[345789]\d{9}$/", $phone)) {
-                return $this->error('手机号格式错误！');
+                return error('手机号格式错误！');
             }
     
             $hasPhone = User::where('phone',$phone)->first();
     
             if($hasPhone) {
-                return $this->error('手机号已经存在！');
+                return error('手机号已经存在！');
             }
     
             if(empty($code)) {
-                return $this->error('手机验证码不能为空！');
+                return error('手机验证码不能为空！');
             }
             $sms = Sms::where('phone',$phone)->orderBy('id','desc')->first();
             // 判断验证码是否正确
@@ -351,12 +362,12 @@ class UserController extends Controller
     
                 // 更新错误次数
                 Sms::where('id',$sms->id)->increment('error_times');
-                return $this->error('手机验证码错误！');
+                return error('手机验证码错误！');
             }
     
             // 验证码有效时间6分钟，最多允许6次错误
             if(((time() - strtotime($sms->created_at)) > 3600) || ($sms->error_times)>6) {
-                return $this->error('手机验证码已经失效，请重新获取！');
+                return error('手机验证码已经失效，请重新获取！');
             }
 
             $data['phone'] = $phone;
@@ -364,9 +375,9 @@ class UserController extends Controller
             $result = User::where('id',$id)->update($data);
 
             if($result) {
-                return $this->success('操作成功！','/user/profile');
+                return success('操作成功！','/user/profile');
             } else {
-                return $this->error('操作失败！');
+                return error('操作失败！');
             }
         } else {
             $id = auth('web')->user()->id;

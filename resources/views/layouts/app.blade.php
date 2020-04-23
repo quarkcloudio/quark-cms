@@ -1,4 +1,3 @@
-@inject('helper', 'App\Services\Helper')
 <!doctype html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
   <head>
@@ -64,8 +63,8 @@
                             </div>
                         </li>
                         @else
-                        <li class="nav-item {{ $helper::urlSelected($nav['url'],'active') }}">
-                            <a class="nav-link text-dark" href="{{ $nav['url'] }}">{!! $nav['title'] !!} <span class="sr-only">{{ $helper::urlSelected($nav['url'],'(current)') }}</span></a>
+                        <li class="nav-item {{ get_url_activated($nav['url'],'active') }}">
+                            <a class="nav-link text-dark" href="{{ $nav['url'] }}">{!! $nav['title'] !!} <span class="sr-only">{{ get_url_activated($nav['url'],'(current)') }}</span></a>
                         </li>
                         @endif
                     @endnavs

@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Category;
 use App\Models\Post;
-use App\Services\Helper;
 use DB;
 
 class ArticleController extends Controller
@@ -39,7 +38,7 @@ class ArticleController extends Controller
 
         // 获取文章内图片
         foreach ($articles as $key => $value) {
-            $articles[$key]->content_pictures = Helper::getContentPicture($value->content);
+            $articles[$key]->content_pictures = get_content_picture($value->content);
         }
 
         $data['category'] = $category;
@@ -76,7 +75,7 @@ class ArticleController extends Controller
 
         // 获取文章内图片
         foreach ($articles as $key => $value) {
-            $articles[$key]->content_pictures = Helper::getContentPicture($value->content);
+            $articles[$key]->content_pictures = get_content_picture($value->content);
         }
 
         $data['category'] = $category;

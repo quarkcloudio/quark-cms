@@ -1,4 +1,3 @@
-@inject('helper', 'App\Services\Helper')
 <!-- 引入模板布局 -->
 @extends('layouts.app')
 <!-- 定义标题 -->
@@ -33,12 +32,12 @@
     <div class="col-md-6"> 
         <div class="row no-gutters border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative"> 
             <div class="col p-4 d-flex flex-column position-static"> 
-                <strong class="d-inline-block mb-2 text-primary">{{ $helper::getCategory($article['category_id']) }}</strong> 
-                <h3 class="mb-0">{{ $helper::msubstr($article['title'],0,30) }}</h3> 
+                <strong class="d-inline-block mb-2 text-primary">{{ get_category($article['category_id']) }}</strong> 
+                <h3 class="mb-0">{{ msubstr($article['title'],0,30) }}</h3> 
                 <div class="mb-1 text-muted">
                     {{date('Y-m-d',strtotime($article['created_at']))}}
                 </div> 
-                <p class="card-text mb-auto">{{ $helper::msubstr($article['description'],0,50) }}</p> 
+                <p class="card-text mb-auto">{{ msubstr($article['description'],0,50) }}</p> 
                 <a href="/article/detail?id={{$article['id']}}" class="stretched-link">查看更多</a> 
             </div>
             <div class="col-auto d-none d-lg-block">
@@ -54,7 +53,7 @@
      <h3 class="pb-4 mb-4 font-italic border-bottom"> 所有文章 </h3>
      @foreach($articles as $key => $article)
      <div class="blog-post"> 
-      <h2 class="blog-post-title"><a href="/article/detail?id={{$article['id']}}">{{ $helper::msubstr($article['title'],0,30) }}</a></h2> 
+      <h2 class="blog-post-title"><a href="/article/detail?id={{$article['id']}}">{{ msubstr($article['title'],0,30) }}</a></h2> 
       <p class="blog-post-meta">{{date('Y-m-d',strtotime($article['created_at']))}}</p> 
         <p>
             {!!strip_tags($article['description'])!!}

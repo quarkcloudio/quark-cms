@@ -4,7 +4,6 @@ namespace App\Modules\Tools\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Services\Helper;
 use App\Models\Sms;
 use Session;
 
@@ -24,15 +23,15 @@ class SmsController extends Controller
 
         // 图形验证码
         if (empty($captcha) || ($captcha != $getCaptcha)) {
-            return $this->error('验证码错误！');
+            return error('验证码错误！');
         }
 
         if(empty($phone)) {
-            return $this->error('手机号不能为空！');
+            return error('手机号不能为空！');
         }
 
-        if(!preg_match("/^1[34578]\d{9}$/", $phone)) {
-            return $this->error('手机号格式不正确！');
+        if(!preg_match("/^1[3456789]\d{9}$/", $phone)) {
+            return error('手机号格式不正确！');
         }
 
         $sms = Sms::where('phone',$phone)
@@ -42,7 +41,7 @@ class SmsController extends Controller
         // 每隔60秒才能发送短信
         if(!empty($sms)) {
             if((time() - strtotime($sms->created_at)) < 60 ) {
-                return $this->error('抱歉，您短信发送过于频繁！');
+                return error('抱歉，您短信发送过于频繁！');
             }
         }
 
@@ -51,22 +50,22 @@ class SmsController extends Controller
 
         // 每天最多发送15条短信
         if($sendDayCount >15) {
-            return $this->error('抱歉，每个手机号一天最多获取十五条短信！');
+            return error('抱歉，每个手机号一天最多获取十五条短信！');
         }
 
         // 生成验证码
-        $code = Helper::makeRand();
+        $code = mt_rand(100000,999999);
         $content = '验证码：'.$code.'，请及时输入完成验证。如非本人操作，请忽略。';
 
         switch ($type) {
             case 'sioo': // 希奥发送短信验证码
-                $result = Helper::siooSendSms($phone,$content);
+                $result = sioo_send_sms($phone,$content);
                 break;
             
             default: // 默认阿里大鱼短信验证码
                 $templateCode = Helper::config('ALIDAYU_TEMPLATE_CODE');
                 $smsParam = [ 'code' => $code];
-                $result = Helper::alidayuSendSms($templateCode,$phone,$smsParam);
+                $result = alidayu_send_sms($templateCode,$phone,$smsParam);
                 break;
         }
 
@@ -77,11 +76,11 @@ class SmsController extends Controller
         if($result) {
             $data['status'] = 1;
             Sms::create($data);
-            return $this->success('短信已发送，请注意查收！');
+            return success('短信已发送，请注意查收！');
         } else {
             $data['status'] = 2;
             Sms::create($data);
-            return $this->error('短信发送失败！');
+            return error('短信发送失败！');
         }
     }
 }

@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
-use App\Services\Helper;
 use App\User;
 use App\Models\ActionLog;
 use App\Models\Sms;
@@ -57,10 +56,10 @@ class LoginController extends Controller
             $username = $request->input('username');
             $password = $request->input('password');
             $captcha = $request->input('captcha');
-
+            
             // 一天内累计6次登录错误，则必须开启验证码
             $loginErrorCount = ActionLog::whereBetween('created_at', [date('Y-m-d 00:00:00'), date('Y-m-d 23:59:59')])
-            ->where('action',$username.'LOGIN_ERROR')
+            ->where('remark','用户'.$username.'尝试登录出错！')
             ->count();
             
             if($loginErrorCount > 6) {
@@ -71,7 +70,7 @@ class LoginController extends Controller
             }
 
             if(empty($username) || empty($password)) {
-                return $this->error('用户名或密码不能为空！');
+                return error('用户名或密码不能为空！');
             }
 
             // 用户名登录
@@ -92,34 +91,29 @@ class LoginController extends Controller
                 User::where('id',$id)->update($data);
 
                 // 根据ip获取地址
-                $getAddress = Helper::getAddress($_SERVER["REMOTE_ADDR"]);
+                $getAddress = get_address($_SERVER["REMOTE_ADDR"]);
+                $remark = '浏览器 '.$getAddress['province'].' '.$getAddress['city'];
+                action_log($id,$remark,'USER');
 
-                // 记录登录日志
-                $log['action'] = '用户登录';
-                $log['type'] = 'USER';
-                $log['remark'] = '浏览器 '.$getAddress['province'].' '.$getAddress['city'];
-                Helper::actionLog($log);
-
-                if(Helper::isMobile()) {
-                    return $this->success('登录成功','mobile/index');
+                if(is_mobile()) {
+                    return success('登录成功','mobile/index');
                 } else {
-                    return $this->success('登录成功','index');
+                    return success('登录成功','index');
                 }
                 
             } else {
 
                 // 记录登录日志
-                $log['action'] = $username.'LOGIN_ERROR';
-                $log['remark'] = '用户'.$username.'尝试登录出错！';
-                Helper::actionLog($log);
+                $remark = '用户'.$username.'尝试登录出错！';
+                action_log(0,$remark,'USER');
 
                 // 清除验证码
                 Session::put('captcha','');
                 
-                return $this->error('用户名或密码错误！');
+                return error('用户名或密码错误！');
             }
         } else {
-            if(Helper::isMobile()) {
+            if(is_mobile()) {
                 return view('auth.mobile.login');
             } else {
                 return view('auth.login');
@@ -137,10 +131,10 @@ class LoginController extends Controller
         $phone = $request->input('phone');
         $code = $request->input('code');
 
-        $validateStatus = Helper::validateSmsCode($phone,$code);
+        $validateStatus = validate_sms_code($phone,$code);
 
         if($validateStatus != 'ok') {
-            return $this->error($validateStatus);
+            return error($validateStatus);
         }
 
         $hasPhone = User::where('phone',$phone)->first();
@@ -155,11 +149,11 @@ class LoginController extends Controller
 
             $uid = User::insertGetId($data);
             if($uid) {
-                $updateData['username'] = Helper::createRand().'-ID'.$uid;
-                $updateData['nickname'] = Helper::createRand().'-ID'.$uid;
+                $updateData['username'] = Str::random(8).'-ID'.$uid;
+                $updateData['nickname'] = Str::random(8).'-ID'.$uid;
                 User::where('id',$uid)->update($updateData);
             } else {
-                return $this->error('注册失败，请重试！');
+                return error('注册失败，请重试！');
             }
         } else {
             $uid = $hasPhone->id;
@@ -177,22 +171,21 @@ class LoginController extends Controller
             User::where('id',$id)->update($loginData);
 
             // 根据ip获取地址
-            $getAddress = Helper::getAddress($_SERVER["REMOTE_ADDR"]);
+            $getAddress = get_address($_SERVER["REMOTE_ADDR"]);
 
             // 记录登录日志
-            $log['action'] = '用户登录';
-            $log['remark'] = '浏览器 '.$getAddress['province'].' '.$getAddress['city'];
-            Helper::actionLog($log);
+            $remark = '浏览器 '.$getAddress['province'].' '.$getAddress['city'];
+            
+            action_log($id,$remark,'USER');
 
-            return $this->success('登录成功','mobile/index/index');
+            return success('登录成功','mobile/index/index');
         } else {
 
             // 记录登录日志
-            $log['action'] = $phone.'LOGIN_ERROR';
-            $log['remark'] = '用户'.$phone.'尝试登录出错！';
-            Helper::log($log);
+            $remark = '用户'.$username.'尝试登录出错！';
+            action_log(0,$remark,'USER');
 
-            return $this->error('用户名或密码错误！');
+            return error('用户名或密码错误！');
         }
     }
 
@@ -206,10 +199,10 @@ class LoginController extends Controller
 
         // 一天内累计6次登录错误，则必须开启验证码
         $loginErrorCount = ActionLog::whereBetween('created_at', [date('Y-m-d 00:00:00'), date('Y-m-d 23:59:59')])
-        ->where('action',$username.'LOGIN_ERROR')
+        ->where('remark','用户'.$username.'尝试登录出错！')
         ->count();
 
-        return $this->success($loginErrorCount);
+        return success($loginErrorCount);
     }
 
     /**
