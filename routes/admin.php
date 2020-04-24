@@ -29,12 +29,30 @@ Route::group([
     $router->post('admin/article/destroy', 'ArticleController@destroy')->name('api/admin/article/destroy');
     $router->get('admin/article/myPublished', 'ArticleController@myPublished')->name('api/admin/article/myPublished');
     
-    $router->get('admin/article/categoryIndex', 'ArticleController@categoryIndex')->name('api/admin/article/categoryIndex');
-    $router->get('admin/article/categoryCreate', 'ArticleController@categoryCreate')->name('api/admin/article/categoryCreate');
-    $router->post('admin/article/categoryStore', 'ArticleController@categoryStore')->name('api/admin/article/categoryStore');
-    $router->get('admin/article/categoryEdit', 'ArticleController@categoryEdit')->name('api/admin/article/categoryEdit');
-    $router->post('admin/article/categorySave', 'ArticleController@categorySave')->name('api/admin/article/categorySave');
-    $router->post('admin/article/categoryChangeStatus', 'ArticleController@categoryChangeStatus')->name('api/admin/article/categoryChangeStatus');
+    $router->get('admin/articleCategory/index', 'ArticleCategoryController@index')->name('api/admin/articleCategory/index');
+    $router->get('admin/articleCategory/show', 'ArticleCategoryController@show')->name('api/admin/articleCategory/show');
+    $router->get('admin/articleCategory/create', 'ArticleCategoryController@create')->name('api/admin/articleCategory/create');
+    $router->post('admin/articleCategory/store', 'ArticleCategoryController@store')->name('api/admin/articleCategory/store');
+    $router->get('admin/articleCategory/edit', 'ArticleCategoryController@edit')->name('api/admin/articleCategory/edit');
+    $router->post('admin/articleCategory/update', 'ArticleCategoryController@update')->name('api/admin/articleCategory/update');
+    $router->any('admin/articleCategory/action', 'ArticleCategoryController@action')->name('api/admin/articleCategory/action');
+    $router->post('admin/articleCategory/destroy', 'ArticleCategoryController@destroy')->name('api/admin/articleCategory/destroy');
+
+    $router->get('admin/banner/index', 'BannerController@index')->name('api/admin/banner/index');
+    $router->get('admin/banner/create', 'BannerController@create')->name('api/admin/banner/create');
+    $router->post('admin/banner/store', 'BannerController@store')->name('api/admin/banner/store');
+    $router->get('admin/banner/edit', 'BannerController@edit')->name('api/admin/banner/edit');
+    $router->post('admin/banner/save', 'BannerController@save')->name('api/admin/banner/save');
+    $router->post('admin/banner/changeStatus', 'BannerController@changeStatus')->name('api/admin/banner/changeStatus');
+
+    $router->get('admin/bannerCategory/index', 'BannerCategoryController@index')->name('api/admin/bannerCategory/index');
+    $router->get('admin/bannerCategory/show', 'BannerCategoryController@show')->name('api/admin/bannerCategory/show');
+    $router->get('admin/bannerCategory/create', 'BannerCategoryController@create')->name('api/admin/bannerCategory/create');
+    $router->post('admin/bannerCategory/store', 'BannerCategoryController@store')->name('api/admin/bannerCategory/store');
+    $router->get('admin/bannerCategory/edit', 'BannerCategoryController@edit')->name('api/admin/bannerCategory/edit');
+    $router->post('admin/bannerCategory/update', 'BannerCategoryController@update')->name('api/admin/bannerCategory/update');
+    $router->any('admin/bannerCategory/action', 'BannerCategoryController@action')->name('api/admin/bannerCategory/action');
+    $router->post('admin/bannerCategory/destroy', 'BannerCategoryController@destroy')->name('api/admin/bannerCategory/destroy');
 
     $router->get('admin/video/index', 'VideoController@index')->name('api/admin/video/index');
     $router->get('admin/video/create', 'VideoController@create')->name('api/admin/video/create');
@@ -60,20 +78,6 @@ Route::group([
     $router->any('admin/user/recharge', 'UserController@recharge')->name('api/admin/user/recharge');
     $router->any('admin/user/suggest', 'UserController@suggest')->name('api/admin/user/suggest');
 
-    $router->get('admin/banner/index', 'BannerController@index')->name('api/admin/banner/index');
-    $router->get('admin/banner/create', 'BannerController@create')->name('api/admin/banner/create');
-    $router->post('admin/banner/store', 'BannerController@store')->name('api/admin/banner/store');
-    $router->get('admin/banner/edit', 'BannerController@edit')->name('api/admin/banner/edit');
-    $router->post('admin/banner/save', 'BannerController@save')->name('api/admin/banner/save');
-    $router->post('admin/banner/changeStatus', 'BannerController@changeStatus')->name('api/admin/banner/changeStatus');
-
-    $router->get('admin/bannerCategory/index', 'BannerCategoryController@index')->name('api/admin/bannerCategory/index');
-    $router->get('admin/bannerCategory/create', 'BannerCategoryController@create')->name('api/admin/bannerCategory/create');
-    $router->post('admin/bannerCategory/store', 'BannerCategoryController@store')->name('api/admin/bannerCategory/store');
-    $router->get('admin/bannerCategory/edit', 'BannerCategoryController@edit')->name('api/admin/bannerCategory/edit');
-    $router->post('admin/bannerCategory/save', 'BannerCategoryController@save')->name('api/admin/bannerCategory/save');
-    $router->post('admin/bannerCategory/changeStatus', 'BannerCategoryController@changeStatus')->name('api/admin/bannerCategory/changeStatus');
-    
     $router->get('admin/comment/index', 'CommentController@index')->name('api/admin/comment/index');
     $router->get('admin/comment/edit', 'CommentController@edit')->name('api/admin/comment/edit');
     $router->post('admin/comment/save', 'CommentController@save')->name('api/admin/comment/save');

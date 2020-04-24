@@ -26,7 +26,7 @@ class CreateCategoriesTable extends Migration
             $table->string('lists_tpl')->nullable()->default('');
             $table->string('detail_tpl')->nullable()->default('');
             $table->integer('page_num')->default(10)->comment('分页数量');
-            $table->tinyInteger('status')->default(1);
+            $table->boolean('status')->default(1);
             $table->string('type')->default('ARTICLE')->comment('分类类型（ARTICLE/GOODS/STORE/TAG等）');
             $table->timestamps();
             $table->softDeletes();

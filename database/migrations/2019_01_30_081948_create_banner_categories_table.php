@@ -19,7 +19,7 @@ class CreateBannerCategoriesTable extends Migration
             $table->string('name');
             $table->integer('width')->default(0)->nullable();
             $table->integer('height')->default(0)->nullable();
-            $table->tinyInteger('status')->default(1);
+            $table->boolean('status')->default(1);
             $table->timestamps();
             $table->softDeletes();
         });
