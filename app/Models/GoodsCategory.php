@@ -14,7 +14,12 @@ class GoodsCategory extends Model
      * @var bool
      */
     public $timestamps = true;
-     
+    
+    protected $casts = [
+        'created_at' => 'datetime:Y-m-d H:i:s',
+        'updated_at' => 'datetime:Y-m-d H:i:s',
+    ];
+
     /**
      * The attributes that are mass assignable.
      *

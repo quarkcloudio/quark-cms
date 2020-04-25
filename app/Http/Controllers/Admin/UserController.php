@@ -2,43 +2,15 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
-use App\Services\Helper;
-use EasyWeChat\Factory;
-use App\Builder\Forms\Controls\ID;
-use App\Builder\Forms\Controls\Input;
-use App\Builder\Forms\Controls\Text;
-use App\Builder\Forms\Controls\TextArea;
-use App\Builder\Forms\Controls\InputNumber;
-use App\Builder\Forms\Controls\Checkbox;
-use App\Builder\Forms\Controls\Radio;
-use App\Builder\Forms\Controls\Select;
-use App\Builder\Forms\Controls\SwitchButton;
-use App\Builder\Forms\Controls\DatePicker;
-use App\Builder\Forms\Controls\RangePicker;
-use App\Builder\Forms\Controls\Editor;
-use App\Builder\Forms\Controls\Image;
-use App\Builder\Forms\Controls\File;
-use App\Builder\Forms\Controls\Button;
-use App\Builder\Forms\Controls\Popconfirm;
-use App\Builder\Forms\FormBuilder;
-use App\Builder\Lists\Tables\Table;
-use App\Builder\Lists\Tables\Column;
-use App\Builder\Lists\ListBuilder;
-use App\User;
-use App\Models\Category;
-use App\Models\AccountLog;
-use Validator;
-use DB;
+namespace App\Http\Controllers\Admin;
 
-class UserController extends BuilderController
+use App\Models\Post;
+use QuarkCMS\QuarkAdmin\Controllers\QuarkController;
+use Quark;
+
+class UserController extends QuarkController
 {
-    public function __construct()
-    {
-        $this->pageTitle = '用户';
-    }
+    public $title = '用户';
 
     /**
      * 列表页面

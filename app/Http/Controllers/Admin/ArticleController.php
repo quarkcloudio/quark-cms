@@ -61,7 +61,7 @@ class ArticleController extends QuarkController
         })->style('select',['width'=>120]);
 
         $grid->search(function($search) {
-            $categorys = Category::where('type','ARTICLE')->get();
+            $categorys = Category::where('type','ARTICLE')->where('status',1)->get();
             $options[''] = '全部';
             foreach ($categorys as $key => $value) {
                 $options[$value['id']] = $value['title'];
@@ -77,9 +77,9 @@ class ArticleController extends QuarkController
         })->expand(false);
 
         if(ADMINID == 1) {
-            $grid->model()->paginate(10);
+            $grid->model()->where('type','ARTICLE')->paginate(10);
         } else {
-            $grid->model()->where('adminid',ADMINID)->paginate(10);
+            $grid->model()->where('adminid',ADMINID)->where('type','ARTICLE')->paginate(10);
         }
 
         return $grid;
@@ -127,7 +127,7 @@ class ArticleController extends QuarkController
 
             $form->image('cover_ids','封面图')->mode('multiple');
 
-            $getCategorys = Category::where('type','ARTICLE')->get();
+            $getCategorys = Category::where('type','ARTICLE')->where('status',1)->get();
             foreach ($getCategorys as $key => $value) {
                 $categorys[$value['id']] = $value['title'];
             }
@@ -165,135 +165,5 @@ class ArticleController extends QuarkController
         });
 
         return $form;
-    }
-
-    /**
-     * 我发布的文章列表页面
-     *
-     * @param  Request  $request
-     * @return Response
-     */
-    public function myPublished(Request $request)
-    {
-        // 获取参数
-        $current   = intval($request->get('current',1));
-        $pageSize  = intval($request->get('pageSize',10));
-        $search    = $request->get('search');
-            
-        // 定义对象
-        $query = Post::query();
-
-        if(ADMINID) {
-            $query->where('posts.adminid',ADMINID);
-        }
-
-        // 查询
-        if(!empty($search)) {
-            // 标题
-            if(isset($search['title'])) {
-                $query->where('posts.title','like','%'.$search['title'].'%');
-            }
-
-            // 分类
-            if(isset($search['category_id'])) {
-                if(!empty($search['category_id'])) {
-                    $query->where('posts.category_id',$search['category_id']);
-                }
-            }
-
-            // 状态
-            if(isset($search['status'])) {
-                if(!empty($search['status'])) {
-                    $query->where('posts.status',$search['status']);
-                }
-            }
-        }
-
-        // 查询数量
-        $total = $query
-        ->where('posts.status', '>', 0)
-        ->where('posts.type', 'ARTICLE')
-        ->count();
-
-        // 查询列表
-        $lists = $query
-        ->join('categories', 'posts.category_id', '=', 'categories.id')
-        ->skip(($current-1)*$pageSize)
-        ->take($pageSize)
-        ->where('posts.status', '>', 0)
-        ->orderBy('id', 'desc')
-        ->select('posts.*','categories.name as category_name','categories.title as category_title')
-        ->get()
-        ->toArray();
-
-        foreach ($lists as $key => $value) {
-            if(empty($value['name'])) {
-                $lists[$key]['name'] = '暂无';
-            }
-        }
-
-        // 默认页码
-        $pagination['defaultCurrent'] = 1;
-        // 当前页码
-        $pagination['current'] = $current;
-        // 分页数量
-        $pagination['pageSize'] = $pageSize;
-        // 总数量
-        $pagination['total'] = $total;
-
-        $categorys         = Category::where('type','ARTICLE')->get()->toArray();
-        $categoryTrees     = Helper::listToTree($categorys);
-        $categoryTreeLists = Helper::treeToOrderList($categoryTrees,0,'title');
-
-        $getCategorys = [];
-
-        $getCategorys[0]['name'] = '所有分类';
-        $getCategorys[0]['value'] = '0';
-
-        foreach ($categoryTreeLists as $key => $categoryTreeList) {
-            $getCategorys[$key+1]['name'] = $categoryTreeList['title'];
-            $getCategorys[$key+1]['value'] = $categoryTreeList['id'];
-        }
-
-        $lists = Helper::listsFormat($lists);
-
-        $status = [
-            [
-                'name'=>'所有状态',
-                'value'=>'0',
-            ],
-            [
-                'name'=>'正常',
-                'value'=>'1',
-            ],
-            [
-                'name'=>'禁用',
-                'value'=>'2',
-            ],
-        ];
-
-        $searchs = [
-            Select::make('分类','categorys')->option($getCategorys)->value('0'),
-            Select::make('状态','status')->option($status)->value('0'),
-            Input::make('搜索内容','title'),
-            Button::make('搜索')->onClick('search'),
-        ];
-
-        $columns = [
-            Column::make('ID','id'),
-            Column::make('标题','title')->withA('admin/article/edit'),
-            Column::make('作者','author'),
-            Column::make('分类','category_title'),
-            Column::make('状态','status')->withTag("text === '已禁用' ? 'red' : 'blue'"),
-            Column::make('发布时间','created_at'),
-        ];
-
-        $data = $this->listBuilder($columns,$lists,$pagination,$searchs);
-
-        if(!empty($data)) {
-            return $this->success('获取成功！','',$data);
-        } else {
-            return $this->success('获取失败！');
-        }
     }
 }

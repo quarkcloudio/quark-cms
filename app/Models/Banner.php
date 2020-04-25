@@ -14,8 +14,13 @@ class Banner extends Model
      *
      * @var bool
      */
-     public $timestamps = true;
+    public $timestamps = true;
      
+    protected $casts = [
+        'created_at' => 'datetime:Y-m-d H:i:s',
+        'updated_at' => 'datetime:Y-m-d H:i:s',
+    ];
+
     /**
      * The attributes that are mass assignable.
      *
@@ -24,6 +29,11 @@ class Banner extends Model
     protected $fillable = [
         'category_id','title', 'url_type', 'url','cover_id','sort','deadline','status'
     ];
+
+    public function category()
+    {
+        return $this->hasOne('App\Models\BannerCategory', 'id', 'category_id');
+    }
 
      protected $dates = ['delete_at'];
 }

@@ -27,7 +27,6 @@ Route::group([
     $router->post('admin/article/update', 'ArticleController@update')->name('api/admin/article/update');
     $router->any('admin/article/action', 'ArticleController@action')->name('api/admin/article/action');
     $router->post('admin/article/destroy', 'ArticleController@destroy')->name('api/admin/article/destroy');
-    $router->get('admin/article/myPublished', 'ArticleController@myPublished')->name('api/admin/article/myPublished');
     
     $router->get('admin/articleCategory/index', 'ArticleCategoryController@index')->name('api/admin/articleCategory/index');
     $router->get('admin/articleCategory/show', 'ArticleCategoryController@show')->name('api/admin/articleCategory/show');
@@ -39,11 +38,13 @@ Route::group([
     $router->post('admin/articleCategory/destroy', 'ArticleCategoryController@destroy')->name('api/admin/articleCategory/destroy');
 
     $router->get('admin/banner/index', 'BannerController@index')->name('api/admin/banner/index');
+    $router->get('admin/banner/show', 'BannerController@show')->name('api/admin/banner/show');
     $router->get('admin/banner/create', 'BannerController@create')->name('api/admin/banner/create');
     $router->post('admin/banner/store', 'BannerController@store')->name('api/admin/banner/store');
     $router->get('admin/banner/edit', 'BannerController@edit')->name('api/admin/banner/edit');
-    $router->post('admin/banner/save', 'BannerController@save')->name('api/admin/banner/save');
-    $router->post('admin/banner/changeStatus', 'BannerController@changeStatus')->name('api/admin/banner/changeStatus');
+    $router->post('admin/banner/update', 'BannerController@update')->name('api/admin/banner/update');
+    $router->any('admin/banner/action', 'BannerController@action')->name('api/admin/banner/action');
+    $router->post('admin/banner/destroy', 'BannerController@destroy')->name('api/admin/banner/destroy');
 
     $router->get('admin/bannerCategory/index', 'BannerCategoryController@index')->name('api/admin/bannerCategory/index');
     $router->get('admin/bannerCategory/show', 'BannerCategoryController@show')->name('api/admin/bannerCategory/show');
@@ -55,26 +56,31 @@ Route::group([
     $router->post('admin/bannerCategory/destroy', 'BannerCategoryController@destroy')->name('api/admin/bannerCategory/destroy');
 
     $router->get('admin/video/index', 'VideoController@index')->name('api/admin/video/index');
+    $router->get('admin/video/show', 'VideoController@show')->name('api/admin/video/show');
     $router->get('admin/video/create', 'VideoController@create')->name('api/admin/video/create');
     $router->post('admin/video/store', 'VideoController@store')->name('api/admin/video/store');
     $router->get('admin/video/edit', 'VideoController@edit')->name('api/admin/video/edit');
-    $router->post('admin/video/save', 'VideoController@save')->name('api/admin/video/save');
-    $router->post('admin/video/changeStatus', 'VideoController@changeStatus')->name('api/admin/video/changeStatus');
-    $router->get('admin/video/myPublished', 'VideoController@myPublished')->name('api/admin/video/myPublished');
+    $router->post('admin/video/update', 'VideoController@update')->name('api/admin/video/update');
+    $router->any('admin/video/action', 'VideoController@action')->name('api/admin/video/action');
+    $router->post('admin/video/destroy', 'VideoController@destroy')->name('api/admin/video/destroy');
 
     $router->get('admin/page/index', 'PageController@index')->name('api/admin/page/index');
+    $router->get('admin/page/show', 'PageController@show')->name('api/admin/page/show');
     $router->get('admin/page/create', 'PageController@create')->name('api/admin/page/create');
     $router->post('admin/page/store', 'PageController@store')->name('api/admin/page/store');
     $router->get('admin/page/edit', 'PageController@edit')->name('api/admin/page/edit');
-    $router->post('admin/page/save', 'PageController@save')->name('api/admin/page/save');
-    $router->post('admin/page/changeStatus', 'PageController@changeStatus')->name('api/admin/page/changeStatus');
+    $router->post('admin/page/update', 'PageController@update')->name('api/admin/page/update');
+    $router->any('admin/page/action', 'PageController@action')->name('api/admin/page/action');
+    $router->post('admin/page/destroy', 'PageController@destroy')->name('api/admin/page/destroy');
     
-    $router->get('admin/user/index', 'UserController@index')->name('api/admin/user/index');
-    $router->get('admin/user/create', 'UserController@create')->name('api/admin/user/create');
-    $router->post('admin/user/store', 'UserController@store')->name('api/admin/user/store');
-    $router->get('admin/user/edit', 'UserController@edit')->name('api/admin/user/edit');
-    $router->post('admin/user/save', 'UserController@save')->name('api/admin/user/save');
-    $router->post('admin/user/changeStatus', 'UserController@changeStatus')->name('api/admin/user/changeStatus');
+    $router->get('admin/page/index', 'PageController@index')->name('api/admin/page/index');
+    $router->get('admin/page/show', 'PageController@show')->name('api/admin/page/show');
+    $router->get('admin/page/create', 'PageController@create')->name('api/admin/page/create');
+    $router->post('admin/page/store', 'PageController@store')->name('api/admin/page/store');
+    $router->get('admin/page/edit', 'PageController@edit')->name('api/admin/page/edit');
+    $router->post('admin/page/update', 'PageController@update')->name('api/admin/page/update');
+    $router->any('admin/page/action', 'PageController@action')->name('api/admin/page/action');
+    $router->post('admin/page/destroy', 'PageController@destroy')->name('api/admin/page/destroy');
     $router->any('admin/user/recharge', 'UserController@recharge')->name('api/admin/user/recharge');
     $router->any('admin/user/suggest', 'UserController@suggest')->name('api/admin/user/suggest');
 

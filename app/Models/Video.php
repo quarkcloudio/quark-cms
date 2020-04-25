@@ -14,7 +14,12 @@ class Video extends Model
      * @var bool
      */
     public $timestamps = true;
-     
+    
+    protected $casts = [
+        'created_at' => 'datetime:Y-m-d H:i:s',
+        'updated_at' => 'datetime:Y-m-d H:i:s',
+    ];
+
     /**
      * The attributes that are mass assignable.
      *
@@ -42,6 +47,11 @@ class Video extends Model
         'comment_status',
         'status'
     ];
+
+    public function category()
+    {
+        return $this->hasOne('App\Models\Category', 'id', 'category_id');
+    }
 
     protected $dates = ['delete_at'];
 }

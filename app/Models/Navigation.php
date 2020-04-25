@@ -16,6 +16,11 @@ class Navigation extends Model
      */
     public $timestamps = true;
     
+    protected $casts = [
+        'created_at' => 'datetime:Y-m-d H:i:s',
+        'updated_at' => 'datetime:Y-m-d H:i:s',
+    ];
+
     protected $fillable=['title','pid','uid','sort','cover_id','url_type','url','status'];   //允许批量赋值的字段
 
     protected $dates = ['delete_at'];

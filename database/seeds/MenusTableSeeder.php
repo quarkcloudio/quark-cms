@@ -14,15 +14,14 @@ class MenusTableSeeder extends Seeder
         DB::table('menus')->insert([
 
             ['id' => 3,'name' => '文章管理','guard_name' => 'admin','icon' => 'icon-article','type'=>'default','pid' => 0,'sort' => 0,'path' => '/article','show'  => 1,'status' => 1],
-            ['id' => 4,'name' => '文章列表','guard_name' => 'admin','icon' => '','type'=>'table','pid' => 3,'sort' => 0,'path' => '/article/index','show'  => 1,'status' => 1],
-            ['id' => 5,'name' => '发布文章','guard_name' => 'admin','icon' => '','type'=>'form','pid' => 3,'sort' => 0,'path' => '/article/create','show'  => 1,'status' => 1],
-            ['id' => 6,'name' => '我的文章','guard_name' => 'admin','icon' => '','type'=>'table','pid' => 3,'sort' => 0,'path' => '/article/myPublished','show'  => 1,'status' => 1],
+            ['id' => 4,'name' => '文章列表','guard_name' => 'admin','icon' => '','type'=>'table','pid' => 3,'sort' => 0,'path' => '/quark/engine?api=admin/article/index&component=table','show'  => 1,'status' => 1],
+            ['id' => 5,'name' => '发布文章','guard_name' => 'admin','icon' => '','type'=>'form','pid' => 3,'sort' => 0,'path' => '/quark/engine?api=admin/article/create&component=form','show'  => 1,'status' => 1],
             
             ['id' => 7,'name' => '单页管理','guard_name' => 'admin','icon' => 'icon-page','type'=>'default','pid' => 0,'sort' => 0,'path' => '/page','show'  => 1,'status' => 1],
             ['id' => 8,'name' => '单页列表','guard_name' => 'admin','icon' => '','type'=>'default','pid' => 7,'sort' => 0,'path' => '/page/index','show'  => 1,'status' => 1],
             ['id' => 9,'name' => '添加单页','guard_name' => 'admin','icon' => '','type'=>'default','pid' => 7,'sort' => 0,'path' => '/page/create','show'  => 1,'status' => 1],
             
-            ['id' => 10,'name' => '会员管理','guard_name' => 'admin','icon' => 'icon-useradd','type'=>'default','pid' => 0,'sort' => 0,'path' => '/user','show'  => 1,'status' => 1],
+            ['id' => 10,'name' => '会员管理','guard_name' => 'admin','icon' => 'icon-user','type'=>'default','pid' => 0,'sort' => 0,'path' => '/user','show'  => 1,'status' => 1],
             ['id' => 11,'name' => '会员列表','guard_name' => 'admin','icon' => '','type'=>'table','pid' => 10,'sort' => 0,'path' => '/user/index','show'  => 1,'status' => 1],
             ['id' =>12,'name' => '添加会员','guard_name' => 'admin','icon' => '','type'=>'form','pid' => 10,'sort' => 0,'path' => '/user/create','show'  => 1,'status' => 1],
             
@@ -39,7 +38,7 @@ class MenusTableSeeder extends Seeder
             ['id' =>30,'name' => '分类列表','guard_name' => 'admin','icon' => '','type'=>'table','pid' => 25,'sort' => 0,'path' => '/system/category','show'  => 1,'status' => 1],
             ['id' =>31,'name' => '短信列表','guard_name' => 'admin','icon' => '','type'=>'table','pid' => 25,'sort' => 0,'path' => '/system/sms/index','show'  => 1,'status' => 1],
            
-            ['id' =>'38','name' => '商城管理','guard_name' => 'admin','icon' => 'icon-shop','type'=>'default','pid' => '0','sort' => '-1','path' => '/mall','show'  => '1','status' => '1'],
+            ['id' =>'38','name' => '商城管理','guard_name' => 'admin','icon' => 'icon-shop','type'=>'default','pid' => '0','sort' => '-1','path' => '/mall','show'  => '0','status' => '1'],
             ['id' =>'39','name' => '商家管理','guard_name' => 'admin','icon' => '','type'=>'default','pid' => '38','sort' => '0','path' => '/mall/shop','show'  => '1','status' => '1'],
             ['id' =>'40','name' => '商家列表','guard_name' => 'admin','icon' => '','type'=>'default','pid' => '39','sort' => '0','path' => '/mall/shop/index','show'  => '1','status' => '1'],
             ['id' =>'41','name' => '添加商家','guard_name' => 'admin','icon' => '','type'=>'default','pid' => '40','sort' => '0','path' => '/mall/shop/create','show'  => '0','status' => '1'],

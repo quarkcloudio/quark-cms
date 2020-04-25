@@ -14,18 +14,14 @@
 
 运行 composer install 安装依赖库
 
-命令行下执行数据迁移
+命令行下安装
 
-第一步：php artisan migrate(您需要将php加入到环境变量)
+第一步：php artisan quark:install
+注意: 您需要将php加入到环境变量，如果在执行迁移时发生「class not found」错误，试着先执行 composer dump-autoload 命令后再进行一次。
 
-第二步：php artisan db:seed(注意: 如果在执行迁移时发生「class not found」错误，试着先执行 composer dump-autoload 命令后再进行一次。)
+第二步：php -S 127.0.0.1:8080 -t ./public
 
-第三步：php artisan key:generate && php artisan passport:install && php artisan storage:link
-
-第四步：php -S 127.0.0.1:8080 -t ./public
-
-第五步：http://127.0.0.1:8080/admin
-
+第三步：http://127.0.0.1:8080/admin
 
 默认用户名：administrator 密码：123456
 
