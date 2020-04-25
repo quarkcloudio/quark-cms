@@ -729,11 +729,11 @@ if(!function_exists('send_email')) {
             'mail.username' => web_config('EMAIL_USERNAME'),
             'mail.password' => web_config('EMAIL_PASSWORD'),
             ]);
-        Mail::raw($content, function ($message) use($toEmail, $subject) {
+        \Mail::raw($content, function ($message) use($toEmail, $subject) {
             $message ->to($toEmail)->subject($subject);
         });
 
-        if(count(Mail::failures()) < 1){
+        if(count(\Mail::failures()) < 1){
             return true;
         }else{
             return false;
@@ -788,7 +788,7 @@ if(!function_exists('export')) {
 
         $export = new Export($getLists,$getTitles,$columnFormats);
 
-        return Excel::download($export,$fileName.'_'.date('YmdHis').'.xlsx');
+        return \Excel::download($export,$fileName.'_'.date('YmdHis').'.xlsx');
     }
 }
 
@@ -801,7 +801,7 @@ if(!function_exists('import')) {
     {
         $file = File::where('id',$fileId)->first();
 
-        $importData = Excel::toArray(new Import, storage_path('app/').$file['path']);
+        $importData = \Excel::toArray(new Import, storage_path('app/').$file['path']);
 
         $results = $importData[0];
 
