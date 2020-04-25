@@ -93,7 +93,7 @@ class DashboardController extends Controller
                         [
                             'key'=> '1',
                             'name'=> 'QuarkAdmin版本',
-                            'info'=> config('quark.version'),
+                            'info'=> config('quark.admin.version'),
                         ],
                         [
                             'key'=> '2',
