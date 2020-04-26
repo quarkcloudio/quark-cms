@@ -25,7 +25,7 @@
         "overtrue/pinyin": "^4.0",
         "overtrue/socialite": "^2.0",
         "overtrue/wechat": "^4.1",
-        "quarkcms/quark-admin": "^0.0.5",
+        "quarkcms/quark-admin": "^0.0.6",
         "topthink/think-image": "^1.0",
         "fruitcake/laravel-cors": "^1.0"
     },

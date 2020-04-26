@@ -6,8 +6,10 @@ use App\User;
 use QuarkCMS\QuarkAdmin\Controllers\QuarkController;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use App\Models\AccountLog;
 use Quark;
 use Validator;
+use DB;
 
 class UserController extends QuarkController
 {
@@ -41,7 +43,7 @@ class UserController extends QuarkController
             ->size('small')
             ->withModal('用户充值',function($modal) {
                 $modal->disableFooter();
-                $modal->form->ajax('admin/menu/edit');
+                $modal->form->ajax('admin/user/recharge');
             });
 
             $rowAction->button('show', '显示')
@@ -358,40 +360,38 @@ class UserController extends QuarkController
             }
     
             if ($result) {
-                return $this->success('操作成功！');
+                return success('操作成功！');
             } else {
-                return $this->error('操作失败！');
+                return error('操作失败！');
             }
 
         } else {
 
-            $id =   $request->get('id');
-            $user = User::find($id);
+            $id = request('id');
+            $user = User::where('id',$id)->first();
+            $form = Quark::form();
 
-            $controls = [
-                ID::make('ID','id')->value($user['id']),
-                Text::make('充值用户')->style(['width'=>200])->value($user['username'].'（'.$user['nickname'].'）'),
-                Text::make('当前余额')->style(['width'=>200,'color'=>'#f81d22'])->value($user['money']),
-                Text::make('当前积分')->style(['width'=>200,'color'=>'#0b8235'])->value($user['score']),
-                Input::make('余额充值','money')->extra('正数为充值，负数为扣款')->style(['width'=>200]),
-                Input::make('积分充值','score')->extra('正数为充值，负数为扣除')->style(['width'=>200]),
-                TextArea::make('充值理由','remark')->style(['width'=>400]),
-                Button::make('提交')
-                ->type('primary')
-                ->style(['width'=>100,'float'=>'left','marginLeft'=>350])
-                ->onClick('submit',null,'admin/'.$this->controllerName().'/recharge'),
-            ];
-    
-            $labelCol['sm'] = ['span'=>4];
-            $wrapperCol['sm'] = ['span'=>20];
+            $layout['labelCol']['span'] = 4;
+            $layout['wrapperCol']['span'] = 20;
+            $form->layout($layout);
 
-            $result = $this->formBuilder($controls,null,$labelCol,$wrapperCol);
+            $title = $form->isCreating() ? '创建'.$this->title : '编辑'.$this->title;
+            $form->title($title);
 
-            if(!empty($result)) {
-                return $this->success('操作成功！','',$result);
-            } else {
-                return $this->error('操作失败！');
-            }
+            $form->setAction('admin/user/recharge');
+
+            $form->id('id','ID')->value($id);
+            $form->display('充值用户')->value($user['username'].'（'.$user['nickname'].'）');
+            $form->display('当前余额')->style(['color'=>'#f81d22'])->value($user['money']);
+            $form->display('当前积分')->style(['color'=>'#f81d22'])->value($user['score']);
+            $form->number('money','余额充值')->extra('正数为充值，负数为扣款')->value(0);
+            $form->number('score','积分充值')->extra('正数为充值，负数为扣除')->value(0);
+            $form->textArea('remark','充值理由')
+            ->rules(['required','max:190'],['required'=>'充值理由必须填写','max'=>'充值理由不能超过190个字符']);
+
+            $content = Quark::content()->body(['form'=>$form->render()]);
+
+            return success('获取成功！','',$content);
         }
     }
 

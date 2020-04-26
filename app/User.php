@@ -10,20 +10,26 @@ class User extends Authenticatable
 {
     use Notifiable;
 
+    protected $casts = [
+        'created_at' => 'datetime:Y-m-d H:i:s',
+        'updated_at' => 'datetime:Y-m-d H:i:s',
+    ];
+
     /**
      * The attributes that are mass assignable.
      *
      * @var array
      */
     protected $fillable = [
-        'category_id',
-        'username', 
-        'nickname', 
-        'email', 
-        'sex', 
-        'password', 
+        'id',
+        'username',
+        'nickname',
+        'realname',
+        'email',
         'phone',
-        'cover_id',
+        'sex',
+        'password',
+        'avatar',
         'money',
         'score',
         'wechat_openid',

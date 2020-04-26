@@ -2,41 +2,15 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use App\Builder\Forms\Controls\ID;
-use App\Builder\Forms\Controls\Input;
-use App\Builder\Forms\Controls\Text;
-use App\Builder\Forms\Controls\TextArea;
-use App\Builder\Forms\Controls\InputNumber;
-use App\Builder\Forms\Controls\Checkbox;
-use App\Builder\Forms\Controls\Radio;
-use App\Builder\Forms\Controls\Select;
-use App\Builder\Forms\Controls\SwitchButton;
-use App\Builder\Forms\Controls\DatePicker;
-use App\Builder\Forms\Controls\RangePicker;
-use App\Builder\Forms\Controls\Editor;
-use App\Builder\Forms\Controls\Image;
-use App\Builder\Forms\Controls\File;
-use App\Builder\Forms\Controls\Button;
-use App\Builder\Forms\Controls\Popconfirm;
-use App\Builder\Forms\FormBuilder;
-use App\Builder\Lists\Tables\Table;
-use App\Builder\Lists\Tables\Column;
-use App\Builder\Lists\ListBuilder;
-use App\Services\Helper;
-use EasyWeChat\Factory;
 use App\Models\Post;
-use App\Models\Category;
 use App\Models\Comment;
-use DB;
+use QuarkCMS\QuarkAdmin\Models\Admin;
+use QuarkCMS\QuarkAdmin\Controllers\QuarkController;
+use Quark;
 
-class CommentController extends BuilderController
+class CommentController extends QuarkController
 {
-    public function __construct()
-    {
-        $this->pageTitle = '评论';
-    }
+    public $title = '评论';
 
     /**
      * 评论列表页
