@@ -18,25 +18,25 @@ class MenusTableSeeder extends Seeder
             ['id' => 5,'name' => '发布文章','guard_name' => 'admin','icon' => '','type'=>'form','pid' => 3,'sort' => 0,'path' => '/quark/engine?api=admin/article/create&component=form','show'  => 1,'status' => 1],
             
             ['id' => 7,'name' => '单页管理','guard_name' => 'admin','icon' => 'icon-page','type'=>'default','pid' => 0,'sort' => 0,'path' => '/page','show'  => 1,'status' => 1],
-            ['id' => 8,'name' => '单页列表','guard_name' => 'admin','icon' => '','type'=>'default','pid' => 7,'sort' => 0,'path' => '/page/index','show'  => 1,'status' => 1],
-            ['id' => 9,'name' => '添加单页','guard_name' => 'admin','icon' => '','type'=>'default','pid' => 7,'sort' => 0,'path' => '/page/create','show'  => 1,'status' => 1],
+            ['id' => 8,'name' => '单页列表','guard_name' => 'admin','icon' => '','type'=>'default','pid' => 7,'sort' => 0,'path' => '/quark/engine?api=admin/page/index&component=table','show'  => 1,'status' => 1],
+            ['id' => 9,'name' => '添加单页','guard_name' => 'admin','icon' => '','type'=>'default','pid' => 7,'sort' => 0,'path' => '/quark/engine?api=admin/page/create&component=form','show'  => 1,'status' => 1],
             
             ['id' => 10,'name' => '会员管理','guard_name' => 'admin','icon' => 'icon-user','type'=>'default','pid' => 0,'sort' => 0,'path' => '/user','show'  => 1,'status' => 1],
-            ['id' => 11,'name' => '会员列表','guard_name' => 'admin','icon' => '','type'=>'table','pid' => 10,'sort' => 0,'path' => '/user/index','show'  => 1,'status' => 1],
-            ['id' =>12,'name' => '添加会员','guard_name' => 'admin','icon' => '','type'=>'form','pid' => 10,'sort' => 0,'path' => '/user/create','show'  => 1,'status' => 1],
+            ['id' => 11,'name' => '会员列表','guard_name' => 'admin','icon' => '','type'=>'table','pid' => 10,'sort' => 0,'path' => '/quark/engine?api=admin/user/index&component=table','show'  => 1,'status' => 1],
+            ['id' =>12,'name' => '添加会员','guard_name' => 'admin','icon' => '','type'=>'form','pid' => 10,'sort' => 0,'path' => '/quark/engine?api=admin/user/create&component=form','show'  => 1,'status' => 1],
             
             ['id' =>18,'name' => '广告管理','guard_name' => 'admin','icon' => 'icon-banner','type'=>'default','pid' => 0,'sort' => 0,'path' => '/banner','show'  => 1,'status' => 1],
-            ['id' =>19,'name' => '广告列表','guard_name' => 'admin','icon' => '','type'=>'table','pid' => 18,'sort' => 0,'path' => '/banner/banner','show'  => 1,'status' => 1],
-            ['id' =>20,'name' => '广告位列表','guard_name' => 'admin','icon' => '','type'=>'table','pid' => 18,'sort' => 0,'path' => '/banner/bannerCategory','show'  => 1,'status' => 1],
+            ['id' =>19,'name' => '广告列表','guard_name' => 'admin','icon' => '','type'=>'table','pid' => 18,'sort' => 0,'path' => '/quark/engine?api=admin/banner/index&component=table','show'  => 1,'status' => 1],
+            ['id' =>20,'name' => '广告位列表','guard_name' => 'admin','icon' => '','type'=>'table','pid' => 18,'sort' => 0,'path' => '/quark/engine?api=admin/bannerCategory/index&component=table','show'  => 1,'status' => 1],
             
             ['id' =>21,'name' => '应用插件','guard_name' => 'admin','icon' => 'icon-plugin','type'=>'default','pid' => 0,'sort' => 0,'path' => '/plugin','show'  => 1,'status' => 1],
-            ['id' =>22,'name' => '评论管理','guard_name' => 'admin','icon' => '','type'=>'table','pid' => 21,'sort' => 0,'path' => '/plugin/comment','show'  => 1,'status' => 1],
-            ['id' =>23,'name' => '友情链接','guard_name' => 'admin','icon' => '','type'=>'table','pid' => 21,'sort' => 0,'path' => '/plugin/link','show'  => 1,'status' => 1],
-            ['id' =>24,'name' => '打印机管理','guard_name' => 'admin','icon' => '','type'=>'table','pid' => 21,'sort' => 0,'path' => '/plugin/printer','show'  => 1,'status' => 1],
+            ['id' =>22,'name' => '评论管理','guard_name' => 'admin','icon' => '','type'=>'table','pid' => 21,'sort' => 0,'path' => '/quark/engine?api=admin/comment/index&component=table','show'  => 1,'status' => 1],
+            ['id' =>23,'name' => '友情链接','guard_name' => 'admin','icon' => '','type'=>'table','pid' => 21,'sort' => 0,'path' => '/quark/engine?api=admin/link/index&component=table','show'  => 1,'status' => 1],
+            ['id' =>24,'name' => '打印机管理','guard_name' => 'admin','icon' => '','type'=>'table','pid' => 21,'sort' => 0,'path' => '/quark/engine?api=admin/printer/index&component=table','show'  => 1,'status' => 1],
             
-            ['id' =>29,'name' => '所有导航','guard_name' => 'admin','icon' => '','type'=>'table','pid' => 25,'sort' => 0,'path' => '/system/navigation','show'  => 1,'status' => 1],
-            ['id' =>30,'name' => '分类列表','guard_name' => 'admin','icon' => '','type'=>'table','pid' => 25,'sort' => 0,'path' => '/system/category','show'  => 1,'status' => 1],
-            ['id' =>31,'name' => '短信列表','guard_name' => 'admin','icon' => '','type'=>'table','pid' => 25,'sort' => 0,'path' => '/system/sms/index','show'  => 1,'status' => 1],
+            ['id' =>29,'name' => '所有导航','guard_name' => 'admin','icon' => '','type'=>'table','pid' => 25,'sort' => 0,'path' => '/quark/engine?api=admin/navigation/index&component=table','show'  => 1,'status' => 1],
+            ['id' =>30,'name' => '分类列表','guard_name' => 'admin','icon' => '','type'=>'table','pid' => 25,'sort' => 0,'path' => '/quark/engine?api=admin/category/index&component=table','show'  => 1,'status' => 1],
+            ['id' =>31,'name' => '短信列表','guard_name' => 'admin','icon' => '','type'=>'table','pid' => 25,'sort' => 0,'path' => '/quark/engine?api=admin/sms/index&component=table','show'  => 1,'status' => 1],
            
             ['id' =>'38','name' => '商城管理','guard_name' => 'admin','icon' => 'icon-shop','type'=>'default','pid' => '0','sort' => '-1','path' => '/mall','show'  => '0','status' => '1'],
             ['id' =>'39','name' => '商家管理','guard_name' => 'admin','icon' => '','type'=>'default','pid' => '38','sort' => '0','path' => '/mall/shop','show'  => '1','status' => '1'],
@@ -62,7 +62,7 @@ class MenusTableSeeder extends Seeder
             ['id' =>'59','name' => '商品单位','guard_name' => 'admin','icon' => '','type'=>'default','pid' => '46','sort' => '0','path' => '/mall/goods/unitIndex','show'  => '1','status' => '1'],
             ['id' =>'60','name' => '详情版式','guard_name' => 'admin','icon' => '','type'=>'default','pid' => '46','sort' => '0','path' => '/mall/goods/layoutIndex','show'  => '1','status' => '1'],
 
-            ['id' =>'61','name' => '分类列表','guard_name' => 'admin','icon' => '','type'=>'table','pid' => 3,'sort' => 0,'path' => '/article/categoryIndex','show'  => 1,'status' => 1],
+            ['id' =>'61','name' => '分类列表','guard_name' => 'admin','icon' => '','type'=>'table','pid' => 3,'sort' => 0,'path' => '/quark/engine?api=admin/articleCategory/index&component=table','show'  => 1,'status' => 1],
         ]);
     }
 }

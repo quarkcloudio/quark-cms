@@ -73,52 +73,65 @@ Route::group([
     $router->any('admin/page/action', 'PageController@action')->name('api/admin/page/action');
     $router->post('admin/page/destroy', 'PageController@destroy')->name('api/admin/page/destroy');
     
-    $router->get('admin/page/index', 'PageController@index')->name('api/admin/page/index');
-    $router->get('admin/page/show', 'PageController@show')->name('api/admin/page/show');
-    $router->get('admin/page/create', 'PageController@create')->name('api/admin/page/create');
-    $router->post('admin/page/store', 'PageController@store')->name('api/admin/page/store');
-    $router->get('admin/page/edit', 'PageController@edit')->name('api/admin/page/edit');
-    $router->post('admin/page/update', 'PageController@update')->name('api/admin/page/update');
-    $router->any('admin/page/action', 'PageController@action')->name('api/admin/page/action');
-    $router->post('admin/page/destroy', 'PageController@destroy')->name('api/admin/page/destroy');
+    $router->get('admin/user/index', 'UserController@index')->name('api/admin/user/index');
+    $router->get('admin/user/show', 'UserController@show')->name('api/admin/user/show');
+    $router->get('admin/user/create', 'UserController@create')->name('api/admin/user/create');
+    $router->post('admin/user/store', 'UserController@store')->name('api/admin/user/store');
+    $router->get('admin/user/edit', 'UserController@edit')->name('api/admin/user/edit');
+    $router->post('admin/user/update', 'UserController@update')->name('api/admin/user/update');
+    $router->any('admin/user/action', 'UserController@action')->name('api/admin/user/action');
+    $router->post('admin/user/destroy', 'UserController@destroy')->name('api/admin/user/destroy');
     $router->any('admin/user/recharge', 'UserController@recharge')->name('api/admin/user/recharge');
     $router->any('admin/user/suggest', 'UserController@suggest')->name('api/admin/user/suggest');
 
     $router->get('admin/comment/index', 'CommentController@index')->name('api/admin/comment/index');
+    $router->get('admin/comment/show', 'CommentController@show')->name('api/admin/comment/show');
+    $router->get('admin/comment/create', 'CommentController@create')->name('api/admin/comment/create');
+    $router->post('admin/comment/store', 'CommentController@store')->name('api/admin/comment/store');
     $router->get('admin/comment/edit', 'CommentController@edit')->name('api/admin/comment/edit');
-    $router->post('admin/comment/save', 'CommentController@save')->name('api/admin/comment/save');
-    $router->post('admin/comment/changeStatus', 'CommentController@changeStatus')->name('api/admin/comment/changeStatus');
+    $router->post('admin/comment/update', 'CommentController@update')->name('api/admin/comment/update');
+    $router->any('admin/comment/action', 'CommentController@action')->name('api/admin/comment/action');
+    $router->post('admin/comment/destroy', 'CommentController@destroy')->name('api/admin/comment/destroy');
     
     $router->get('admin/link/index', 'LinkController@index')->name('api/admin/link/index');
+    $router->get('admin/link/show', 'LinkController@show')->name('api/admin/link/show');
     $router->get('admin/link/create', 'LinkController@create')->name('api/admin/link/create');
     $router->post('admin/link/store', 'LinkController@store')->name('api/admin/link/store');
     $router->get('admin/link/edit', 'LinkController@edit')->name('api/admin/link/edit');
-    $router->post('admin/link/save', 'LinkController@save')->name('api/admin/link/save');
-    $router->post('admin/link/changeStatus', 'LinkController@changeStatus')->name('api/admin/link/changeStatus');
+    $router->post('admin/link/update', 'LinkController@update')->name('api/admin/link/update');
+    $router->any('admin/link/action', 'LinkController@action')->name('api/admin/link/action');
+    $router->post('admin/link/destroy', 'LinkController@destroy')->name('api/admin/link/destroy');
 
     $router->get('admin/printer/index', 'PrinterController@index')->name('api/admin/printer/index');
+    $router->get('admin/printer/show', 'PrinterController@show')->name('api/admin/printer/show');
     $router->get('admin/printer/create', 'PrinterController@create')->name('api/admin/printer/create');
     $router->post('admin/printer/store', 'PrinterController@store')->name('api/admin/printer/store');
     $router->get('admin/printer/edit', 'PrinterController@edit')->name('api/admin/printer/edit');
-    $router->post('admin/printer/save', 'PrinterController@save')->name('api/admin/printer/save');
-    $router->post('admin/printer/changeStatus', 'PrinterController@changeStatus')->name('api/admin/printer/changeStatus');
+    $router->post('admin/printer/update', 'PrinterController@update')->name('api/admin/printer/update');
+    $router->any('admin/printer/action', 'PrinterController@action')->name('api/admin/printer/action');
+    $router->post('admin/printer/destroy', 'PrinterController@destroy')->name('api/admin/printer/destroy');
 
     $router->get('admin/navigation/index', 'NavigationController@index')->name('api/admin/navigation/index');
+    $router->get('admin/navigation/show', 'NavigationController@show')->name('api/admin/navigation/show');
     $router->get('admin/navigation/create', 'NavigationController@create')->name('api/admin/navigation/create');
     $router->post('admin/navigation/store', 'NavigationController@store')->name('api/admin/navigation/store');
     $router->get('admin/navigation/edit', 'NavigationController@edit')->name('api/admin/navigation/edit');
-    $router->post('admin/navigation/save', 'NavigationController@save')->name('api/admin/navigation/save');
-    $router->post('admin/navigation/changeStatus', 'NavigationController@changeStatus')->name('api/admin/navigation/changeStatus');
+    $router->post('admin/navigation/update', 'NavigationController@update')->name('api/admin/navigation/update');
+    $router->any('admin/navigation/action', 'NavigationController@action')->name('api/admin/navigation/action');
+    $router->post('admin/navigation/destroy', 'NavigationController@destroy')->name('api/admin/navigation/destroy');
 
     $router->get('admin/category/index', 'CategoryController@index')->name('api/admin/category/index');
+    $router->get('admin/category/show', 'CategoryController@show')->name('api/admin/category/show');
     $router->get('admin/category/create', 'CategoryController@create')->name('api/admin/category/create');
     $router->post('admin/category/store', 'CategoryController@store')->name('api/admin/category/store');
     $router->get('admin/category/edit', 'CategoryController@edit')->name('api/admin/category/edit');
-    $router->post('admin/category/save', 'CategoryController@save')->name('api/admin/category/save');
-    $router->post('admin/category/changeStatus', 'CategoryController@changeStatus')->name('api/admin/category/changeStatus');
+    $router->post('admin/category/update', 'CategoryController@update')->name('api/admin/category/update');
+    $router->any('admin/category/action', 'CategoryController@action')->name('api/admin/category/action');
+    $router->post('admin/category/destroy', 'CategoryController@destroy')->name('api/admin/category/destroy');
 
     $router->get('admin/sms/index', 'SmsController@index')->name('api/admin/sms/index');
-    $router->post('admin/sms/changeStatus', 'SmsController@destroy')->name('api/admin/sms/changeStatus');
+    $router->any('admin/sms/action', 'SmsController@action')->name('api/admin/sms/action');
+    $router->post('admin/sms/destroy', 'SmsController@destroy')->name('api/admin/sms/destroy');
     $router->any('admin/sms/import', 'SmsController@import')->name('api/admin/sms/import');
     $router->post('admin/sms/sendImportSms', 'SmsController@sendImportSms')->name('api/admin/sms/sendImportSms');
     $router->post('admin/sms/sendSms', 'SmsController@sendSms')->name('api/admin/sms/sendSms');

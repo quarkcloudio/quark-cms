@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "9d30a31c52217404760ff3967207eb36",
+    "content-hash": "d0211f2321a0f31fefd69032b222e814",
     "packages": [
         {
             "name": "aliyuncs/oss-sdk-php",
@@ -1959,16 +1959,16 @@
         },
         {
             "name": "league/commonmark",
-            "version": "1.4.1",
+            "version": "1.4.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/thephpleague/commonmark.git",
-                "reference": "c995966d35424bae20f76f8b31248099487a3f57"
+                "reference": "9e780d972185e4f737a03bade0fd34a9e67bbf31"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/thephpleague/commonmark/zipball/c995966d35424bae20f76f8b31248099487a3f57",
-                "reference": "c995966d35424bae20f76f8b31248099487a3f57",
+                "url": "https://api.github.com/repos/thephpleague/commonmark/zipball/9e780d972185e4f737a03bade0fd34a9e67bbf31",
+                "reference": "9e780d972185e4f737a03bade0fd34a9e67bbf31",
                 "shasum": "",
                 "mirrors": [
                     {
@@ -2035,7 +2035,7 @@
                 "md",
                 "parser"
             ],
-            "time": "2020-04-20T13:36:51+00:00"
+            "time": "2020-04-24T13:39:56+00:00"
         },
         {
             "name": "league/event",
@@ -4687,16 +4687,16 @@
         },
         {
             "name": "quarkcms/quark-admin",
-            "version": "v0.0.3",
+            "version": "v0.0.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/quarkcms/quark-admin.git",
-                "reference": "22ad78a63de7ccae01767c9c19ce423df3cb2a91"
+                "reference": "424f70b5ad9bef15d786a47763813acc02952185"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/quarkcms/quark-admin/zipball/22ad78a63de7ccae01767c9c19ce423df3cb2a91",
-                "reference": "22ad78a63de7ccae01767c9c19ce423df3cb2a91",
+                "url": "https://api.github.com/repos/quarkcms/quark-admin/zipball/424f70b5ad9bef15d786a47763813acc02952185",
+                "reference": "424f70b5ad9bef15d786a47763813acc02952185",
                 "shasum": "",
                 "mirrors": [
                     {
@@ -4741,14 +4741,14 @@
                     "email": "dai_hang_love@126.com"
                 }
             ],
-            "description": "laravel admin",
+            "description": "quark-admin v0.0.5",
             "keywords": [
                 "laravel",
                 "laravel-admin",
                 "quark-admin",
                 "sdk"
             ],
-            "time": "2020-04-23T06:21:59+00:00"
+            "time": "2020-04-26T05:40:53+00:00"
         },
         {
             "name": "ralouphie/getallheaders",

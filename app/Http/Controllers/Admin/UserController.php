@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers\Admin;
 
-namespace App\Http\Controllers\Admin;
-
-use App\Models\Post;
+use App\User;
 use QuarkCMS\QuarkAdmin\Controllers\QuarkController;
+use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Quark;
+use Validator;
 
 class UserController extends QuarkController
 {
@@ -18,206 +19,134 @@ class UserController extends QuarkController
      * @param  Request  $request
      * @return Response
      */
-    public function index(Request $request)
+    protected function table()
     {
-        // 获取参数
-        $current   = intval($request->get('current',1));
-        $pageSize  = intval($request->get('pageSize',10));
-        $search    = $request->get('search');
+        $grid = Quark::grid(new User)->title($this->title);
+        $grid->column('id','ID');
+        $grid->column('avatar','头像')->image();
+        $grid->column('username','用户名')->link();
+        $grid->column('nickname','昵称');
+        $grid->column('phone','手机号');
+        $grid->column('email','邮箱');
+        $grid->column('created_at','注册时间');
+        $grid->column('status','状态')->editable('switch',[
+            'on'  => ['value' => 1, 'text' => '正常'],
+            'off' => ['value' => 2, 'text' => '禁用']
+        ])->width(100);
+
+        $grid->column('actions','操作')->width(260)->rowActions(function($rowAction) {
+
+            $rowAction->button('recharge', '充值')
+            ->type('default')
+            ->size('small')
+            ->withModal('用户充值',function($modal) {
+                $modal->disableFooter();
+                $modal->form->ajax('admin/menu/edit');
+            });
+
+            $rowAction->button('show', '显示')
+            ->type('default')
+            ->size('small');
+
+            $rowAction->button('edit', '编辑')
+            ->type('primary')
+            ->size('small');
+
+            $rowAction->button('delete', '删除')
+            ->type('default',true)
+            ->size('small')
+            ->model(function($model) {
+                $model->delete();
+            })->withConfirm('确认要删除吗？','删除后数据将无法恢复，请谨慎操作！');
+
+        },'button');
+
+        // 头部操作
+        $grid->actions(function($action) {
+            $action->button('create', '新增');
+            $action->button('refresh', '刷新');
+        });
+
+        // select样式的批量操作
+        $grid->batchActions(function($batch) {
+            $batch->option('', '批量操作');
+            $batch->option('resume', '启用')->model(function($model) {
+                $model->update(['status'=>1]);
+            });
+            $batch->option('forbid', '禁用')->model(function($model) {
+                $model->update(['status'=>2]);
+            });
+            $batch->option('delete', '删除')->model(function($model) {
+                $model->delete();
+            })->withConfirm('确认要删除吗？','删除后数据将无法恢复，请谨慎操作！');
+        })->style('select',['width'=>120]);
+
+        $grid->search(function($search) {
+
+            $search->where('usernameOrNickname', '搜索内容',function ($query) {
+                $query->where('username', 'like', "%{input}%")->orWhere('nickname', 'like', "%{input}%")->orWhere('phone', 'like', "%{input}%");
+            })->placeholder('用户名/手机号/昵称');
+
+            $search->equal('status', '所选状态')->select([''=>'全部',1=>'正常',2=>'已禁用'])->placeholder('选择状态')->width(110)->advanced();
             
-        // 定义对象
-        $query = User::query();
+            $search->between('created_at', '注册时间')->datetime()->advanced();
+        })->expand(false);
 
-        // 查询
-        if(!empty($search)) {
+        $grid->model()->paginate(10);
 
-            // 用户名
-            if(isset($search['username'])) {
-                $query->where('username','like','%'.$search['username'].'%');
-            }
-
-            // 昵称
-            if(isset($search['nickname'])) {
-                $query->where('nickname','like','%'.$search['nickname'].'%');
-            }
-
-            // 手机号
-            if(isset($search['phone'])) {
-                $query->where('phone','like','%'.$search['phone'].'%');
-            }
-
-            // 状态
-            if(isset($search['status'])) {
-                if(!empty($search['status'])) {
-                    $query->where('status',$search['status']);
-                }
-            }
-
-            // 时间范围
-            if(isset($search['dateRange'])) {
-                if(!empty($search['dateRange'][0]) || !empty($search['dateRange'][1])) {
-                    $query->whereBetween('created_at', [$search['dateRange'][0], $search['dateRange'][1]]);
-                }
-            }
-        }
-
-        // 查询数量
-        $total = $query
-        ->where('status', '>', 0)
-        ->count();
-
-        // 查询列表
-        $lists = $query
-        ->skip(($current-1)*$pageSize)
-        ->take($pageSize)
-        ->where('status', '>', 0)
-        ->orderBy('id', 'desc')
-        ->get()
-        ->toArray();
-
-        foreach ($lists as $key => $value) {
-            $lists[$key]['cover_path'] = Helper::getPicture($value['avatar']);
-        }
-
-        $lists = Helper::listsFormat($lists);
-
-        // 默认页码
-        $pagination['defaultCurrent'] = 1;
-        // 当前页码
-        $pagination['current'] = $current;
-        // 分页数量
-        $pagination['pageSize'] = $pageSize;
-        // 总数量
-        $pagination['total'] = $total;
-
-        $status = [
-            [
-                'name'=>'所有状态',
-                'value'=>'0',
-            ],
-            [
-                'name'=>'正常',
-                'value'=>'1',
-            ],
-            [
-                'name'=>'禁用',
-                'value'=>'2',
-            ],
-        ];
-
-        $searchs = [
-            Select::make('状态','status')->option($status)->value('0'),
-            Input::make('搜索内容','username'),
-            Button::make('搜索')->onClick('search'),
-        ];
-
-        $advancedSearchs = [
-            Input::make('用户名','username'),
-            Input::make('手机号','phone'),
-            RangePicker::make('注册时间','created_at')->format("YYYY-MM-DD HH:mm:ss"),
-            Select::make('状态','status')->option($status)->value('0'),
-            Button::make('搜索')->type('primary')->onClick('search'),
-            Button::make('重置')->onClick('resetSearch'),
-        ];
-
-        $columns = [
-            Column::make('ID','id'),
-            Column::make('头像','cover_path')->isImage()->withA('admin/'.$this->controllerName().'/edit'),
-            Column::make('用户名','username')->withA('admin/'.$this->controllerName().'/edit'),
-            Column::make('昵称','nickname'),
-            Column::make('手机号','phone'),
-            Column::make('邮箱','email'),
-            Column::make('状态','status')->withTag("text === '已禁用' ? 'red' : 'blue'"),
-            Column::make('注册时间','created_at'),
-        ];
-
-        $actions = [
-            Button::make('充值')->type('link')->onClick('openModal',['title'=>'用户充值','width'=>500],'admin/'.$this->controllerName().'/recharge'),
-            Button::make('启用|禁用')->type('link')->onClick('changeStatus','1|2','admin/'.$this->controllerName().'/changeStatus'),
-            Button::make('编辑')->type('link')->href('admin/'.$this->controllerName().'/edit'),
-            Popconfirm::make('删除')->type('link')->title('确定删除吗？')->onConfirm('changeStatus','-1','admin/'.$this->controllerName().'/changeStatus'),
-        ];
-
-        $data = $this->listBuilder($columns,$lists,$pagination,$searchs,$advancedSearchs,null,null,$actions);
-
-        if(!empty($data)) {
-            return $this->success('获取成功！','',$data);
-        } else {
-            return $this->success('获取失败！');
-        }
+        return $grid;
     }
 
     /**
-     * Form页面模板
+     * 表单页面
      * 
      * @param  Request  $request
      * @return Response
      */
-    public function form($data = [])
+    protected function form()
     {
-        $radioList = [
-            [
-                'name'=>'男',
-                'value'=>1,
-            ],
-            [
-                'name'=>'女',
-                'value'=>2,
-            ],
-        ];
+        $id = request('id');
 
-        if(isset($data['id'])) {
-            $action = 'admin/'.$this->controllerName().'/save';
-        } else {
-            $action = 'admin/'.$this->controllerName().'/store';
-        }
+        $form = Quark::form(new User);
 
-        $controls = [
-            ID::make('ID','id'),
-            Image::make('头像','avatar'),
-            Input::make('用户名','username')->style(['width'=>200]),
-            Input::make('昵称','nickname')->style(['width'=>200]),
-            Input::make('邮箱','email')->style(['width'=>200]),
-            Radio::make('性别','sex')->list($radioList)->value(1),
-            Input::make('密码','password')->style(['width'=>200])->type('password'),
-            Input::make('手机号','phone')->style(['width'=>200]),
-        ];
+        $title = $form->isCreating() ? '创建'.$this->title : '编辑'.$this->title;
+        $form->title($title);
 
-        if(isset($data['id'])) {
+        $form->id('id','ID');
 
-            if(empty($data['last_login_ip'])) {
-                $data['last_login_ip'] = '暂无';
-            }
-    
-            if(empty($data['last_login_time'])) {
-                $data['last_login_time'] = '暂无';
-            }
-            $controls[] = Text::make('注册时间')->style(['width'=>200])->value($data['created_at']);
-            $controls[] = Text::make('登录时间')->style(['width'=>200])->value($data['last_login_time']);
-            $controls[] = Text::make('登录IP')->style(['width'=>200])->value($data['last_login_ip']);
-        }
+        $form->image('avatar','头像')->button('上传头像');
 
-        $controls[] = SwitchButton::make('状态','status')->checkedText('正常')->unCheckedText('禁用')->value(true);
-        $controls[] = Button::make('提交')
-        ->type('primary')
-        ->style(['width'=>100,'float'=>'left','marginLeft'=>200])
-        ->onClick('submit',null,$action);
+        $form->text('username','用户名')
+        ->rules(['required','min:6','max:20'],['required'=>'用户名必须填写','min'=>'用户名不能少于6个字符','max'=>'用户名不能超过20个字符'])
+        ->creationRules(["unique:users"],['unique'=>'用户名已经存在'])
+        ->updateRules(["unique:users,username,{{id}}"],['unique'=>'用户名已经存在']);
 
-        $result = $this->formBuilder($controls,$data);
+        $form->text('nickname','昵称')
+        ->rules(['required','max:20'],['required'=>'昵称必须填写','max'=>'昵称不能超过20个字符']);
 
-        return $result;
-    }
+        $form->radio('sex','性别')
+        ->options(['1' => '男', '2'=> '女'])
+        ->default(1);
 
-    /**
-     * 添加页面
-     * 
-     * @param  Request  $request
-     * @return Response
-     */
-    public function create(Request $request)
-    {
-        $data = $this->form();
-        return $this->success('获取成功！','',$data);
+        $form->text('email','邮箱')
+        ->rules(['required','email','max:255'],['required'=>'邮箱必须填写','email'=>'邮箱格式错误','max'=>'邮箱不能超过255个字符'])
+        ->creationRules(["unique:users"],['unique'=>'邮箱已经存在',])
+        ->updateRules(["unique:users,email,{{id}}"],['unique'=>'邮箱已经存在']);
+
+        $form->text('phone','手机号')
+        ->rules(['required','max:11'],['required'=>'手机号必须填写','max'=>'手机号不能超过11个字符'])
+        ->creationRules(["unique:users"],['unique'=>'手机号已经存在'])
+        ->updateRules(["unique:users,phone,{{id}}"],['unique'=>'手机号已经存在']);
+
+        $form->text('password','密码')
+        ->creationRules(["required"],['required'=>'密码不能为空']);
+
+        $form->switch('status','状态')->options([
+            'on'  => '正常',
+            'off' => '禁用'
+        ])->default(true);
+
+        return $form;
     }
 
     /**
@@ -231,31 +160,20 @@ class UserController extends QuarkController
         $requestJson    =   $request->getContent();
         $requestData    =   json_decode($requestJson,true);
 
-        // 删除url
+        // 删除modelName
+        unset($requestData['id']);
         unset($requestData['actionUrl']);
-
-        $avatar = $requestData['avatar'];
-        if($avatar) {
-            unset($requestData['avatar']);
-            $requestData['avatar'] = $avatar[0]['id'];
-        }
 
         // 表单验证错误提示信息
         $messages = [
-            'required' => '必填',
-            'max' => '最大长度不超过255位',
-            'min' => '不得小于6位',
-            'email' => '格式无效',
             'unique' => '已经存在',
         ];
 
         // 表单验证规则
         $rules = [
-            'username' => ['required','max:255',Rule::unique('users')],
-            'password' => ['required','max:255','min:6'],
-            'nickname' => ['required','max:255',Rule::unique('users')],
-            'email' =>  ['required','email','max:255',Rule::unique('users')],
-            'phone' =>  ['required','max:11',Rule::unique('users')],
+            'username' => [Rule::unique('users')],
+            'email' =>  [Rule::unique('users')],
+            'phone' =>  [Rule::unique('users')],
         ];
 
         // 进行验证
@@ -269,10 +187,6 @@ class UserController extends QuarkController
                     $errorMsg = '用户名'.$value[0];
                 }
 
-                if($key === 'nickname') {
-                    $errorMsg = '昵称'.$value[0];
-                }
-
                 if($key === 'email') {
                     $errorMsg = '邮箱'.$value[0];
                 }
@@ -280,71 +194,21 @@ class UserController extends QuarkController
                 if($key === 'phone') {
                     $errorMsg = '手机号'.$value[0];
                 }
-
-                if($key === 'password') {
-                    $errorMsg = '密码'.$value[0];
-                }
             }
 
-            return $this->error($errorMsg);
+            return error($errorMsg);
         }
 
         if (!empty($requestData['password'])) {
             $requestData['password'] = bcrypt($requestData['password']);
         }
 
-        if ($requestData['status'] == true) {
-            $requestData['status'] = 1;
-        } else {
-            $requestData['status'] = 2;
-        }
-
         $result = User::create($requestData);
 
         if ($result) {
-            return $this->success('操作成功！','/user/index');
+            return success('操作成功！','/quark/engine?api=admin/user/index&component=table');
         } else {
-            return $this->error('操作失败！');
-        }
-    }
-
-    /**
-     * 编辑页面
-     *
-     * @param  Request  $request
-     * @return Response
-     */
-    public function edit(Request $request)
-    {
-        $id = $request->get('id');
-
-        if(empty($id)) {
-            return $this->error('参数错误！');
-        }
-
-        $data = User::find($id)->toArray();
-
-        $avatar = $data['avatar'];
-
-        unset($data['avatar']);
-
-        $data['avatar'][0]['id'] =$avatar;
-        $data['avatar'][0]['uid'] =$avatar;
-        $data['avatar'][0]['name'] = Helper::getPicture($avatar,'name');
-        $data['avatar'][0]['url'] = Helper::getPicture($avatar);
-
-        if ($data['status'] == 1) {
-            $data['status'] = true;
-        } else {
-            $data['status'] = false;
-        }
-
-        $data = $this->form($data);
-
-        if(!empty($data)) {
-            return $this->success('操作成功！','',$data);
-        } else {
-            return $this->error('操作失败！');
+            return error('操作失败！');
         }
     }
 
@@ -354,34 +218,24 @@ class UserController extends QuarkController
      * @param  Request  $request
      * @return Response
      */
-    public function save(Request $request)
+    public function update(Request $request)
     {
         $requestJson    =   $request->getContent();
         $requestData    =   json_decode($requestJson,true);
 
-        // 删除url
+        // 删除modelName
         unset($requestData['actionUrl']);
-
-        $avatar = $requestData['avatar'];
-        if($avatar) {
-            unset($requestData['avatar']);
-            $requestData['avatar'] = $avatar[0]['id'];
-        }
 
         // 表单验证错误提示信息
         $messages = [
-            'required' => '必填',
-            'max' => '最大长度不超过255位',
-            'email' => '格式无效',
             'unique' => '已经存在',
         ];
 
         // 表单验证规则
         $rules = [
-            'username' => ['required','max:255',Rule::unique('users')->ignore($requestData['id'])],
-            'nickname' => ['required','max:255',Rule::unique('users')->ignore($requestData['id'])],
-            'email' =>  ['required','email','max:255',Rule::unique('users')->ignore($requestData['id'])],
-            'phone' =>  ['required','max:11',Rule::unique('users')->ignore($requestData['id'])],
+            'username' => [Rule::unique('users')->ignore($requestData['id'])],
+            'email' =>  [Rule::unique('users')->ignore($requestData['id'])],
+            'phone' =>  [Rule::unique('users')->ignore($requestData['id'])],
         ];
 
         // 进行验证
@@ -395,10 +249,6 @@ class UserController extends QuarkController
                     $errorMsg = '用户名'.$value[0];
                 }
 
-                if($key === 'nickname') {
-                    $errorMsg = '昵称'.$value[0];
-                }
-
                 if($key === 'email') {
                     $errorMsg = '邮箱'.$value[0];
                 }
@@ -408,59 +258,57 @@ class UserController extends QuarkController
                 }
             }
 
-            return $this->error($errorMsg);
+            return error($errorMsg);
         }
 
         if (!empty($requestData['password'])) {
             $requestData['password'] = bcrypt($requestData['password']);
         }
 
-        if ($requestData['status'] == true) {
-            $requestData['status'] = 1;
-        } else {
-            $requestData['status'] = 2;
-        }
-
         $result = User::where('id',$requestData['id'])->update($requestData);
 
         if ($result) {
-            return $this->success('操作成功！','/user/index');
+            return success('操作成功！','/quark/engine?api=admin/user/index&component=table');
         } else {
-            return $this->error('操作失败！');
+            return error('操作失败！');
         }
     }
 
     /**
-     * 改变数据状态
-     *
+     * 详情页面
+     * 
      * @param  Request  $request
      * @return Response
      */
-    public function changeStatus(Request $request)
+    protected function detail($id)
     {
-        $id = $request->json('id');
-        $status = $request->json('status');
+        $show = Quark::show(User::findOrFail($id)->toArray())->title('详情页');
 
-        if(empty($id) || empty($status)) {
-            return $this->error('参数错误！');
-        }
+        $show->field('id','ID');
+        $show->field('avatar','头像')->image();
+        $show->field('username','用户名');
+        $show->field('nickname','昵称');
+        $show->field('sex','性别');
+        $show->field('created_at','注册时间');
+        $show->field('last_login_time','登录时间');
+        $show->field('last_login_ip','登录IP');
+        $show->field('status','状态');
 
-        // 定义对象
-        $query = User::query();
+        //渲染前回调
+        $show->rendering(function ($show) {
+            $show->data['avatar'] = get_picture($show->data['avatar']);
+            $show->data['sex'] == 1 ? $show->data['sex'] = '男' : $show->data['sex'] = '女';
 
-        if(is_array($id)) {
-            $query->whereIn('id',$id);
-        } else {
-            $query->where('id',$id);
-        }
+            if(empty($show->data['last_login_time'])) {
+                $show->data['last_login_time'] = '暂无';
+            }
 
-        $result = $query->update(['status'=>$status]);
+            if(empty($show->data['last_login_ip'])) {
+                $show->data['last_login_ip'] = '暂无';
+            }
+        });
 
-        if ($result) {
-            return $this->success('操作成功！');
-        } else {
-            return $this->error('操作失败！');
-        }
+        return $show;
     }
 
     /**
@@ -582,5 +430,4 @@ class UserController extends QuarkController
 
         return $this->success('获取成功！','',$lists);
     }
-
 }
