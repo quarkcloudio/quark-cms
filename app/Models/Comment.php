@@ -37,4 +37,14 @@ class Comment extends Model
         'status',
         'rate'
     ];
+
+    public function article()
+    {
+        return $this->hasOne('App\Models\Post', 'id', 'object_id');
+    }
+
+    public function user()
+    {
+        return $this->hasOne('App\User', 'id', 'uid');
+    }
 }
