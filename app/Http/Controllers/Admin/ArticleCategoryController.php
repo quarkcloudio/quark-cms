@@ -97,8 +97,12 @@ class ArticleCategoryController extends QuarkController
             $form->text('name','缩略名');
 
             $categorys[0] = '根目录';
-            $getCategorys = Category::where('type','ARTICLE')->get();
-            foreach ($getCategorys as $key => $value) {
+            $getCategorys = Category::where('type','ARTICLE')->where('status',1)->get();
+
+            $categoryTrees = list_to_tree($getCategorys,'id','pid','children',0);
+            $categoryTreeLists = tree_to_ordered_list($categoryTrees,0,'name','children');
+
+            foreach ($categoryTreeLists as $key => $value) {
                 $categorys[$value['id']] = $value['title'];
             }
 
