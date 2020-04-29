@@ -2,8 +2,9 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Models\Printer;
+use App\Models\Sms;
 use QuarkCMS\QuarkAdmin\Controllers\QuarkController;
+use Illuminate\Http\Request;
 use Quark;
 
 class SmsController extends QuarkController
@@ -18,7 +19,7 @@ class SmsController extends QuarkController
      */
     protected function table()
     {
-        $grid = Quark::grid(new Printer)->title($this->title);
+        $grid = Quark::grid(new Sms)->title($this->title);
         $grid->column('id','ID');
         $grid->column('phone','手机号');
         $grid->column('code','验证码');
@@ -27,7 +28,10 @@ class SmsController extends QuarkController
         $grid->column('status','状态')->using(['1'=>'发送成功','2'=>'发送失败']);
 
         $grid->column('actions','操作')->width(100)->rowActions(function($rowAction) {
-            $rowAction->menu('edit', '编辑');
+            $rowAction->menu('sendSms', '发送')
+            ->setAction('admin/sms/sendSms')
+            ->withConfirm('确认要发送短信吗？','确认后将重新发送短信！');
+
             $rowAction->menu('delete', '删除')->model(function($model) {
                 $model->delete();
             })->withConfirm('确认要删除吗？','删除后数据将无法恢复，请谨慎操作！');
@@ -35,19 +39,19 @@ class SmsController extends QuarkController
 
         // 头部操作
         $grid->actions(function($action) {
-            $action->button('create', '新增');
+            $action->button('sendSms', '发送短信')
+            ->icon('plus-circle')
+            ->type('primary')
+            ->link('#/admin/sms/send');
             $action->button('refresh', '刷新');
         });
 
         // select样式的批量操作
         $grid->batchActions(function($batch) {
             $batch->option('', '批量操作');
-            $batch->option('resume', '启用')->model(function($model) {
-                $model->update(['status'=>1]);
-            });
-            $batch->option('forbid', '禁用')->model(function($model) {
-                $model->update(['status'=>2]);
-            });
+            $batch->option('sendSms', '发送')
+            ->setAction('admin/sms/sendSms')
+            ->withConfirm('确认要群发短信吗？','确认后将重新发送短信！');
             $batch->option('delete', '删除')->model(function($model) {
                 $model->delete();
             })->withConfirm('确认要删除吗？','删除后数据将无法恢复，请谨慎操作！');
@@ -102,7 +106,7 @@ class SmsController extends QuarkController
         $id = $request->json('id');
         $status = $request->json('status');
 
-        if(empty($id) || empty($status)) {
+        if(empty($id)) {
             return error('参数错误！');
         }
 
