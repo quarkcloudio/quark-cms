@@ -411,23 +411,18 @@ class UserController extends QuarkController
 
         // 查询用户名
         if(!empty($search)) {
-            $query->where('users.username','like','%'.$search.'%');
+            $query->where('username','like','%'.$search.'%');
         }
 
-        // 查询数量
-        $count = $query
-        ->where('users.status', '>', 0)
-        ->count();
-
         // 查询列表
-        $lists = $query
+        $users = $query
         ->limit(20)
-        ->where('users.status', '>', 0)
+        ->where('status', '>', 0)
         ->orderBy('id', 'desc')
-        ->select('users.username as name','users.id as value')
+        ->select('username as label','id as value')
         ->get()
         ->toArray();
 
-        return $this->success('获取成功！','',$lists);
+        return success('获取成功！','',$users);
     }
 }

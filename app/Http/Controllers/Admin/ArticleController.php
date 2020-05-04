@@ -127,8 +127,12 @@ class ArticleController extends QuarkController
 
             $form->image('cover_ids','封面图')->mode('multiple');
 
+            $categorys = [];
             $getCategorys = Category::where('type','ARTICLE')->where('status',1)->get();
-            foreach ($getCategorys as $key => $value) {
+            $categoryTrees = list_to_tree($getCategorys,'id','pid','children',0);
+            $categoryTreeLists = tree_to_ordered_list($categoryTrees,0,'name','children');
+
+            foreach ($categoryTreeLists as $key => $value) {
                 $categorys[$value['id']] = $value['title'];
             }
 

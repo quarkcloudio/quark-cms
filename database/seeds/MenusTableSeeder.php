@@ -40,12 +40,9 @@ class MenusTableSeeder extends Seeder
            
             ['id' =>'38','name' => '商城管理','guard_name' => 'admin','icon' => 'icon-shop','type'=>'default','pid' => '0','sort' => '-1','path' => '/mall','show'  => '0','status' => '1'],
             ['id' =>'39','name' => '商家管理','guard_name' => 'admin','icon' => '','type'=>'default','pid' => '38','sort' => '0','path' => '/mall/shop','show'  => '1','status' => '1'],
-            ['id' =>'40','name' => '商家列表','guard_name' => 'admin','icon' => '','type'=>'default','pid' => '39','sort' => '0','path' => '/mall/shop/index','show'  => '1','status' => '1'],
-            ['id' =>'41','name' => '添加商家','guard_name' => 'admin','icon' => '','type'=>'default','pid' => '40','sort' => '0','path' => '/mall/shop/create','show'  => '0','status' => '1'],
-            ['id' =>'42','name' => '编辑商家','guard_name' => 'admin','icon' => '','type'=>'default','pid' => '40','sort' => '0','path' => '/mall/shop/edit','show'  => '0','status' => '1'],
-            ['id' =>'43','name' => '商家分类','guard_name' => 'admin','icon' => '','type'=>'default','pid' => '39','sort' => '0','path' => '/mall/shop/categoryIndex','show'  => '1','status' => '1'],
-            ['id' =>'44','name' => '创建分类','guard_name' => 'admin','icon' => '','type'=>'default','pid' => '43','sort' => '0','path' => '/mall/shop/categoryCreate','show'  => '0','status' => '1'],
-            ['id' =>'45','name' => '编辑分类','guard_name' => 'admin','icon' => '','type'=>'default','pid' => '43','sort' => '0','path' => '/mall/shop/categoryEdit','show'  => '0','status' => '1'],
+            ['id' =>'40','name' => '商家列表','guard_name' => 'admin','icon' => '','type'=>'table','pid' => '39','sort' => '0','path' => '/quark/engine?api=/admin/shop/index&component=table','show'  => '1','status' => '1'],
+            ['id' =>'43','name' => '商家分类','guard_name' => 'admin','icon' => '','type'=>'table','pid' => '39','sort' => '0','path' => '/quark/engine?api=/admin/shopCategory/index&component=table','show'  => '1','status' => '1'],
+
             ['id' =>'46','name' => '商品管理','guard_name' => 'admin','icon' => '','type'=>'default','pid' => '38','sort' => '0','path' => '/mall/goods','show'  => '1','status' => '1'],
             ['id' =>'47','name' => '商品列表','guard_name' => 'admin','icon' => '','type'=>'default','pid' => '46','sort' => '0','path' => '/mall/goods/index','show'  => '1','status' => '1'],
             ['id' =>'48','name' => '商品分类','guard_name' => 'admin','icon' => '','type'=>'default','pid' => '46','sort' => '0','path' => '/mall/goods/categoryIndex','show'  => '1','status' => '1'],

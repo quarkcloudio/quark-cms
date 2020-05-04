@@ -2,48 +2,17 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use App\Builder\Forms\Controls\ID;
-use App\Builder\Forms\Controls\Input;
-use App\Builder\Forms\Controls\Text;
-use App\Builder\Forms\Controls\TextArea;
-use App\Builder\Forms\Controls\InputNumber;
-use App\Builder\Forms\Controls\Checkbox;
-use App\Builder\Forms\Controls\Radio;
-use App\Builder\Forms\Controls\Select;
-use App\Builder\Forms\Controls\SwitchButton;
-use App\Builder\Forms\Controls\DatePicker;
-use App\Builder\Forms\Controls\RangePicker;
-use App\Builder\Forms\Controls\Editor;
-use App\Builder\Forms\Controls\Image;
-use App\Builder\Forms\Controls\File;
-use App\Builder\Forms\Controls\Button;
-use App\Builder\Forms\Controls\Popconfirm;
-use App\Builder\Forms\Controls\Area;
-use App\Builder\Forms\Controls\Map;
-use App\Builder\Forms\Controls\SearchInput;
-use App\Builder\Forms\FormBuilder;
-use App\Builder\Lists\Tables\Table;
-use App\Builder\Lists\Tables\Column;
-use App\Builder\Lists\ListBuilder;
-use App\Builder\Tabs;
-use App\Builder\TabPane;
-use Illuminate\Validation\Rule;
-use App\Services\Helper;
+use QuarkCMS\QuarkAdmin\Controllers\QuarkController;
 use App\Models\Shop;
 use App\Models\Merchant;
 use App\Models\ShopCategory;
 use App\User;
-use Validator;
 use DB;
+use Quark;
 
-class ShopController extends BuilderController
+class ShopController extends QuarkController
 {
-    public function __construct()
-    {
-        $this->pageTitle = '商家';
-    }
+    public $title = '商家';
 
     /**
      * 列表页面
@@ -51,748 +20,794 @@ class ShopController extends BuilderController
      * @param  Request  $request
      * @return Response
      */
-    public function index(Request $request)
+    protected function table()
     {
-        // 获取参数
-        $current   = intval($request->get('current',1));
-        $pageSize  = intval($request->get('pageSize',10));
-        $search    = $request->get('search');
-            
-        // 定义对象
-        $query = Shop::query();
+        $grid = Quark::grid(new Shop)->title($this->title);
+        $grid->column('id','ID');
+        $grid->column('logo','Logo')->image();
+        $grid->column('title','商家名称')->link();
+        $grid->column('username','店铺联系人');
+        $grid->column('phone','店铺电话');
+        $grid->column('created_at','创建时间');
+        $grid->column('status','状态')->editable('switch',[
+            'on'  => ['value' => 1, 'text' => '正常'],
+            'off' => ['value' => 2, 'text' => '禁用']
+        ])->width(100);
 
-        // 查询
-        if(!empty($search)) {
+        $grid->column('actions','操作')->width(100)->rowActions(function($rowAction) {
+            $rowAction->menu('edit', '编辑');
+            $rowAction->menu('show', '显示');
+            $rowAction->menu('delete', '删除')->model(function($model) {
+                $model->delete();
+            })->withConfirm('确认要删除吗？','删除后数据将无法恢复，请谨慎操作！');
+        });
 
-            // 用户名
-            if(isset($search['title'])) {
-                $query->where('title','like','%'.$search['title'].'%');
-            }
+        // 头部操作
+        $grid->actions(function($action) {
+            $action->button('create', '新增');
+            $action->button('refresh', '刷新');
+        });
 
-            // 状态
-            if(isset($search['status'])) {
-                if(!empty($search['status'])) {
-                    $query->where('status',$search['status']);
-                }
-            }
+        // select样式的批量操作
+        $grid->batchActions(function($batch) {
+            $batch->option('', '批量操作');
+            $batch->option('resume', '启用')->model(function($model) {
+                $model->update(['status'=>1]);
+            });
+            $batch->option('forbid', '禁用')->model(function($model) {
+                $model->update(['status'=>2]);
+            });
+            $batch->option('delete', '删除')->model(function($model) {
+                $model->delete();
+            })->withConfirm('确认要删除吗？','删除后数据将无法恢复，请谨慎操作！');
+        })->style('select',['width'=>120]);
 
-            // 时间范围
-            if(isset($search['dateRange'])) {
-                if(!empty($search['dateRange'][0]) || !empty($search['dateRange'][1])) {
-                    $query->whereBetween('created_at', [$search['dateRange'][0], $search['dateRange'][1]]);
-                }
-            }
-        }
+        $grid->search(function($search) {
 
-        // 查询数量
-        $total = $query
-        ->where('status', '>', 0)
-        ->count();
+            $search->equal('status', '所选状态')
+            ->select([''=>'全部',1=>'正常',2=>'已禁用'])
+            ->placeholder('选择状态')
+            ->width(110);
 
-        // 查询列表
-        $lists = $query
-        ->skip(($current-1)*$pageSize)
-        ->take($pageSize)
-        ->where('status', '>', 0)
-        ->orderBy('id', 'desc')
-        ->get()
-        ->toArray();
+            $search->where('title', '搜索内容',function ($query) {
+                $query->where('title', 'like', "%{input}%");
+            })->placeholder('搜索内容');
 
-        // 默认页码
-        $pagination['defaultCurrent'] = 1;
-        // 当前页码
-        $pagination['current'] = $current;
-        // 分页数量
-        $pagination['pageSize'] = $pageSize;
-        // 总数量
-        $pagination['total'] = $total;
+            $search->between('created_at', '创建时间')->datetime()->advanced();
+        })->expand(false);
 
-        $status = [
-            [
-                'name'=>'所有状态',
-                'value'=>'0',
-            ],
-            [
-                'name'=>'正常',
-                'value'=>'1',
-            ],
-            [
-                'name'=>'禁用',
-                'value'=>'2',
-            ],
-        ];
+        $grid->model()->paginate(10);
 
-        $searchs = [
-            Select::make('状态','status')->option($status)->value('0'),
-            Input::make('搜索内容','title'),
-            Button::make('搜索')->onClick('search'),
-        ];
-
-        $columns = [
-            Column::make('ID','id'),
-            Column::make('logo','logo')->isImage(),
-            Column::make('商家名称','title')->withA('admin/mall/'.$this->controllerName().'/edit'),
-            Column::make('店铺联系人','username'),
-            Column::make('店铺电话','phone'),
-            Column::make('状态','status')->withTag("text === '已禁用' ? 'red' : 'blue'"),
-            Column::make('创建时间','created_at'),
-        ];
-
-        $headerButtons = [
-            Button::make('新增'.$this->pageTitle)->icon('plus-circle')->type('primary')->href('admin/mall/'.$this->controllerName().'/create'),
-        ];
-
-        $actions = [
-            Button::make('启用|禁用')->type('link')->onClick('changeStatus','1|2','admin/'.$this->controllerName().'/changeStatus'),
-            Button::make('编辑')->type('link')->href('admin/mall/'.$this->controllerName().'/edit'),
-            Popconfirm::make('删除')->type('link')->title('确定删除吗？')->onConfirm('changeStatus','-1','admin/'.$this->controllerName().'/changeStatus'),
-        ];
-
-        foreach ($lists as $key => $value) {
-            $lists[$key]['logo'] = Helper::getPicture($value['logo']);
-        }
-
-        $lists = Helper::listsFormat($lists);
-
-        $data = $this->listBuilder($columns,$lists,$pagination,$searchs,[],$headerButtons,null,$actions);
-
-        if(!empty($data)) {
-            return $this->success('获取成功！','',$data);
-        } else {
-            return $this->success('获取失败！');
-        }
+        return $grid;
     }
 
     /**
-     * Form页面模板
+     * 表单页面
      * 
      * @param  Request  $request
      * @return Response
      */
-    public function form($data = [])
+    protected function form()
     {
-        if(isset($data['id'])) {
-            $action = 'admin/'.$this->controllerName().'/save';
-        } else {
-            $action = 'admin/'.$this->controllerName().'/store';
-        }
+        $form = Quark::form(new Shop);
 
-        $categorys         = ShopCategory::where('status',1)->get()->toArray();
-        $categoryTrees     = Helper::listToTree($categorys);
-        $categoryTreeLists = Helper::treeToOrderList($categoryTrees,0,'title');
+        $title = $form->isCreating() ? '创建'.$this->title : '编辑'.$this->title;
+        $form->title($title);
 
-        // 模板数据
-        $getCategorys = [];
+        $form->tab('基本信息', function ($form) {
+            $form->id('id','ID');
 
-        $getCategorys[0]['name'] = '请选择分类';
-        $getCategorys[0]['value'] = '0';
+            $form->text('title','商家名称')
+            ->rules(['required','max:190'],['required'=>'标题必须填写','max'=>'名称不能超过190个字符']);
 
-        foreach ($categoryTreeLists as $key => $categoryTreeList) {
-            $getCategorys[$key+1]['name'] = $categoryTreeList['title'];
-            $getCategorys[$key+1]['value'] = $categoryTreeList['id'];
-        }
+            $form->image('logo','Logo')->mode('single');
 
-        $checkboxList = [
-            [
-                'name'=>'首页推荐',
-                'value'=>1,
-            ],
-            [
-                'name'=>'频道推荐',
-                'value'=>2,
-            ],
-            [
-                'name'=>'列表推荐',
-                'value'=>4,
-            ],
-            [
-                'name'=>'详情推荐',
-                'value'=>8,
-            ],
-        ];
+            $categorys = [];
+            $getCategorys = ShopCategory::where('status',1)->get()->toArray();
+            $categoryTrees = list_to_tree($getCategorys,'id','pid','children',0);
+            $categoryTreeLists = tree_to_ordered_list($categoryTrees,0,'name','children');
 
-        $openDays = [
-            [
-                'name'=>'周一',
-                'value'=>1,
-            ],
-            [
-                'name'=>'周二',
-                'value'=>2,
-            ],
-            [
-                'name'=>'周三',
-                'value'=>3,
-            ],
-            [
-                'name'=>'周四',
-                'value'=>4,
-            ],
-            [
-                'name'=>'周五',
-                'value'=>5,
-            ],
-            [
-                'name'=>'周六',
-                'value'=>6,
-            ],
-            [
-                'name'=>'周日',
-                'value'=>7,
-            ],
-        ];
+            foreach ($categoryTreeLists as $key => $value) {
+                $categorys[$value['id']] = $value['title'];
+            }
 
-        if($data) {
+            $form->select('category_id','分类')
+            ->options($categorys)
+            ->rules(['required'],['required'=>'请选择分类'])
+            ->width(200);
 
-            // 定义对象
-            $options = User::where('users.id',$data['uid'])
-            ->select('users.username as name','users.id as value')
-            ->get()
-            ->toArray();
-            $bindUser = SearchInput::make('绑定用户','uid')
-            ->style(['width'=>200])
-            ->option($options)
-            ->dataSource('admin/user/suggest');
+            if(isset($form->data)) {
+                $bindUser = User::where('id',$form->data['uid'])->first();
 
-            // 商家地域
-            $data['area'] = [$data['province'],$data['city'],$data['county']];
+                $form->search('uid','绑定用户')
+                ->rules(['required'],['required'=>'请选择用户'])
+                ->options([
+                    $bindUser['id'] => $bindUser['username']
+                ])
+                ->ajax('admin/user/suggest')
+                ->width(200);
+            } else {
+                $form->search('uid','绑定用户')
+                ->rules(['required'],['required'=>'请选择用户'])
+                ->ajax('admin/user/suggest')
+                ->width(200);
+            }
 
-            // 地图坐标
-            $map = Map::make('商家坐标','map')
-            ->style(['width'=>'100%','height'=>400])
-            ->position($data['longitude'],$data['latitude']);
+            $form->text('tags','标签');
 
-        } else {
-            $bindUser = SearchInput::make('绑定用户','uid')
-            ->style(['width'=>200])
-            ->dataSource('admin/user/suggest');
+            $form->textArea('description','描述')
+            ->rules(['max:190'],['max'=>'名称不能超过190个字符']);
 
-            // 地图坐标
-            $map = Map::make('商家坐标','map')
-            ->style(['width'=>'100%','height'=>400]);
-        }
+            $form->image('cover_ids','封面图')->mode('multiple');
 
+            $form->editor('content','内容');
 
-        $oneControls = [
-            ID::make('ID','id'),
-            Input::make('商家名称','title')->style(['width'=>400]),
-            Image::make('Logo','logo'),
-            Select::make('分类','category_id')->style(['width'=>200])->option($getCategorys)->value('0'),
-            $bindUser,
-            Input::make('标签','tags')->style(['width'=>400]),
-            TextArea::make('描述','description')->style(['width'=>400]),
-            Image::make('封面图','cover_ids')->mode('multiple'),
-            Editor::make('内容','content'),
-            Input::make('联系人','username')->style(['width'=>200]),
-            Input::make('商家电话','phone')->style(['width'=>200]),
-            Checkbox::make('营业日期','open_days')->list($openDays)->value([1,2,3,4,5,6,7]),
-            RangePicker::make('营业时间','open_times')->format('H:mm')->value(['00:00','23:59']),
-            SwitchButton::make('营业状态','comment_status')->checkedText('营业')->unCheckedText('打烊')->value(true),
-            SwitchButton::make('状态','status')->checkedText('正常')->unCheckedText('禁用')->value(true),
-            Button::make('提交')
-            ->type('primary')
-            ->style(['width'=>100,'float'=>'left','marginLeft'=>200])
-            ->onClick('submit',null,$action),
-        ];
+            $form->text('username','联系人');
+            $form->text('phone','商家电话');
 
-        $twoControls = [
-            InputNumber::make('排序','level')->extra('越大越靠前')->max(10000)->value(1),
-            Checkbox::make('推荐位','position')->list($checkboxList),
-            SwitchButton::make('自营','is_self')->checkedText('是')->unCheckedText('否')->value(false),
-            SwitchButton::make('允许评论','comment_status')->checkedText('是')->unCheckedText('否')->value(true),
-            SwitchButton::make('状态','status')->checkedText('正常')->unCheckedText('禁用')->value(true),
-            Button::make('提交')
-            ->type('primary')
-            ->style(['width'=>100,'float'=>'left','marginLeft'=>200])
-            ->onClick('submit',null,$action)
-        ];
+            $form->checkbox('open_days','营业日期')->options([
+                1 => '周一',
+                2 => '周二',
+                3 => '周三',
+                4 => '周四',
+                5 => '周五',
+                6 => '周六',
+                7 => '周日'
+            ]);
 
-        $threeControls = [
-            Area::make('商家地域','area')->style(['width'=>400]),
-            Input::make('详细地址','address')->style(['width'=>400]),
-            $map,
-            SwitchButton::make('状态','status')->checkedText('正常')->unCheckedText('禁用')->value(true),
-            Button::make('提交')
-            ->type('primary')
-            ->style(['width'=>100,'float'=>'left','marginLeft'=>200])
-            ->onClick('submit',null,$action)
-        ];
+            $form->datetime('open_times','营业时间')->format('H:mm')->value(['00:00','23:59']);
 
-        $fourControls = [
-            Input::make('法人姓名','corporate_name')->style(['width'=>200]),
-            Input::make('身份证号','corporate_idcard')->style(['width'=>200]),
-            Image::make('身份证照片','corporate_idcard_cover_id'),
-            Image::make('营业执照','business_license_cover_id'),
-            SwitchButton::make('状态','status')->checkedText('正常')->unCheckedText('禁用')->value(true),
-            Button::make('提交')
-            ->type('primary')
-            ->style(['width'=>100,'float'=>'left','marginLeft'=>200])
-            ->onClick('submit',null,$action)
-        ];
+            $form->switch('open_status','营业状态')->options([
+                'on'  => '营业',
+                'off' => '打烊'
+            ])->default(true);
 
-        $fiveControls = [
-            Input::make('开户行','bank_name')->style(['width'=>200]),
-            Input::make('收款人','bank_payee')->style(['width'=>200]),
-            Input::make('银行账号','bank_number')->style(['width'=>200]),
-            SwitchButton::make('状态','status')->checkedText('正常')->unCheckedText('禁用')->value(true),
-            Button::make('提交')
-            ->type('primary')
-            ->style(['width'=>100,'float'=>'left','marginLeft'=>200])
-            ->onClick('submit',null,$action)
-        ];
+            $form->switch('status','状态')->options([
+                'on'  => '是',
+                'off' => '否'
+            ])->default(true);
 
-        $tabPane = [
-            TabPane::make('基本信息',1)->controls($oneControls),
-            TabPane::make('扩展信息',2)->controls($twoControls),
-            TabPane::make('商铺位置',3)->controls($threeControls),
-            TabPane::make('资质证件',4)->controls($fourControls),
-            TabPane::make('打款信息',5)->controls($fiveControls)
-        ];
+        })->tab('扩展信息', function ($form) {
 
-        $tabs = Tabs::make('tab')->defaultActiveKey(1)->tabPanes($tabPane);
+        });
 
-        $result = $this->formBuilder($tabs,$data);
+        $form->saving(function ($form) {
+            $form->request['adminid'] = ADMINID;
+        });
 
-        return $result;
+        return $form;
     }
 
-    /**
-     * 添加页面
-     * 
-     * @param  Request  $request
-     * @return Response
-     */
-    public function create(Request $request)
-    {
-        $data = $this->form();
-        return $this->success('获取成功！','',$data);
-    }
+    // /**
+    //  * Form页面模板
+    //  * 
+    //  * @param  Request  $request
+    //  * @return Response
+    //  */
+    // public function form($data = [])
+    // {
+    //     if(isset($data['id'])) {
+    //         $action = 'admin/'.$this->controllerName().'/save';
+    //     } else {
+    //         $action = 'admin/'.$this->controllerName().'/store';
+    //     }
 
-    /**
-     * 保存方法
-     * 
-     * @param  Request  $request
-     * @return Response
-     */
-    public function store(Request $request)
-    {
-        $title                      =   $request->json('title','');
-        $logo                       =   $request->json('logo','');
-        $uid                        =   $request->json('uid','');
-        $categoryId                 =   $request->json('category_id',0);
-        $tags                       =   $request->json('tags','');
-        $description                =   $request->json('description');
-        $content                    =   $request->json('content','');
-        $coverIds                   =   $request->json('cover_ids');
-        $level                      =   $request->json('level','');
-        $position                   =   $request->json('position','');
-        $username                   =   $request->json('username','');
-        $phone                      =   $request->json('phone',0);
-        $area                       =   $request->json('area');
-        $address                    =   $request->json('address');
-        $map                        =   $request->json('map');
-        $businessLicenseCoverId     =   $request->json('business_license_cover_id');
-        $corporateName              =   $request->json('corporate_name');
-        $corporateIdcard            =   $request->json('corporate_idcard');
-        $corporateIdcardCoverId     =   $request->json('corporate_idcard_cover_id');
-        $comment                    =   $request->json('comment');
-        $view                       =   $request->json('view');
-        $commentStatus              =   $request->json('comment_status');
-        $rate                       =   $request->json('rate');
-        $openDays                   =   $request->json('open_days');
-        $openTimes                  =   $request->json('open_times');
-        $openStatus                 =   $request->json('open_status');
-        $isSelf                     =   $request->json('is_self');
-        $status                     =   $request->json('status');
+    //     $categorys         = ShopCategory::where('status',1)->get()->toArray();
+    //     $categoryTrees     = Helper::listToTree($categorys);
+    //     $categoryTreeLists = Helper::treeToOrderList($categoryTrees,0,'title');
 
-        $bankName                  =   $request->json('bank_name');
-        $bankPayee                 =   $request->json('bank_payee');
-        $bankNumber                =   $request->json('bank_number');
+    //     // 模板数据
+    //     $getCategorys = [];
 
-        if(empty($title)) {
-            return $this->error('商家名称不能为空！');
-        }
+    //     $getCategorys[0]['name'] = '请选择分类';
+    //     $getCategorys[0]['value'] = '0';
 
-        if(empty($logo)) {
-            return $this->error('请上传logo！');
-        }
+    //     foreach ($categoryTreeLists as $key => $categoryTreeList) {
+    //         $getCategorys[$key+1]['name'] = $categoryTreeList['title'];
+    //         $getCategorys[$key+1]['value'] = $categoryTreeList['id'];
+    //     }
 
-        if(empty($uid)) {
-            return $this->error('请选择绑定用户！');
-        }
+    //     $checkboxList = [
+    //         [
+    //             'name'=>'首页推荐',
+    //             'value'=>1,
+    //         ],
+    //         [
+    //             'name'=>'频道推荐',
+    //             'value'=>2,
+    //         ],
+    //         [
+    //             'name'=>'列表推荐',
+    //             'value'=>4,
+    //         ],
+    //         [
+    //             'name'=>'详情推荐',
+    //             'value'=>8,
+    //         ],
+    //     ];
 
-        if(empty($categoryId)) {
-            return $this->error('请选择分类！');
-        }
+    //     $openDays = [
+    //         [
+    //             'name'=>'周一',
+    //             'value'=>1,
+    //         ],
+    //         [
+    //             'name'=>'周二',
+    //             'value'=>2,
+    //         ],
+    //         [
+    //             'name'=>'周三',
+    //             'value'=>3,
+    //         ],
+    //         [
+    //             'name'=>'周四',
+    //             'value'=>4,
+    //         ],
+    //         [
+    //             'name'=>'周五',
+    //             'value'=>5,
+    //         ],
+    //         [
+    //             'name'=>'周六',
+    //             'value'=>6,
+    //         ],
+    //         [
+    //             'name'=>'周日',
+    //             'value'=>7,
+    //         ],
+    //     ];
 
-        if(empty($username)) {
-            return $this->error('商家联系人不能为空！');
-        }
+    //     if($data) {
 
-        if(empty($phone)) {
-            return $this->error('商家电话不能为空！');
-        }
+    //         // 定义对象
+    //         $options = User::where('users.id',$data['uid'])
+    //         ->select('users.username as name','users.id as value')
+    //         ->get()
+    //         ->toArray();
+    //         $bindUser = SearchInput::make('绑定用户','uid')
+    //         ->style(['width'=>200])
+    //         ->option($options)
+    //         ->dataSource('admin/user/suggest');
 
-        $hasMerchant = Merchant::where('uid',$uid)->first();
+    //         // 商家地域
+    //         $data['area'] = [$data['province'],$data['city'],$data['county']];
 
-        if(!empty($hasMerchant)) {
-            $data['mch_id'] = $hasMerchant['id'];
-        } else {
-            $merchantData['uid'] = $uid;
-            $merchantData['bank_name'] = $bankName;
-            $merchantData['bank_payee'] = $bankPayee;
-            $merchantData['bank_number'] = $bankNumber;
-            $merchantInfo = Merchant::create($merchantData);
-            $data['mch_id'] = $merchantInfo['id'];
-        }
+    //         // 地图坐标
+    //         $map = Map::make('商家坐标','map')
+    //         ->style(['width'=>'100%','height'=>400])
+    //         ->position($data['longitude'],$data['latitude']);
 
-        if ($status == true) {
-            $status = 1;
-        } else {
-            $status = 2;
-        }
+    //     } else {
+    //         $bindUser = SearchInput::make('绑定用户','uid')
+    //         ->style(['width'=>200])
+    //         ->dataSource('admin/user/suggest');
 
-        if ($openStatus == true) {
-            $openStatus = 1;
-        } else {
-            $openStatus = 2;
-        }
+    //         // 地图坐标
+    //         $map = Map::make('商家坐标','map')
+    //         ->style(['width'=>'100%','height'=>400]);
+    //     }
 
-        if ($commentStatus == true) {
-            $commentStatus = 1;
-        } else {
-            $commentStatus = 2;
-        }
 
-        $data['title'] = $title;
-        $data['logo'] = $logo[0]['id'];
-        $data['category_id'] = $categoryId;
-        $data['tags'] = $tags;
-        $data['description'] = $description;
-        $data['content'] = $content;
-        $data['cover_ids'] = json_encode($coverIds);
-        $data['level'] = $level;
-        if($position) {
-            $data['position'] = collect($position)->sum();
-        }
-        $data['username'] = $username;
-        $data['phone'] = $phone;
-        $data['province'] = $area[0];
-        $data['city'] = $area[1];
-        $data['county'] = $area[2];
-        $data['address'] = $address;
+    //     $oneControls = [
+    //         ID::make('ID','id'),
+    //         Input::make('商家名称','title')->style(['width'=>400]),
+    //         Image::make('Logo','logo'),
+    //         Select::make('分类','category_id')->style(['width'=>200])->option($getCategorys)->value('0'),
+    //         $bindUser,
+    //         Input::make('标签','tags')->style(['width'=>400]),
+    //         TextArea::make('描述','description')->style(['width'=>400]),
+    //         Image::make('封面图','cover_ids')->mode('multiple'),
+    //         Editor::make('内容','content'),
+    //         Input::make('联系人','username')->style(['width'=>200]),
+    //         Input::make('商家电话','phone')->style(['width'=>200]),
+    //         Checkbox::make('营业日期','open_days')->list($openDays)->value([1,2,3,4,5,6,7]),
+    //         RangePicker::make('营业时间','open_times')->format('H:mm')->value(['00:00','23:59']),
+    //         SwitchButton::make('营业状态','comment_status')->checkedText('营业')->unCheckedText('打烊')->value(true),
+    //         SwitchButton::make('状态','status')->checkedText('正常')->unCheckedText('禁用')->value(true),
+    //         Button::make('提交')
+    //         ->type('primary')
+    //         ->style(['width'=>100,'float'=>'left','marginLeft'=>200])
+    //         ->onClick('submit',null,$action),
+    //     ];
 
-        if($map) {
-            $maps = explode(',',$map);
-            $data['longitude'] = $maps[0];
-            $data['latitude'] = $maps[1];
-        }
+    //     $twoControls = [
+    //         InputNumber::make('排序','level')->extra('越大越靠前')->max(10000)->value(1),
+    //         Checkbox::make('推荐位','position')->list($checkboxList),
+    //         SwitchButton::make('自营','is_self')->checkedText('是')->unCheckedText('否')->value(false),
+    //         SwitchButton::make('允许评论','comment_status')->checkedText('是')->unCheckedText('否')->value(true),
+    //         SwitchButton::make('状态','status')->checkedText('正常')->unCheckedText('禁用')->value(true),
+    //         Button::make('提交')
+    //         ->type('primary')
+    //         ->style(['width'=>100,'float'=>'left','marginLeft'=>200])
+    //         ->onClick('submit',null,$action)
+    //     ];
 
-        if($businessLicenseCoverId) {
-            $data['business_license_cover_id'] = $businessLicenseCoverId[0]['id'];
-        }
+    //     $threeControls = [
+    //         Area::make('商家地域','area')->style(['width'=>400]),
+    //         Input::make('详细地址','address')->style(['width'=>400]),
+    //         $map,
+    //         SwitchButton::make('状态','status')->checkedText('正常')->unCheckedText('禁用')->value(true),
+    //         Button::make('提交')
+    //         ->type('primary')
+    //         ->style(['width'=>100,'float'=>'left','marginLeft'=>200])
+    //         ->onClick('submit',null,$action)
+    //     ];
 
-        $data['corporate_name'] = $corporateName;
-        $data['corporate_idcard'] = $corporateIdcard;
+    //     $fourControls = [
+    //         Input::make('法人姓名','corporate_name')->style(['width'=>200]),
+    //         Input::make('身份证号','corporate_idcard')->style(['width'=>200]),
+    //         Image::make('身份证照片','corporate_idcard_cover_id'),
+    //         Image::make('营业执照','business_license_cover_id'),
+    //         SwitchButton::make('状态','status')->checkedText('正常')->unCheckedText('禁用')->value(true),
+    //         Button::make('提交')
+    //         ->type('primary')
+    //         ->style(['width'=>100,'float'=>'left','marginLeft'=>200])
+    //         ->onClick('submit',null,$action)
+    //     ];
 
-        if($corporateIdcardCoverId) {
-            $data['corporate_idcard_cover_id'] = $corporateIdcardCoverId[0]['id'];
-        }
+    //     $fiveControls = [
+    //         Input::make('开户行','bank_name')->style(['width'=>200]),
+    //         Input::make('收款人','bank_payee')->style(['width'=>200]),
+    //         Input::make('银行账号','bank_number')->style(['width'=>200]),
+    //         SwitchButton::make('状态','status')->checkedText('正常')->unCheckedText('禁用')->value(true),
+    //         Button::make('提交')
+    //         ->type('primary')
+    //         ->style(['width'=>100,'float'=>'left','marginLeft'=>200])
+    //         ->onClick('submit',null,$action)
+    //     ];
 
-        $data['comment_status'] = $commentStatus;
-        $data['open_days'] = json_encode($openDays);
+    //     $tabPane = [
+    //         TabPane::make('基本信息',1)->controls($oneControls),
+    //         TabPane::make('扩展信息',2)->controls($twoControls),
+    //         TabPane::make('商铺位置',3)->controls($threeControls),
+    //         TabPane::make('资质证件',4)->controls($fourControls),
+    //         TabPane::make('打款信息',5)->controls($fiveControls)
+    //     ];
 
-        $getOpenTimes = [date("H:i", strtotime($openTimes[0])),date("H:i", strtotime($openTimes[1]))];
+    //     $tabs = Tabs::make('tab')->defaultActiveKey(1)->tabPanes($tabPane);
 
-        $data['open_times'] = json_encode($getOpenTimes);
-        $data['open_status'] = $openStatus;
-        $data['is_self'] = $isSelf;
-        $data['status'] = $status;
+    //     $result = $this->formBuilder($tabs,$data);
 
-        $result = Shop::create($data);
+    //     return $result;
+    // }
 
-        if ($result) {
-            return $this->success('操作成功！','/mall/shop/index');
-        } else {
-            return $this->error('操作失败！');
-        }
-    }
+    // /**
+    //  * 添加页面
+    //  * 
+    //  * @param  Request  $request
+    //  * @return Response
+    //  */
+    // public function create(Request $request)
+    // {
+    //     $data = $this->form();
+    //     return $this->success('获取成功！','',$data);
+    // }
 
-    /**
-     * 编辑页面
-     *
-     * @param  Request  $request
-     * @return Response
-     */
-    public function edit(Request $request)
-    {
-        $id = $request->get('id');
+    // /**
+    //  * 保存方法
+    //  * 
+    //  * @param  Request  $request
+    //  * @return Response
+    //  */
+    // public function store(Request $request)
+    // {
+    //     $title                      =   $request->json('title','');
+    //     $logo                       =   $request->json('logo','');
+    //     $uid                        =   $request->json('uid','');
+    //     $categoryId                 =   $request->json('category_id',0);
+    //     $tags                       =   $request->json('tags','');
+    //     $description                =   $request->json('description');
+    //     $content                    =   $request->json('content','');
+    //     $coverIds                   =   $request->json('cover_ids');
+    //     $level                      =   $request->json('level','');
+    //     $position                   =   $request->json('position','');
+    //     $username                   =   $request->json('username','');
+    //     $phone                      =   $request->json('phone',0);
+    //     $area                       =   $request->json('area');
+    //     $address                    =   $request->json('address');
+    //     $map                        =   $request->json('map');
+    //     $businessLicenseCoverId     =   $request->json('business_license_cover_id');
+    //     $corporateName              =   $request->json('corporate_name');
+    //     $corporateIdcard            =   $request->json('corporate_idcard');
+    //     $corporateIdcardCoverId     =   $request->json('corporate_idcard_cover_id');
+    //     $comment                    =   $request->json('comment');
+    //     $view                       =   $request->json('view');
+    //     $commentStatus              =   $request->json('comment_status');
+    //     $rate                       =   $request->json('rate');
+    //     $openDays                   =   $request->json('open_days');
+    //     $openTimes                  =   $request->json('open_times');
+    //     $openStatus                 =   $request->json('open_status');
+    //     $isSelf                     =   $request->json('is_self');
+    //     $status                     =   $request->json('status');
 
-        if(empty($id)) {
-            return $this->error('参数错误！');
-        }
+    //     $bankName                  =   $request->json('bank_name');
+    //     $bankPayee                 =   $request->json('bank_payee');
+    //     $bankNumber                =   $request->json('bank_number');
 
-        $data = Shop::find($id)->toArray();
+    //     if(empty($title)) {
+    //         return $this->error('商家名称不能为空！');
+    //     }
 
-        $logo = $data['logo'];
-        $coverIds = $data['cover_ids'];
-        $businessLicenseCoverId = $data['business_license_cover_id'];
-        $corporateIdcardCoverId = $data['corporate_idcard_cover_id'];
+    //     if(empty($logo)) {
+    //         return $this->error('请上传logo！');
+    //     }
 
-        unset($data['logo']);
-        unset($data['cover_ids']);
-        unset($data['business_license_cover_id']);
-        unset($data['corporate_idcard_cover_id']);
+    //     if(empty($uid)) {
+    //         return $this->error('请选择绑定用户！');
+    //     }
 
-        $data['logo'][0]['id'] =$logo;
-        $data['logo'][0]['uid'] =$logo;
-        $data['logo'][0]['name'] = Helper::getPicture($logo,'name');
-        $data['logo'][0]['url'] = Helper::getPicture($logo);
+    //     if(empty($categoryId)) {
+    //         return $this->error('请选择分类！');
+    //     }
 
-        $data['cover_ids'] = json_decode($coverIds,true);
+    //     if(empty($username)) {
+    //         return $this->error('商家联系人不能为空！');
+    //     }
 
-        $data['business_license_cover_id'][0]['id'] =$businessLicenseCoverId;
-        $data['business_license_cover_id'][0]['uid'] =$businessLicenseCoverId;
-        $data['business_license_cover_id'][0]['name'] = Helper::getPicture($businessLicenseCoverId,'name');
-        $data['business_license_cover_id'][0]['url'] = Helper::getPicture($businessLicenseCoverId);
+    //     if(empty($phone)) {
+    //         return $this->error('商家电话不能为空！');
+    //     }
 
-        $data['corporate_idcard_cover_id'][0]['id'] =$businessLicenseCoverId;
-        $data['corporate_idcard_cover_id'][0]['uid'] =$businessLicenseCoverId;
-        $data['corporate_idcard_cover_id'][0]['name'] = Helper::getPicture($businessLicenseCoverId,'name');
-        $data['corporate_idcard_cover_id'][0]['url'] = Helper::getPicture($businessLicenseCoverId);
+    //     $hasMerchant = Merchant::where('uid',$uid)->first();
 
-        $data['open_days'] = json_decode($data['open_days']);
-        $data['open_times'] = json_decode($data['open_times']);
+    //     if(!empty($hasMerchant)) {
+    //         $data['mch_id'] = $hasMerchant['id'];
+    //     } else {
+    //         $merchantData['uid'] = $uid;
+    //         $merchantData['bank_name'] = $bankName;
+    //         $merchantData['bank_payee'] = $bankPayee;
+    //         $merchantData['bank_number'] = $bankNumber;
+    //         $merchantInfo = Merchant::create($merchantData);
+    //         $data['mch_id'] = $merchantInfo['id'];
+    //     }
 
-        $merchantInfo = Merchant::where('id',$data['mch_id'])->first();
-        $data['uid'] = $merchantInfo['uid'];
-        $data['bank_name'] = $merchantInfo['bank_name'];
-        $data['bank_payee'] = $merchantInfo['bank_payee'];
-        $data['bank_number'] = $merchantInfo['bank_number'];
+    //     if ($status == true) {
+    //         $status = 1;
+    //     } else {
+    //         $status = 2;
+    //     }
 
-        $position = [];
+    //     if ($openStatus == true) {
+    //         $openStatus = 1;
+    //     } else {
+    //         $openStatus = 2;
+    //     }
 
-        if(in_array($data['position'], [1,3,5,7,9,15])) {
-            $position[] = 1;
-        }
+    //     if ($commentStatus == true) {
+    //         $commentStatus = 1;
+    //     } else {
+    //         $commentStatus = 2;
+    //     }
 
-        if(in_array($data['position'], [2,3,6,7,9,10,14,15])) {
-            $position[] = 2;
-        }
+    //     $data['title'] = $title;
+    //     $data['logo'] = $logo[0]['id'];
+    //     $data['category_id'] = $categoryId;
+    //     $data['tags'] = $tags;
+    //     $data['description'] = $description;
+    //     $data['content'] = $content;
+    //     $data['cover_ids'] = json_encode($coverIds);
+    //     $data['level'] = $level;
+    //     if($position) {
+    //         $data['position'] = collect($position)->sum();
+    //     }
+    //     $data['username'] = $username;
+    //     $data['phone'] = $phone;
+    //     $data['province'] = $area[0];
+    //     $data['city'] = $area[1];
+    //     $data['county'] = $area[2];
+    //     $data['address'] = $address;
 
-        if(in_array($data['position'], [4,5,6,7,12,13,14,15])) {
-            $position[] = 4;
-        }
+    //     if($map) {
+    //         $maps = explode(',',$map);
+    //         $data['longitude'] = $maps[0];
+    //         $data['latitude'] = $maps[1];
+    //     }
 
-        if(in_array($data['position'], [8,9,10,11,12,13,14,15])) {
-            $position[] = 8;
-        }
+    //     if($businessLicenseCoverId) {
+    //         $data['business_license_cover_id'] = $businessLicenseCoverId[0]['id'];
+    //     }
 
-        $data['position'] = $position;
+    //     $data['corporate_name'] = $corporateName;
+    //     $data['corporate_idcard'] = $corporateIdcard;
+
+    //     if($corporateIdcardCoverId) {
+    //         $data['corporate_idcard_cover_id'] = $corporateIdcardCoverId[0]['id'];
+    //     }
+
+    //     $data['comment_status'] = $commentStatus;
+    //     $data['open_days'] = json_encode($openDays);
+
+    //     $getOpenTimes = [date("H:i", strtotime($openTimes[0])),date("H:i", strtotime($openTimes[1]))];
+
+    //     $data['open_times'] = json_encode($getOpenTimes);
+    //     $data['open_status'] = $openStatus;
+    //     $data['is_self'] = $isSelf;
+    //     $data['status'] = $status;
+
+    //     $result = Shop::create($data);
+
+    //     if ($result) {
+    //         return $this->success('操作成功！','/mall/shop/index');
+    //     } else {
+    //         return $this->error('操作失败！');
+    //     }
+    // }
+
+    // /**
+    //  * 编辑页面
+    //  *
+    //  * @param  Request  $request
+    //  * @return Response
+    //  */
+    // public function edit(Request $request)
+    // {
+    //     $id = $request->get('id');
+
+    //     if(empty($id)) {
+    //         return $this->error('参数错误！');
+    //     }
+
+    //     $data = Shop::find($id)->toArray();
+
+    //     $logo = $data['logo'];
+    //     $coverIds = $data['cover_ids'];
+    //     $businessLicenseCoverId = $data['business_license_cover_id'];
+    //     $corporateIdcardCoverId = $data['corporate_idcard_cover_id'];
+
+    //     unset($data['logo']);
+    //     unset($data['cover_ids']);
+    //     unset($data['business_license_cover_id']);
+    //     unset($data['corporate_idcard_cover_id']);
+
+    //     $data['logo'][0]['id'] =$logo;
+    //     $data['logo'][0]['uid'] =$logo;
+    //     $data['logo'][0]['name'] = Helper::getPicture($logo,'name');
+    //     $data['logo'][0]['url'] = Helper::getPicture($logo);
+
+    //     $data['cover_ids'] = json_decode($coverIds,true);
+
+    //     $data['business_license_cover_id'][0]['id'] =$businessLicenseCoverId;
+    //     $data['business_license_cover_id'][0]['uid'] =$businessLicenseCoverId;
+    //     $data['business_license_cover_id'][0]['name'] = Helper::getPicture($businessLicenseCoverId,'name');
+    //     $data['business_license_cover_id'][0]['url'] = Helper::getPicture($businessLicenseCoverId);
+
+    //     $data['corporate_idcard_cover_id'][0]['id'] =$businessLicenseCoverId;
+    //     $data['corporate_idcard_cover_id'][0]['uid'] =$businessLicenseCoverId;
+    //     $data['corporate_idcard_cover_id'][0]['name'] = Helper::getPicture($businessLicenseCoverId,'name');
+    //     $data['corporate_idcard_cover_id'][0]['url'] = Helper::getPicture($businessLicenseCoverId);
+
+    //     $data['open_days'] = json_decode($data['open_days']);
+    //     $data['open_times'] = json_decode($data['open_times']);
+
+    //     $merchantInfo = Merchant::where('id',$data['mch_id'])->first();
+    //     $data['uid'] = $merchantInfo['uid'];
+    //     $data['bank_name'] = $merchantInfo['bank_name'];
+    //     $data['bank_payee'] = $merchantInfo['bank_payee'];
+    //     $data['bank_number'] = $merchantInfo['bank_number'];
+
+    //     $position = [];
+
+    //     if(in_array($data['position'], [1,3,5,7,9,15])) {
+    //         $position[] = 1;
+    //     }
+
+    //     if(in_array($data['position'], [2,3,6,7,9,10,14,15])) {
+    //         $position[] = 2;
+    //     }
+
+    //     if(in_array($data['position'], [4,5,6,7,12,13,14,15])) {
+    //         $position[] = 4;
+    //     }
+
+    //     if(in_array($data['position'], [8,9,10,11,12,13,14,15])) {
+    //         $position[] = 8;
+    //     }
+
+    //     $data['position'] = $position;
         
-        if ($data['status'] == 1) {
-            $data['status'] = true;
-        } else {
-            $data['status'] = false;
-        }
+    //     if ($data['status'] == 1) {
+    //         $data['status'] = true;
+    //     } else {
+    //         $data['status'] = false;
+    //     }
 
-        $data = $this->form($data);
+    //     $data = $this->form($data);
 
-        if(!empty($data)) {
-            return $this->success('操作成功！','',$data);
-        } else {
-            return $this->error('操作失败！');
-        }
-    }
+    //     if(!empty($data)) {
+    //         return $this->success('操作成功！','',$data);
+    //     } else {
+    //         return $this->error('操作失败！');
+    //     }
+    // }
 
-    /**
-     * 保存编辑数据
-     *
-     * @param  Request  $request
-     * @return Response
-     */
-    public function save(Request $request)
-    {
-        $id                         =   $request->json('id');
-        $title                      =   $request->json('title','');
-        $logo                       =   $request->json('logo','');
-        $uid                        =   $request->json('uid','');
-        $categoryId                 =   $request->json('category_id',0);
-        $tags                       =   $request->json('tags','');
-        $description                =   $request->json('description');
-        $content                    =   $request->json('content','');
-        $coverIds                   =   $request->json('cover_ids');
-        $level                      =   $request->json('level','');
-        $position                   =   $request->json('position','');
-        $username                   =   $request->json('username','');
-        $phone                      =   $request->json('phone',0);
-        $area                       =   $request->json('area');
-        $address                    =   $request->json('address');
-        $map                        =   $request->json('map');
-        $businessLicenseCoverId     =   $request->json('business_license_cover_id');
-        $corporateName              =   $request->json('corporate_name');
-        $corporateIdcard            =   $request->json('corporate_idcard');
-        $corporateIdcardCoverId     =   $request->json('corporate_idcard_cover_id');
-        $comment                    =   $request->json('comment');
-        $view                       =   $request->json('view');
-        $commentStatus              =   $request->json('comment_status');
-        $rate                       =   $request->json('rate');
-        $openDays                   =   $request->json('open_days');
-        $openTimes                  =   $request->json('open_times');
-        $openStatus                 =   $request->json('open_status');
-        $isSelf                     =   $request->json('is_self');
-        $status                     =   $request->json('status');
+    // /**
+    //  * 保存编辑数据
+    //  *
+    //  * @param  Request  $request
+    //  * @return Response
+    //  */
+    // public function save(Request $request)
+    // {
+    //     $id                         =   $request->json('id');
+    //     $title                      =   $request->json('title','');
+    //     $logo                       =   $request->json('logo','');
+    //     $uid                        =   $request->json('uid','');
+    //     $categoryId                 =   $request->json('category_id',0);
+    //     $tags                       =   $request->json('tags','');
+    //     $description                =   $request->json('description');
+    //     $content                    =   $request->json('content','');
+    //     $coverIds                   =   $request->json('cover_ids');
+    //     $level                      =   $request->json('level','');
+    //     $position                   =   $request->json('position','');
+    //     $username                   =   $request->json('username','');
+    //     $phone                      =   $request->json('phone',0);
+    //     $area                       =   $request->json('area');
+    //     $address                    =   $request->json('address');
+    //     $map                        =   $request->json('map');
+    //     $businessLicenseCoverId     =   $request->json('business_license_cover_id');
+    //     $corporateName              =   $request->json('corporate_name');
+    //     $corporateIdcard            =   $request->json('corporate_idcard');
+    //     $corporateIdcardCoverId     =   $request->json('corporate_idcard_cover_id');
+    //     $comment                    =   $request->json('comment');
+    //     $view                       =   $request->json('view');
+    //     $commentStatus              =   $request->json('comment_status');
+    //     $rate                       =   $request->json('rate');
+    //     $openDays                   =   $request->json('open_days');
+    //     $openTimes                  =   $request->json('open_times');
+    //     $openStatus                 =   $request->json('open_status');
+    //     $isSelf                     =   $request->json('is_self');
+    //     $status                     =   $request->json('status');
 
-        $bankName                  =   $request->json('bank_name');
-        $bankPayee                 =   $request->json('bank_payee');
-        $bankNumber                =   $request->json('bank_number');
+    //     $bankName                  =   $request->json('bank_name');
+    //     $bankPayee                 =   $request->json('bank_payee');
+    //     $bankNumber                =   $request->json('bank_number');
 
-        if(empty($title)) {
-            return $this->error('商家名称不能为空！');
-        }
+    //     if(empty($title)) {
+    //         return $this->error('商家名称不能为空！');
+    //     }
 
-        if(empty($logo)) {
-            return $this->error('请上传logo！');
-        }
+    //     if(empty($logo)) {
+    //         return $this->error('请上传logo！');
+    //     }
 
-        if(empty($uid)) {
-            return $this->error('请选择绑定用户！');
-        }
+    //     if(empty($uid)) {
+    //         return $this->error('请选择绑定用户！');
+    //     }
 
-        if(empty($categoryId)) {
-            return $this->error('请选择分类！');
-        }
+    //     if(empty($categoryId)) {
+    //         return $this->error('请选择分类！');
+    //     }
 
-        if(empty($username)) {
-            return $this->error('商家联系人不能为空！');
-        }
+    //     if(empty($username)) {
+    //         return $this->error('商家联系人不能为空！');
+    //     }
 
-        if(empty($phone)) {
-            return $this->error('商家电话不能为空！');
-        }
+    //     if(empty($phone)) {
+    //         return $this->error('商家电话不能为空！');
+    //     }
 
-        $hasMerchant = Merchant::where('uid',$uid)->first();
+    //     $hasMerchant = Merchant::where('uid',$uid)->first();
 
-        if(!empty($hasMerchant)) {
-            $data['mch_id'] = $hasMerchant['id'];
-            $merchantData['uid'] = $uid;
-            $merchantData['bank_name'] = $bankName;
-            $merchantData['bank_payee'] = $bankPayee;
-            $merchantData['bank_number'] = $bankNumber;
-            $merchantInfo = Merchant::where('id',$hasMerchant['id'])->update($merchantData);
-        } else {
-            $merchantData['uid'] = $uid;
-            $merchantData['bank_name'] = $bankName;
-            $merchantData['bank_payee'] = $bankPayee;
-            $merchantData['bank_number'] = $bankNumber;
-            $merchantInfo = Merchant::create($merchantData);
-            $data['mch_id'] = $merchantInfo['id'];
-        }
+    //     if(!empty($hasMerchant)) {
+    //         $data['mch_id'] = $hasMerchant['id'];
+    //         $merchantData['uid'] = $uid;
+    //         $merchantData['bank_name'] = $bankName;
+    //         $merchantData['bank_payee'] = $bankPayee;
+    //         $merchantData['bank_number'] = $bankNumber;
+    //         $merchantInfo = Merchant::where('id',$hasMerchant['id'])->update($merchantData);
+    //     } else {
+    //         $merchantData['uid'] = $uid;
+    //         $merchantData['bank_name'] = $bankName;
+    //         $merchantData['bank_payee'] = $bankPayee;
+    //         $merchantData['bank_number'] = $bankNumber;
+    //         $merchantInfo = Merchant::create($merchantData);
+    //         $data['mch_id'] = $merchantInfo['id'];
+    //     }
 
-        if ($status == true) {
-            $status = 1;
-        } else {
-            $status = 2;
-        }
+    //     if ($status == true) {
+    //         $status = 1;
+    //     } else {
+    //         $status = 2;
+    //     }
 
-        if ($openStatus == true) {
-            $openStatus = 1;
-        } else {
-            $openStatus = 2;
-        }
+    //     if ($openStatus == true) {
+    //         $openStatus = 1;
+    //     } else {
+    //         $openStatus = 2;
+    //     }
 
-        if ($commentStatus == true) {
-            $commentStatus = 1;
-        } else {
-            $commentStatus = 2;
-        }
+    //     if ($commentStatus == true) {
+    //         $commentStatus = 1;
+    //     } else {
+    //         $commentStatus = 2;
+    //     }
 
-        $data['title'] = $title;
-        $data['logo'] = $logo[0]['id'];
-        $data['category_id'] = $categoryId;
-        $data['tags'] = $tags;
-        $data['description'] = $description;
-        $data['content'] = $content;
-        $data['cover_ids'] = json_encode($coverIds);
-        $data['level'] = $level;
-        if($position) {
-            $data['position'] = collect($position)->sum();
-        }
-        $data['username'] = $username;
-        $data['phone'] = $phone;
-        $data['province'] = $area[0];
-        $data['city'] = $area[1];
-        $data['county'] = $area[2];
-        $data['address'] = $address;
+    //     $data['title'] = $title;
+    //     $data['logo'] = $logo[0]['id'];
+    //     $data['category_id'] = $categoryId;
+    //     $data['tags'] = $tags;
+    //     $data['description'] = $description;
+    //     $data['content'] = $content;
+    //     $data['cover_ids'] = json_encode($coverIds);
+    //     $data['level'] = $level;
+    //     if($position) {
+    //         $data['position'] = collect($position)->sum();
+    //     }
+    //     $data['username'] = $username;
+    //     $data['phone'] = $phone;
+    //     $data['province'] = $area[0];
+    //     $data['city'] = $area[1];
+    //     $data['county'] = $area[2];
+    //     $data['address'] = $address;
 
-        if($map) {
-            $maps = explode(',',$map);
-            $data['longitude'] = $maps[0];
-            $data['latitude'] = $maps[1];
-        }
+    //     if($map) {
+    //         $maps = explode(',',$map);
+    //         $data['longitude'] = $maps[0];
+    //         $data['latitude'] = $maps[1];
+    //     }
 
-        if($businessLicenseCoverId) {
-            $data['business_license_cover_id'] = $businessLicenseCoverId[0]['id'];
-        }
+    //     if($businessLicenseCoverId) {
+    //         $data['business_license_cover_id'] = $businessLicenseCoverId[0]['id'];
+    //     }
 
-        $data['corporate_name'] = $corporateName;
-        $data['corporate_idcard'] = $corporateIdcard;
+    //     $data['corporate_name'] = $corporateName;
+    //     $data['corporate_idcard'] = $corporateIdcard;
 
-        if($corporateIdcardCoverId) {
-            $data['corporate_idcard_cover_id'] = $corporateIdcardCoverId[0]['id'];
-        }
+    //     if($corporateIdcardCoverId) {
+    //         $data['corporate_idcard_cover_id'] = $corporateIdcardCoverId[0]['id'];
+    //     }
 
-        $data['comment_status'] = $commentStatus;
-        $data['open_days'] = json_encode($openDays);
+    //     $data['comment_status'] = $commentStatus;
+    //     $data['open_days'] = json_encode($openDays);
 
-        $getOpenTimes = [date("H:i", strtotime($openTimes[0])),date("H:i", strtotime($openTimes[1]))];
+    //     $getOpenTimes = [date("H:i", strtotime($openTimes[0])),date("H:i", strtotime($openTimes[1]))];
 
-        $data['open_times'] = json_encode($getOpenTimes);
-        $data['open_status'] = $openStatus;
-        $data['is_self'] = $isSelf;
-        $data['status'] = $status;
+    //     $data['open_times'] = json_encode($getOpenTimes);
+    //     $data['open_status'] = $openStatus;
+    //     $data['is_self'] = $isSelf;
+    //     $data['status'] = $status;
 
-        $result = Shop::where('id',$id)->update($data);
+    //     $result = Shop::where('id',$id)->update($data);
 
-        if ($result) {
-            return $this->success('操作成功！','/mall/shop/index');
-        } else {
-            return $this->error('操作失败！');
-        }
-    }
+    //     if ($result) {
+    //         return $this->success('操作成功！','/mall/shop/index');
+    //     } else {
+    //         return $this->error('操作失败！');
+    //     }
+    // }
 
-    /**
-     * 改变数据状态
-     *
-     * @param  Request  $request
-     * @return Response
-     */
-    public function changeStatus(Request $request)
-    {
-        $id = $request->json('id');
-        $status = $request->json('status');
+    // /**
+    //  * 改变数据状态
+    //  *
+    //  * @param  Request  $request
+    //  * @return Response
+    //  */
+    // public function changeStatus(Request $request)
+    // {
+    //     $id = $request->json('id');
+    //     $status = $request->json('status');
 
-        if(empty($id) || empty($status)) {
-            return $this->error('参数错误！');
-        }
+    //     if(empty($id) || empty($status)) {
+    //         return $this->error('参数错误！');
+    //     }
 
-        // 定义对象
-        $query = Shop::query();
+    //     // 定义对象
+    //     $query = Shop::query();
 
-        if(is_array($id)) {
-            $query->whereIn('id',$id);
-        } else {
-            $query->where('id',$id);
-        }
+    //     if(is_array($id)) {
+    //         $query->whereIn('id',$id);
+    //     } else {
+    //         $query->where('id',$id);
+    //     }
 
-        $result = $query->update(['status'=>$status]);
+    //     $result = $query->update(['status'=>$status]);
 
-        if ($result) {
-            return $this->success('操作成功！');
-        } else {
-            return $this->error('操作失败！');
-        }
-    }
+    //     if ($result) {
+    //         return $this->success('操作成功！');
+    //     } else {
+    //         return $this->error('操作失败！');
+    //     }
+    // }
 
     /**
      * 列表页面
