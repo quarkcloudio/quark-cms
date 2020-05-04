@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use QuarkCMS\QuarkAdmin\Controllers\QuarkController;
 use App\Models\Shop;
+use App\Models\Area;
 use App\Models\Merchant;
 use App\Models\ShopCategory;
 use App\User;
@@ -169,6 +170,47 @@ class ShopController extends QuarkController
 
         })->tab('扩展信息', function ($form) {
 
+            $form->number('level','排序')->extra('越大越靠前')->value(0);
+
+            $form->checkbox('position','推荐位')->options([
+                1 => '首页推荐',
+                2 => '频道推荐',
+                3 => '列表推荐',
+                4 => '详情推荐'
+            ]);
+
+            $form->switch('is_self','自营')->options([
+                'on'  => '是',
+                'off' => '否'
+            ])->default(false);
+
+            $form->switch('comment_status','允许评论')->options([
+                'on'  => '是',
+                'off' => '否'
+            ])->default(true);
+
+        })->tab('商铺位置', function ($form) {
+
+            $areas = Area::where('pid','<>',0)
+            ->select('area_name as value','area_name as label','id','pid')
+            ->get()
+            ->toArray();
+
+            $options = list_to_tree($areas,'id','pid','children',1);
+
+            $form->cascader('area','商家地域')->options($options)->width(400);
+
+            $form->text('address','详细地址')->width(400);
+
+            if(isset($form->data)) {
+                // 地图坐标
+                $form->map('map','商家坐标')
+                ->style(['width'=>'100%','height'=>400])
+                ->position($data['longitude'],$data['latitude']);
+            } else {
+                $form->map('map','商家坐标')
+                ->style(['width'=>'100%','height'=>400]);
+            }
         });
 
         $form->saving(function ($form) {
