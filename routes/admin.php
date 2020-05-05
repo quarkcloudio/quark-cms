@@ -137,18 +137,22 @@ Route::group([
 
     // 商城
     $router->get('admin/shop/index', 'ShopController@index')->name('api/admin/shop/index');
+    $router->get('admin/shop/show', 'ShopController@show')->name('api/admin/shop/show');
     $router->get('admin/shop/create', 'ShopController@create')->name('api/admin/shop/create');
     $router->post('admin/shop/store', 'ShopController@store')->name('api/admin/shop/store');
     $router->get('admin/shop/edit', 'ShopController@edit')->name('api/admin/shop/edit');
-    $router->post('admin/shop/save', 'ShopController@save')->name('api/admin/shop/save');
-    $router->post('admin/shop/changeStatus', 'ShopController@changeStatus')->name('api/admin/shop/changeStatus');
+    $router->post('admin/shop/update', 'ShopController@update')->name('api/admin/shop/update');
+    $router->any('admin/shop/action', 'ShopController@action')->name('api/admin/shop/action');
+    $router->post('admin/shop/destroy', 'ShopController@destroy')->name('api/admin/shop/destroy');
 
-    $router->get('admin/shop/categoryIndex', 'ShopController@categoryIndex')->name('api/admin/shop/categoryIndex');
-    $router->get('admin/shop/categoryCreate', 'ShopController@categoryCreate')->name('api/admin/shop/categoryCreate');
-    $router->post('admin/shop/categoryStore', 'ShopController@categoryStore')->name('api/admin/shop/categoryStore');
-    $router->get('admin/shop/categoryEdit', 'ShopController@categoryEdit')->name('api/admin/shop/categoryEdit');
-    $router->post('admin/shop/categorySave', 'ShopController@categorySave')->name('api/admin/shop/categorySave');
-    $router->post('admin/shop/categoryChangeStatus', 'ShopController@categoryChangeStatus')->name('api/admin/shop/categoryChangeStatus');
+    $router->get('admin/shopCategory/index', 'ShopCategoryController@index')->name('api/admin/shopCategory/index');
+    $router->get('admin/shopCategory/show', 'ShopCategoryController@show')->name('api/admin/shopCategory/show');
+    $router->get('admin/shopCategory/create', 'ShopCategoryController@create')->name('api/admin/shopCategory/create');
+    $router->post('admin/shopCategory/store', 'ShopCategoryController@store')->name('api/admin/shopCategory/store');
+    $router->get('admin/shopCategory/edit', 'ShopCategoryController@edit')->name('api/admin/shopCategory/edit');
+    $router->post('admin/shopCategory/update', 'ShopCategoryController@update')->name('api/admin/shopCategory/update');
+    $router->any('admin/shopCategory/action', 'ShopCategoryController@action')->name('api/admin/shopCategory/action');
+    $router->post('admin/shopCategory/destroy', 'ShopCategoryController@destroy')->name('api/admin/shopCategory/destroy');
 
     $router->get('admin/goods/index', 'GoodsController@index')->name('api/admin/goods/index');
     $router->get('admin/goods/create', 'GoodsController@create')->name('api/admin/goods/create');
