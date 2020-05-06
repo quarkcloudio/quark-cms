@@ -268,27 +268,27 @@ class ShopController extends QuarkController
         $bankNumber                =   $request->json('bank_number');
 
         if(empty($title)) {
-            return $this->error('商家名称不能为空！');
+            return error('商家名称不能为空！');
         }
 
         if(empty($logo)) {
-            return $this->error('请上传logo！');
+            return error('请上传logo！');
         }
 
         if(empty($uid)) {
-            return $this->error('请选择绑定用户！');
+            return error('请选择绑定用户！');
         }
 
         if(empty($categoryId)) {
-            return $this->error('请选择分类！');
+            return error('请选择分类！');
         }
 
         if(empty($username)) {
-            return $this->error('商家联系人不能为空！');
+            return error('商家联系人不能为空！');
         }
 
         if(empty($phone)) {
-            return $this->error('商家电话不能为空！');
+            return error('商家电话不能为空！');
         }
 
         $hasMerchant = Merchant::where('uid',$uid)->first();
@@ -307,19 +307,19 @@ class ShopController extends QuarkController
         if ($status == true) {
             $status = 1;
         } else {
-            $status = 2;
+            $status = 0;
         }
 
         if ($openStatus == true) {
             $openStatus = 1;
         } else {
-            $openStatus = 2;
+            $openStatus = 0;
         }
 
         if ($commentStatus == true) {
             $commentStatus = 1;
         } else {
-            $commentStatus = 2;
+            $commentStatus = 0;
         }
 
         $data['title'] = $title;
@@ -370,9 +370,9 @@ class ShopController extends QuarkController
         $result = Shop::create($data);
 
         if ($result) {
-            return $this->success('操作成功！','/mall/shop/index');
+            return success('操作成功！','/mall/shop/index');
         } else {
-            return $this->error('操作失败！');
+            return error('操作失败！');
         }
     }
 
@@ -419,27 +419,27 @@ class ShopController extends QuarkController
         $bankNumber                =   $request->json('bank_number');
 
         if(empty($title)) {
-            return $this->error('商家名称不能为空！');
+            return error('商家名称不能为空！');
         }
 
         if(empty($logo)) {
-            return $this->error('请上传logo！');
+            return error('请上传logo！');
         }
 
         if(empty($uid)) {
-            return $this->error('请选择绑定用户！');
+            return error('请选择绑定用户！');
         }
 
         if(empty($categoryId)) {
-            return $this->error('请选择分类！');
+            return error('请选择分类！');
         }
 
         if(empty($username)) {
-            return $this->error('商家联系人不能为空！');
+            return error('商家联系人不能为空！');
         }
 
         if(empty($phone)) {
-            return $this->error('商家电话不能为空！');
+            return error('商家电话不能为空！');
         }
 
         $hasMerchant = Merchant::where('uid',$uid)->first();
@@ -526,9 +526,9 @@ class ShopController extends QuarkController
         $result = Shop::where('id',$id)->update($data);
 
         if ($result) {
-            return $this->success('操作成功！','/mall/shop/index');
+            return success('操作成功！','/mall/shop/index');
         } else {
-            return $this->error('操作失败！');
+            return error('操作失败！');
         }
     }
 }
