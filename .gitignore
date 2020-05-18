@@ -2,6 +2,7 @@
 /public/hot
 /public/storage
 /public/.user.ini
+/public/nginx.htaccess
 /storage/*.key
 /vendor
 .env
