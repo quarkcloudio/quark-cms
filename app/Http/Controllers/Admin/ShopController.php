@@ -118,8 +118,14 @@ class ShopController extends QuarkController
             ->rules(['required'],['required'=>'请选择分类'])
             ->width(200);
 
+            dump($form->data);
+
             if(isset($form->data)) {
-                $bindUser = User::where('id',$form->data['uid'])->first();
+                $merchantInfo = Merchant::where('id',$form->data['mch_id'])->first();
+
+                dump($merchantInfo);
+
+                $bindUser = User::where('id',$merchantInfo['uid'])->first();
 
                 $form->search('uid','绑定用户')
                 ->rules(['required'],['required'=>'请选择用户'])
@@ -127,6 +133,7 @@ class ShopController extends QuarkController
                     $bindUser['id'] => $bindUser['username']
                 ])
                 ->ajax('admin/user/suggest')
+                ->value($bindUser['id'])
                 ->width(200);
             } else {
                 $form->search('uid','绑定用户')
@@ -323,7 +330,7 @@ class ShopController extends QuarkController
         }
 
         $data['title'] = $title;
-        $data['logo'] = $logo[0]['id'];
+        $data['logo'] = $logo;
         $data['category_id'] = $categoryId;
         $data['tags'] = $tags;
         $data['description'] = $description;
@@ -341,9 +348,8 @@ class ShopController extends QuarkController
         $data['address'] = $address;
 
         if($map) {
-            $maps = explode(',',$map);
-            $data['longitude'] = $maps[0];
-            $data['latitude'] = $maps[1];
+            $data['longitude'] = $map['longitude'];
+            $data['latitude'] = $map['latitude'];
         }
 
         if($businessLicenseCoverId) {
@@ -370,7 +376,7 @@ class ShopController extends QuarkController
         $result = Shop::create($data);
 
         if ($result) {
-            return success('操作成功！','/mall/shop/index');
+            return success('操作成功！','/quark/engine?api=admin/shop/index&component=table');
         } else {
             return error('操作失败！');
         }
@@ -479,7 +485,7 @@ class ShopController extends QuarkController
         }
 
         $data['title'] = $title;
-        $data['logo'] = $logo[0]['id'];
+        $data['logo'] = $logo;
         $data['category_id'] = $categoryId;
         $data['tags'] = $tags;
         $data['description'] = $description;
@@ -497,9 +503,8 @@ class ShopController extends QuarkController
         $data['address'] = $address;
 
         if($map) {
-            $maps = explode(',',$map);
-            $data['longitude'] = $maps[0];
-            $data['latitude'] = $maps[1];
+            $data['longitude'] = $map['longitude'];
+            $data['latitude'] = $map['latitude'];
         }
 
         if($businessLicenseCoverId) {
@@ -526,7 +531,7 @@ class ShopController extends QuarkController
         $result = Shop::where('id',$id)->update($data);
 
         if ($result) {
-            return success('操作成功！','/mall/shop/index');
+            return success('操作成功！','/quark/engine?api=admin/shop/index&component=table');
         } else {
             return error('操作失败！');
         }
