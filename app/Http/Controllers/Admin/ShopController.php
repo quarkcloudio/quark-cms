@@ -118,12 +118,8 @@ class ShopController extends QuarkController
             ->rules(['required'],['required'=>'请选择分类'])
             ->width(200);
 
-            dump($form->data);
-
             if(isset($form->data)) {
                 $merchantInfo = Merchant::where('id',$form->data['mch_id'])->first();
-
-                dump($merchantInfo);
 
                 $bindUser = User::where('id',$merchantInfo['uid'])->first();
 
