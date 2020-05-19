@@ -9,6 +9,7 @@ use App\Models\User;
 use App\Models\ActionLog;
 use EasyWeChat\Factory;
 use Str;
+use Session;
 
 class WxLoginController extends Controller
 {
