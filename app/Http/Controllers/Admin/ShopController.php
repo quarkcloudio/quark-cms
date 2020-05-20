@@ -96,6 +96,15 @@ class ShopController extends QuarkController
         $title = $form->isCreating() ? '创建'.$this->title : '编辑'.$this->title;
         $form->title($title);
 
+        if($form->isEditing()) {
+
+            // 编辑商铺
+            $id = request('id');
+
+            // 读取商铺信息
+            $shopInfo = Shop::where('id',$id)->first();
+        }
+
         $form->tab('基本信息', function ($form) {
             $form->id('id','ID');
 
@@ -118,8 +127,9 @@ class ShopController extends QuarkController
             ->rules(['required'],['required'=>'请选择分类'])
             ->width(200);
 
-            if(isset($form->data)) {
-                $merchantInfo = Merchant::where('id',$form->data['mch_id'])->first();
+            if(isset($shopInfo)) {
+
+                $merchantInfo = Merchant::where('id',$shopInfo['mch_id'])->first();
 
                 $bindUser = User::where('id',$merchantInfo['uid'])->first();
 
@@ -206,15 +216,16 @@ class ShopController extends QuarkController
 
             $form->text('address','详细地址')->width(400);
 
-            if(isset($form->data)) {
+            if(isset($shopInfo)) {
                 // 地图坐标
                 $form->map('map','商家坐标')
                 ->style(['width'=>'100%','height'=>400])
-                ->position($data['longitude'],$data['latitude']);
+                ->position($shopInfo['longitude'],$shopInfo['latitude']);
             } else {
                 $form->map('map','商家坐标')
                 ->style(['width'=>'100%','height'=>400]);
             }
+
         })->tab('资质证件', function ($form) {
             $form->text('corporate_name','法人姓名');
             $form->text('corporate_idcard','身份证号');

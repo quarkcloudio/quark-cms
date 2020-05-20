@@ -11,7 +11,10 @@
 |
 */
 
-Route::group(['prefix' => 'wechat'], function () {
+Route::group(['prefix' => 'wechat'], function ($router) {
+
+    $router->any('wechat/server/token', 'ServerController@token')->name('wechat/server/token');
+
     Route::get('/', function () {
         dd('This is the Wechat module index page. Build something great!');
     });
