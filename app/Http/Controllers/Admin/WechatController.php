@@ -191,4 +191,39 @@ class WechatController extends QuarkController
             return $this->success('操作成功！');
         }
     }
+
+    // todo同步用户
+    public function syncUsers(Request $request)
+    {
+        $nextOpenid = $request->input('nextOpenid',null);
+        $type = $request->input('type','dyh');
+
+        $app = Factory::officialAccount(wechat_config($type));
+
+        $users = $app->user->list($nextOpenid);
+
+        if($users['data']['openid']) {
+            foreach ($users['data']['openid'] as $key => $value) {
+                $user = $app->user->get($value);
+                $wechatUserInfo = WechatUser::where('wechat_openid',$user['openid'])->first();
+
+                if(empty($wechatUserInfo)) {
+                    $data['wechat_openid'] = $user['openid'];
+                    $data['wechat_unionid'] = $user['unionid'];
+                    $data['type'] = $type;
+                    WechatUser::create($data);
+                } else {
+                    $data['wechat_openid'] = $user['openid'];
+                    $data['wechat_unionid'] = $user['unionid'];
+                    $data['type'] = $type;
+                    WechatUser::where('wechat_openid',$user['openid'])->update($data);
+                }
+
+                if($key == 500) {
+                    echo ("进行下一步同步，正在跳转...<script>window.location.href='".url('index/syncUsers?nextOpenid='.$user['openid'])."';</script>");
+                    break;
+                }
+            }
+        }
+    }
 }
