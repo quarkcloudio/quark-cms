@@ -105,7 +105,7 @@ class ArticleController extends QuarkController
             ->rules(['required','max:190'],['required'=>'标题必须填写','max'=>'名称不能超过190个字符']);
 
             $form->textArea('description','描述')
-            ->rules(['max:190'],['max'=>'名称不能超过190个字符']);
+            ->rules(['max:190'],['max'=>'描述不能超过190个字符']);
 
             $form->text('author','作者');
 

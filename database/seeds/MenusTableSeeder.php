@@ -47,8 +47,8 @@ class MenusTableSeeder extends Seeder
             ['id' =>'47','name' => '商品列表','guard_name' => 'admin','icon' => '','type'=>'default','pid' => '46','sort' => '0','path' => '/mall/goods/index','show'  => '1','status' => '1'],
             ['id' =>'48','name' => '商品分类','guard_name' => 'admin','icon' => '','type'=>'default','pid' => '46','sort' => '0','path' => '/mall/goods/categoryIndex','show'  => '1','status' => '1'],
             ['id' =>'49','name' => '品牌管理','guard_name' => 'admin','icon' => '','type'=>'default','pid' => '38','sort' => '0','path' => '/mall/goodsBrand','show'  => '1','status' => '1'],
-            ['id' =>'50','name' => '品牌列表','guard_name' => 'admin','icon' => '','type'=>'default','pid' => '49','sort' => '0','path' => '/mall/goodsBrand/index','show'  => '1','status' => '1'],
-            ['id' =>'51','name' => '商品类型','guard_name' => 'admin','icon' => '','type'=>'default','pid' => '46','sort' => '0','path' => '/mall/goods/typeIndex','show'  => '1','status' => '1'],
+            ['id' =>'50','name' => '品牌列表','guard_name' => 'admin','icon' => '','type'=>'default','pid' => '49','sort' => '0','path' => '/quark/engine?api=admin/goodsBrand/index&component=table','show'  => '1','status' => '1'],
+            ['id' =>'51','name' => '商品类型','guard_name' => 'admin','icon' => '','type'=>'default','pid' => '46','sort' => '0','path' => '/quark/engine?api=admin/goodsType/index&component=table','show'  => '1','status' => '1'],
             ['id' =>'52','name' => '商品订单','guard_name' => 'admin','icon' => '','type'=>'default','pid' => '38','sort' => '0','path' => '/mall/goodsOrder','show'  => '1','status' => '1'],
             ['id' =>'53','name' => '订单列表','guard_name' => 'admin','icon' => '','type'=>'default','pid' => '52','sort' => '0','path' => '/mall/goodsOrder/index','show'  => '1','status' => '1'],
             ['id' =>'54','name' => '虚拟订单','guard_name' => 'admin','icon' => '','type'=>'default','pid' => '52','sort' => '0','path' => '/mall/goodsOrder/virtualOrderIndex','show'  => '1','status' => '1'],
@@ -56,8 +56,8 @@ class MenusTableSeeder extends Seeder
             ['id' =>'56','name' => '退款订单','guard_name' => 'admin','icon' => '','type'=>'default','pid' => '52','sort' => '0','path' => '/mall/goodsOrder/refundIndex','show'  => '1','status' => '1'],
             ['id' =>'57','name' => '售后订单','guard_name' => 'admin','icon' => '','type'=>'default','pid' => '52','sort' => '0','path' => '/mall/goodsOrder/afterSaleIndex','show'  => '0','status' => '0'],
             ['id' =>'58','name' => '评价管理','guard_name' => 'admin','icon' => '','type'=>'default','pid' => '52','sort' => '0','path' => '/mall/goodsOrder/commentIndex','show'  => '1','status' => '1'],
-            ['id' =>'59','name' => '商品单位','guard_name' => 'admin','icon' => '','type'=>'default','pid' => '46','sort' => '0','path' => '/mall/goods/unitIndex','show'  => '1','status' => '1'],
-            ['id' =>'60','name' => '详情版式','guard_name' => 'admin','icon' => '','type'=>'default','pid' => '46','sort' => '0','path' => '/mall/goods/layoutIndex','show'  => '1','status' => '1'],
+            ['id' =>'59','name' => '商品单位','guard_name' => 'admin','icon' => '','type'=>'default','pid' => '46','sort' => '0','path' => '/quark/engine?api=admin/goodsUnit/index&component=table','show'  => '1','status' => '1'],
+            ['id' =>'60','name' => '详情版式','guard_name' => 'admin','icon' => '','type'=>'default','pid' => '46','sort' => '0','path' => '/quark/engine?api=admin/goodsLayout/index&component=table','show'  => '1','status' => '1'],
 
             ['id' =>'61','name' => '分类列表','guard_name' => 'admin','icon' => '','type'=>'table','pid' => 3,'sort' => 0,'path' => '/quark/engine?api=admin/articleCategory/index&component=table','show'  => 1,'status' => 1],
         ]);

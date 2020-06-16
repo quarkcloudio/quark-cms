@@ -96,6 +96,8 @@ class ShopController extends QuarkController
         $title = $form->isCreating() ? '创建'.$this->title : '编辑'.$this->title;
         $form->title($title);
 
+        $shopInfo = [];
+
         if($form->isEditing()) {
 
             // 编辑商铺
@@ -105,7 +107,7 @@ class ShopController extends QuarkController
             $shopInfo = Shop::where('id',$id)->first();
         }
 
-        $form->tab('基本信息', function ($form) {
+        $form->tab('基本信息', function ($form) use ($shopInfo) {
             $form->id('id','ID');
 
             $form->text('title','商家名称')
@@ -127,7 +129,7 @@ class ShopController extends QuarkController
             ->rules(['required'],['required'=>'请选择分类'])
             ->width(200);
 
-            if(isset($shopInfo)) {
+            if($shopInfo) {
 
                 $merchantInfo = Merchant::where('id',$shopInfo['mch_id'])->first();
 
@@ -203,7 +205,7 @@ class ShopController extends QuarkController
                 'off' => '否'
             ])->default(true);
 
-        })->tab('商铺位置', function ($form) {
+        })->tab('商铺位置', function ($form) use ($shopInfo) {
 
             $areas = Area::where('pid','<>',0)
             ->select('area_name as value','area_name as label','id','pid')
@@ -212,11 +214,19 @@ class ShopController extends QuarkController
 
             $options = list_to_tree($areas,'id','pid','children',1);
 
-            $form->cascader('area','商家地域')->options($options)->width(400);
+            if($shopInfo) {
+
+                $shopArea[] = $shopInfo['province'];
+                $shopArea[] = $shopInfo['city'];
+                $shopArea[] = $shopInfo['county'];
+                $form->cascader('area','商家地域')->options($options)->width(400)->value($shopArea);
+            } else {
+                $form->cascader('area','商家地域')->options($options)->width(400);
+            }
 
             $form->text('address','详细地址')->width(400);
 
-            if(isset($shopInfo)) {
+            if($shopInfo) {
                 // 地图坐标
                 $form->map('map','商家坐标')
                 ->style(['width'=>'100%','height'=>400])

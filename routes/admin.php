@@ -175,12 +175,14 @@ Route::group([
     $router->post('admin/goods/categorySave', 'GoodsController@categorySave')->name('api/admin/goods/categorySave');
     $router->post('admin/goods/categoryChangeStatus', 'GoodsController@categoryChangeStatus')->name('api/admin/goods/categoryChangeStatus');
 
-    $router->get('admin/goods/typeIndex', 'GoodsController@typeIndex')->name('api/admin/goods/typeIndex');
-    $router->get('admin/goods/typeCreate', 'GoodsController@typeCreate')->name('api/admin/goods/typeCreate');
-    $router->post('admin/goods/typeStore', 'GoodsController@typeStore')->name('api/admin/goods/typeStore');
-    $router->get('admin/goods/typeEdit', 'GoodsController@typeEdit')->name('api/admin/goods/typeEdit');
-    $router->post('admin/goods/typeSave', 'GoodsController@typeSave')->name('api/admin/goods/typeSave');
-    $router->post('admin/goods/typeChangeStatus', 'GoodsController@typeChangeStatus')->name('api/admin/goods/typeChangeStatus');
+    $router->get('admin/goodsType/index', 'GoodsTypeController@index')->name('api/admin/goodsType/index');
+    $router->get('admin/goodsType/show', 'GoodsTypeController@show')->name('api/admin/goodsType/show');
+    $router->get('admin/goodsType/create', 'GoodsTypeController@create')->name('api/admin/goodsType/create');
+    $router->post('admin/goodsType/store', 'GoodsTypeController@store')->name('api/admin/goodsType/store');
+    $router->get('admin/goodsType/edit', 'GoodsTypeController@edit')->name('api/admin/goodsType/edit');
+    $router->post('admin/goodsType/update', 'GoodsTypeController@update')->name('api/admin/goodsType/update');
+    $router->any('admin/goodsType/action', 'GoodsTypeController@action')->name('api/admin/goodsType/action');
+    $router->post('admin/goodsType/destroy', 'GoodsTypeController@destroy')->name('api/admin/goodsType/destroy');
 
     // 商品属性
     $router->get('admin/goods/attributeIndex', 'GoodsController@attributeIndex')->name('api/admin/goods/attributeIndex');
@@ -198,26 +200,29 @@ Route::group([
     $router->post('admin/goods/specificationSave', 'GoodsController@specificationSave')->name('api/admin/goods/specificationSave');
     $router->post('admin/goods/specificationChangeStatus', 'GoodsController@specificationChangeStatus')->name('api/admin/goods/specificationChangeStatus');
 
-    $router->get('admin/goods/unitIndex', 'GoodsController@unitIndex')->name('api/admin/goods/unitIndex');
-    $router->get('admin/goods/unitCreate', 'GoodsController@unitCreate')->name('api/admin/goods/unitCreate');
-    $router->post('admin/goods/unitStore', 'GoodsController@unitStore')->name('api/admin/goods/unitStore');
-    $router->get('admin/goods/unitEdit', 'GoodsController@unitEdit')->name('api/admin/goods/unitEdit');
-    $router->post('admin/goods/unitSave', 'GoodsController@unitSave')->name('api/admin/goods/unitSave');
-    $router->post('admin/goods/unitChangeStatus', 'GoodsController@unitChangeStatus')->name('api/admin/goods/unitChangeStatus');
+    $router->get('admin/goodsUnit/index', 'GoodsUnitController@index')->name('api/admin/goodsUnit/index');
+    $router->get('admin/goodsUnit/create', 'GoodsUnitController@create')->name('api/admin/goodsUnit/create');
+    $router->post('admin/goodsUnit/store', 'GoodsUnitController@store')->name('api/admin/goodsUnit/store');
+    $router->get('admin/goodsUnit/edit', 'GoodsUnitController@edit')->name('api/admin/goodsUnit/edit');
+    $router->post('admin/goodsUnit/update', 'GoodsUnitController@update')->name('api/admin/goodsUnit/update');
+    $router->any('admin/goodsUnit/action', 'GoodsUnitController@action')->name('api/admin/goodsUnit/action');
+    $router->post('admin/goodsUnit/destroy', 'GoodsUnitController@destroy')->name('api/admin/goodsUnit/destroy');
 
-    $router->get('admin/goods/layoutIndex', 'GoodsController@layoutIndex')->name('api/admin/goods/layoutIndex');
-    $router->get('admin/goods/layoutCreate', 'GoodsController@layoutCreate')->name('api/admin/goods/layoutCreate');
-    $router->post('admin/goods/layoutStore', 'GoodsController@layoutStore')->name('api/admin/goods/layoutStore');
-    $router->get('admin/goods/layoutEdit', 'GoodsController@layoutEdit')->name('api/admin/goods/layoutEdit');
-    $router->post('admin/goods/layoutSave', 'GoodsController@layoutSave')->name('api/admin/goods/layoutSave');
-    $router->post('admin/goods/layoutChangeStatus', 'GoodsController@layoutChangeStatus')->name('api/admin/goods/layoutChangeStatus');
+    $router->get('admin/goodsLayout/index', 'GoodsLayoutController@index')->name('api/admin/goodsLayout/index');
+    $router->get('admin/goodsLayout/create', 'GoodsLayoutController@create')->name('api/admin/goodsLayout/create');
+    $router->post('admin/goodsLayout/store', 'GoodsLayoutController@store')->name('api/admin/goodsLayout/store');
+    $router->get('admin/goodsLayout/edit', 'GoodsLayoutController@edit')->name('api/admin/goodsLayout/edit');
+    $router->post('admin/goodsLayout/update', 'GoodsLayoutController@update')->name('api/admin/goodsLayout/update');
+    $router->any('admin/goodsLayout/action', 'GoodsLayoutController@action')->name('api/admin/goodsLayout/action');
+    $router->post('admin/goodsLayout/destroy', 'GoodsLayoutController@destroy')->name('api/admin/goodsLayout/destroy');
 
     $router->get('admin/goodsBrand/index', 'GoodsBrandController@index')->name('api/admin/goodsBrand/index');
     $router->get('admin/goodsBrand/create', 'GoodsBrandController@create')->name('api/admin/goodsBrand/create');
     $router->post('admin/goodsBrand/store', 'GoodsBrandController@store')->name('api/admin/goodsBrand/store');
     $router->get('admin/goodsBrand/edit', 'GoodsBrandController@edit')->name('api/admin/goodsBrand/edit');
-    $router->post('admin/goodsBrand/save', 'GoodsBrandController@save')->name('api/admin/goodsBrand/save');
-    $router->post('admin/goodsBrand/changeStatus', 'GoodsBrandController@changeStatus')->name('api/admin/goodsBrand/changeStatus');
+    $router->post('admin/goodsBrand/update', 'GoodsBrandController@update')->name('api/admin/goodsBrand/update');
+    $router->any('admin/goodsBrand/action', 'GoodsBrandController@action')->name('api/admin/goodsBrand/action');
+    $router->post('admin/goodsBrand/destroy', 'GoodsBrandController@destroy')->name('api/admin/goodsBrand/destroy');
 
     $router->get('admin/goodsOrder/index', 'GoodsOrderController@index')->name('api/admin/goodsOrder/index');
     $router->get('admin/goodsOrder/export', 'GoodsOrderController@export')->name('api/admin/goodsOrder/export');

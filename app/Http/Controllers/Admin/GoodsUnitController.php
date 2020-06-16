@@ -4,14 +4,14 @@ namespace App\Http\Controllers\Admin;
 
 use QuarkCMS\QuarkAdmin\Controllers\QuarkController;
 use Illuminate\Http\Request;
-use App\Models\GoodsBrand;
+use App\Models\GoodsUnit;
 use Validator;
 use DB;
 use Quark;
 
-class GoodsBrandController extends QuarkController
+class GoodsUnitController extends QuarkController
 {
-    public $title = '品牌';
+    public $title = '商品单位';
 
     /**
      * 列表页面
@@ -21,17 +21,10 @@ class GoodsBrandController extends QuarkController
      */
     protected function table()
     {
-        $grid = Quark::grid(new GoodsBrand)->title($this->title);
+        $grid = Quark::grid(new GoodsUnit)->title($this->title);
 
         $grid->column('id','ID');
-        $grid->column('logo','Logo')->image();
-        $grid->column('name','品牌名称')->link();
-        $grid->column('site_url','品牌网址');
-        $grid->column('sort','排序')->editable()->sorter()->width(100);
-        $grid->column('is_recommend','推荐')->editable('switch',[
-            'on'  => ['value' => 1, 'text' => '是'],
-            'off' => ['value' => 2, 'text' => '否']
-        ])->width(100);
+        $grid->column('name','单位名称')->link();
         $grid->column('status','状态')->editable('switch',[
             'on'  => ['value' => 1, 'text' => '正常'],
             'off' => ['value' => 2, 'text' => '禁用']
@@ -89,33 +82,15 @@ class GoodsBrandController extends QuarkController
      */
     protected function form()
     {
-        $form = Quark::form(new GoodsBrand);
+        $form = Quark::form(new GoodsUnit);
 
         $title = $form->isCreating() ? '创建'.$this->title : '编辑'.$this->title;
         $form->title($title);
 
         $form->id('id','ID');
 
-        $form->text('name','品牌名称')
+        $form->text('name','单位名称')
         ->rules(['required','max:190'],['required'=>'标题必须填写','max'=>'名称不能超过190个字符']);
-
-        $form->image('logo','Logo')->mode('single');
-
-        $form->image('promotion_image','品牌推广图')->mode('single');
-
-        $form->text('letter','品牌名称首字母');
-
-        $form->textArea('description','品牌描述')
-        ->rules(['max:190'],['max'=>'描述不能超过190个字符']);
-
-        $form->text('site_url','品牌网址');
-
-        $form->number('sort','排序')->value(0);
-
-        $form->switch('is_recommend','是否推荐')->options([
-            'on'  => '是',
-            'off' => '否'
-        ])->default(true);
 
         $form->switch('status','状态')->options([
             'on'  => '是',
