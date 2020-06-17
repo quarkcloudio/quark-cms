@@ -96,7 +96,7 @@ class CategoryController extends QuarkController
             $form->text('name','缩略名');
 
             $categorys[0] = '根目录';
-            $getCategorys = Category::where('status',1)->get();
+            $getCategorys = Category::where('status',1)->get()->toArray();
 
             $categoryTrees = list_to_tree($getCategorys,'id','pid','children',0);
             $categoryTreeLists = tree_to_ordered_list($categoryTrees,0,'name','children');

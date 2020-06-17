@@ -2,13 +2,15 @@
 
 namespace App\Http\Controllers\Admin;
 
+use QuarkCMS\QuarkAdmin\Controllers\QuarkController;
 use Illuminate\Http\Request;
 use App\Models\GoodsType;
 use App\Models\GoodsAttribute;
 use App\Models\GoodsAttributeValue;
 use DB;
+use Quark;
 
-class GoodsController extends QuarkController
+class GoodsAttributeController extends QuarkController
 {
     public $title = '商品属性';
 
@@ -18,164 +20,73 @@ class GoodsController extends QuarkController
      * @param  Request  $request
      * @return Response
      */
-    public function index(Request $request)
+    protected function table()
     {
-        $this->pageTitle = '商品属性';
-        // 获取参数
-        $current            = intval($request->get('current',1));
-        $pageSize           = intval($request->get('pageSize',10));
-        $search             = $request->get('search');
-        $attributeSelectedIds     = $request->get('attributeSelectedIds');
-            
-        // 定义对象
-        $query = GoodsAttribute::query();
+        $grid = Quark::grid(new GoodsAttribute)->title($this->title);
+        $grid->column('id','ID');
+        $grid->column('name','属性名称')->link();
+        $grid->column('goodsType.name','属性类型');
+        $grid->column('description','属性描述');
+        $grid->column('style','显示样式')->using([1 => '多选', 2 => '单选', 3 => '文本']);
+        $grid->column('sort','排序')->editable()->sorter()->width(100);
+        $grid->column('status','状态')->editable('switch',[
+            'on'  => ['value' => 1, 'text' => '正常'],
+            'off' => ['value' => 2, 'text' => '禁用']
+        ])->width(100);
 
-        // 查询
-        if(!empty($search)) {
+        $grid->column('actions','操作')->width(100)->rowActions(function($rowAction) {
+            $rowAction->menu('edit', '编辑');
+            $rowAction->menu('delete', '删除')->model(function($model) {
+                $model->delete();
+            })->withConfirm('确认要删除吗？','删除后数据将无法恢复，请谨慎操作！');
+        });
 
-            // 名称
-            if(isset($search['name'])) {
-                if(!empty($search['name'])) {
-                    $query->where('goods_attributes.name',$search['name']);
-                }
+        // 头部操作
+        $grid->actions(function($action) {
+            $action->button('myCreate', '新增')->link('#/goodsAttribute/create');
+            $action->button('refresh', '刷新');
+        });
+
+        // select样式的批量操作
+        $grid->batchActions(function($batch) {
+            $batch->option('', '批量操作');
+            $batch->option('resume', '启用')->model(function($model) {
+                $model->update(['status'=>1]);
+            });
+            $batch->option('forbid', '禁用')->model(function($model) {
+                $model->update(['status'=>2]);
+            });
+            $batch->option('delete', '删除')->model(function($model) {
+                $model->delete();
+            })->withConfirm('确认要删除吗？','删除后数据将无法恢复，请谨慎操作！');
+        })->style('select',['width'=>120]);
+
+        $grid->search(function($search) {
+
+            $goodsTypes = GoodsType::where('status',1)->get();
+
+            $options[''] = '全部';
+            foreach ($goodsTypes as $key => $value) {
+                $options[$value['id']] = $value['name'];
             }
 
-            // 类型
-            if(isset($search['goodsTypeId'])) {
-                if(!empty($search['goodsTypeId'])) {
-                    $query->where('goods_attributes.goods_type_id',$search['goodsTypeId']);
-                }
-            }
+            $search->equal('goods_type_id', '商品类型')->select($options)->placeholder('请选择商品类型')->width(110);
 
-            // 状态
-            if(isset($search['status']) && $search['status'] !=0) {
-                if(!empty($search['status'])) {
-                    $query->where('goods_attributes.status',$search['status']);
-                }
-            }
-        }
+            $search->where('name', '搜索内容',function ($query) {
+                $query->where('name', 'like', "%{input}%");
+            })->placeholder('搜索内容');
 
-        if(isset($attributeSelectedIds)) {
-            $query->whereNotIn('goods_attributes.id', $attributeSelectedIds);
-        }
+            $search->equal('status', '所选状态')
+            ->select([''=>'全部',1=>'正常',2=>'已禁用'])
+            ->placeholder('选择状态')
+            ->width(110)
+            ->advanced();
 
-        // 查询数量
-        $total = $query
-        ->where('goods_attributes.status', '>', 0)
-        ->where('goods_attributes.type', 1)
-        ->count();
+        })->expand(false);
 
-        // 查询列表
-        $lists = $query
-        ->join('goods_types', 'goods_attributes.goods_type_id', '=', 'goods_types.id')
-        ->skip(($current-1)*$pageSize)
-        ->take($pageSize)
-        ->where('goods_attributes.status', '>', 0)
-        ->where('goods_attributes.type', 1)
-        ->orderBy('goods_attributes.id', 'desc')
-        ->select('goods_attributes.*','goods_types.name as goods_type_name')
-        ->get()
-        ->toArray();
+        $grid->model()->paginate(10);
 
-        // 默认页码
-        $pagination['defaultCurrent'] = 1;
-        // 当前页码
-        $pagination['current'] = $current;
-        // 分页数量
-        $pagination['pageSize'] = $pageSize;
-        // 总数量
-        $pagination['total'] = $total;
-
-        foreach ($lists as $key => $list) {
-
-            if($list['status'] == 1) {
-                $lists[$key]['status'] = '正常';
-            }
-
-            if($list['status'] == 2) {
-                $lists[$key]['status'] = '已禁用';
-            }
-
-            switch ($list['style']) {
-                case 1:
-                    $lists[$key]['style'] = '多选';
-                    break;
-                case 2:
-                    $lists[$key]['style'] = '单选';
-                    break;
-                case 3:
-                    $lists[$key]['style'] = '文本';
-                    break;
-                default:
-                    $lists[$key]['style'] = '未知';
-            }
-
-            $goodsAttributeValues = GoodsAttributeValue::where('goods_attribute_id',$list['id'])->pluck('vname')->toArray();
-
-            $lists[$key]['goods_attribute_values'] = implode(',',$goodsAttributeValues);
-        }
-
-        $status = [
-            [
-                'name'=>'所有状态',
-                'value'=>'0',
-            ],
-            [
-                'name'=>'正常',
-                'value'=>'1',
-            ],
-            [
-                'name'=>'禁用',
-                'value'=>'2',
-            ],
-        ];
-
-        $goodsTypes[0]['name'] = '请选择商品类型';
-        $goodsTypes[0]['value'] = '0';
-
-        $getGoodsTypes = GoodsType::where('status',1)->select('name','id as value')->get();
-
-        foreach ($getGoodsTypes as $key => $getGoodsType) {
-            $goodsTypes[$key+1]['name'] = $getGoodsType['name'];
-            $goodsTypes[$key+1]['value'] = $getGoodsType['value'];
-        }
-
-        $searchs = [
-            Select::make('商品类型','goodsTypeId')->option($goodsTypes)->value('0'),
-            Select::make('状态','status')->option($status)->value('0'),
-            Input::make('搜索内容','name'),
-            Button::make('搜索')->onClick('search'),
-        ];
-
-        $columns = [
-            Column::make('ID','id'),
-            Column::make('属性名称','name')->withA('admin/mall/'.$this->controllerName().'/attributeEdit'),
-            Column::make('属性类型','goods_type_name'),
-            Column::make('样式','style'),
-            Column::make('属性值','goods_attribute_values'),
-            Column::make('排序','sort'),
-            Column::make('状态','status')->withTag("text === '已禁用' ? 'red' : 'blue'"),
-        ];
-
-        $headerButtons = [
-            Button::make('新增'.$this->pageTitle)->icon('plus-circle')->type('primary')->href('admin/mall/goods/attributeCreate'),
-        ];
-
-        $toolbarButtons = [
-            Button::make('启用')->type('primary')->onClick('multiChangeStatus','1','admin/'.$this->controllerName().'/attributeChangeStatus'),
-            Button::make('禁用')->onClick('multiChangeStatus','2','admin/'.$this->controllerName().'/attributeChangeStatus'),
-            Button::make('删除')->type('danger')->onClick('multiChangeStatus','-1','admin/'.$this->controllerName().'/attributeChangeStatus'),
-        ];
-
-        $actions = [
-            Button::make('启用|禁用')->type('link')->onClick('changeStatus','1|2','admin/'.$this->controllerName().'/attributeChangeStatus')->style(['paddingLeft'=>5,'paddingRight'=>5]),
-            Button::make('编辑')->type('link')->href('admin/mall/goods/attributeEdit')->style(['paddingLeft'=>5,'paddingRight'=>5]),
-            Popconfirm::make('删除')->type('link')->title('确定删除吗？')->onConfirm('changeStatus','-1','admin/'.$this->controllerName().'/attributeChangeStatus')->style(['paddingLeft'=>5,'paddingRight'=>5]),
-        ];
-
-        $data = $this->listBuilder($columns,$lists,$pagination,$searchs,[],$headerButtons,null,$actions);
-
-        return $this->success('获取成功！','',$data);
+        return $grid;
     }
 
     /**
@@ -191,9 +102,9 @@ class GoodsController extends QuarkController
         $data['goods_types'] = GoodsType::where('status',1)->get();
 
         if(!empty($data)) {
-            return $this->success('获取成功！','',$data);
+            return success('获取成功！','',$data);
         } else {
-            return $this->success('获取失败！');
+            return error('获取失败！');
         }
     }
 
@@ -375,39 +286,6 @@ class GoodsController extends QuarkController
 
         if ($result!==false) {
             return $this->success('操作成功！','attributeIndex');
-        } else {
-            return $this->error('操作失败！');
-        }
-    }
-
-    /**
-     * 改变数据状态
-     *
-     * @param  Request  $request
-     * @return Response
-     */
-    public function changeStatus(Request $request)
-    {
-        $id = $request->json('id');
-        $status = $request->json('status');
-
-        if(empty($id) || empty($status)) {
-            return $this->error('参数错误！');
-        }
-
-        // 定义对象
-        $query = GoodsAttribute::query();
-
-        if(is_array($id)) {
-            $query->whereIn('id',$id);
-        } else {
-            $query->where('id',$id);
-        }
-
-        $result = $query->update(['status'=>$status]);
-
-        if ($result) {
-            return $this->success('操作成功！');
         } else {
             return $this->error('操作失败！');
         }

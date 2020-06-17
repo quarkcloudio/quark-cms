@@ -185,12 +185,14 @@ Route::group([
     $router->post('admin/goodsType/destroy', 'GoodsTypeController@destroy')->name('api/admin/goodsType/destroy');
 
     // 商品属性
-    $router->get('admin/goods/attributeIndex', 'GoodsController@attributeIndex')->name('api/admin/goods/attributeIndex');
-    $router->get('admin/goods/attributeCreate', 'GoodsController@attributeCreate')->name('api/admin/goods/attributeCreate');
-    $router->post('admin/goods/attributeStore', 'GoodsController@attributeStore')->name('api/admin/goods/attributeStore');
-    $router->get('admin/goods/attributeEdit', 'GoodsController@attributeEdit')->name('api/admin/goods/attributeEdit');
-    $router->post('admin/goods/attributeSave', 'GoodsController@attributeSave')->name('api/admin/goods/attributeSave');
-    $router->post('admin/goods/attributeChangeStatus', 'GoodsController@attributeChangeStatus')->name('api/admin/goods/attributeChangeStatus');
+    $router->get('admin/goodsAttribute/index', 'GoodsAttributeController@index')->name('api/admin/goodsAttribute/index');
+    $router->get('admin/goodsAttribute/show', 'GoodsAttributeController@show')->name('api/admin/goodsAttribute/show');
+    $router->get('admin/goodsAttribute/create', 'GoodsAttributeController@create')->name('api/admin/goodsAttribute/create');
+    $router->post('admin/goodsAttribute/store', 'GoodsAttributeController@store')->name('api/admin/goodsAttribute/store');
+    $router->get('admin/goodsAttribute/edit', 'GoodsAttributeController@edit')->name('api/admin/goodsAttribute/edit');
+    $router->post('admin/goodsAttribute/update', 'GoodsAttributeController@update')->name('api/admin/goodsAttribute/update');
+    $router->any('admin/goodsAttribute/action', 'GoodsAttributeController@action')->name('api/admin/goodsAttribute/action');
+    $router->post('admin/goodsAttribute/destroy', 'GoodsAttributeController@destroy')->name('api/admin/goodsAttribute/destroy');
 
     // 商品规格
     $router->get('admin/goods/specificationIndex', 'GoodsController@specificationIndex')->name('api/admin/goods/specificationIndex');

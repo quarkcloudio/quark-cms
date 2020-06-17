@@ -47,7 +47,7 @@ class GoodsTypeController extends QuarkController
             $rowAction->button('attributeIndex', '属性列表')
             ->type('default')
             ->size('small')
-            ->link();
+            ->link('#/quark/engine?api=admin/goodsAttribute/index&component=table');
 
             $rowAction->button('specificationIndex', '规格列表')
             ->type('default')

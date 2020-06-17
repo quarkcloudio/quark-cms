@@ -33,4 +33,9 @@ class GoodsAttribute extends Model
         'status',
         'type'
     ];
+
+    public function goodsType()
+    {
+        return $this->hasOne('App\Models\GoodsType', 'id', 'goods_type_id');
+    }
 }
