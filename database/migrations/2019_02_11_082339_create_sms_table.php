@@ -20,7 +20,7 @@ class CreateSmsTable extends Migration
             $table->string('code')->comment('验证码');
             $table->longText('content')->comment('发送内容');
             $table->tinyInteger('error_times')->default(0);
-            $table->tinyInteger('status')->default(1);
+            $table->boolean('status')->default(1);
             $table->timestamps();
         });
     }

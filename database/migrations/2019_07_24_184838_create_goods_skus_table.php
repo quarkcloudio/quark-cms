@@ -27,7 +27,7 @@ class CreateGoodsSkusTable extends Migration
             $table->decimal('market_price',10,2)->nullable();
             $table->string('goods_sn')->nullable();
             $table->string('goods_barcode')->nullable();
-            $table->tinyInteger('status')->default('1');    
+            $table->boolean('status')->default(1); 
         });
     }
 

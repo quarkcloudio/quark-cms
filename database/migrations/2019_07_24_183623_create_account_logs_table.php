@@ -22,7 +22,7 @@ class CreateAccountLogsTable extends Migration
             $table->integer('score')->nullable();
             $table->tinyInteger('type');
             $table->string('remark');
-            $table->tinyInteger('status')->default(1);
+            $table->boolean('status')->default(1);
             $table->timestamps();
         });
     }

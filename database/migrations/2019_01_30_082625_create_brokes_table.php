@@ -20,7 +20,7 @@ class CreateBrokesTable extends Migration
             $table->string('phone')->nullable();
             $table->longText('content');
             $table->text('cover_ids')->nullable();
-            $table->tinyInteger('status')->default(1);
+            $table->boolean('status')->default(1);
             $table->timestamps();
         });
     }

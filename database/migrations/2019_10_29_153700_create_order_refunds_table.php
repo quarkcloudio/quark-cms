@@ -20,7 +20,7 @@ class CreateOrderRefundsTable extends Migration
             $table->string('thirdparty_order_no')->nullable()->comment('支付宝或微信退款单号');
             $table->string('refund_reason')->comment('例如：正常退款');
             $table->decimal('refund_amount',10,2)->comment('退款金额，单位为人民币（元）');
-            $table->tinyInteger('status')->default(1);
+            $table->boolean('status')->default(1);
             $table->timestamps();
         });
     }

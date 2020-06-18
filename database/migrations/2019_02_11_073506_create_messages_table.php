@@ -20,7 +20,7 @@ class CreateMessagesTable extends Migration
             $table->string('title');
             $table->string('type')->comment('消息类型（SYSTEM/USER等）');
             $table->longText('content')->COMMENT('消息详情');
-            $table->tinyInteger('status')->default('1');
+            $table->boolean('status')->default(1);
             $table->timestamps();
         });
     }

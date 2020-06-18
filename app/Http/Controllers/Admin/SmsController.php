@@ -25,7 +25,7 @@ class SmsController extends QuarkController
         $grid->column('code','验证码');
         $grid->column('content','内容');
         $grid->column('created_at','发送时间');
-        $grid->column('status','状态')->using(['1'=>'发送成功','2'=>'发送失败']);
+        $grid->column('status','状态')->using(['1'=>'发送成功','0'=>'发送失败']);
 
         $grid->column('actions','操作')->width(100)->rowActions(function($rowAction) {
             $rowAction->menu('sendSms', '发送')
@@ -59,7 +59,7 @@ class SmsController extends QuarkController
 
         $grid->search(function($search) {
             $search->equal('status', '所选状态')
-            ->select([''=>'全部',1=>'发送成功',2=>'发送失败'])
+            ->select([''=>'全部',1=>'发送成功',0=>'发送失败'])
             ->placeholder('选择状态')
             ->width(110);
 
@@ -130,7 +130,7 @@ class SmsController extends QuarkController
                 Sms::where('id',$value['id'])->update($data);
             } else {
                 $sendResult =false;
-                $data['status'] = 2;
+                $data['status'] = 0;
                 Sms::where('id',$value['id'])->update($data);
             }
         }
@@ -192,7 +192,7 @@ class SmsController extends QuarkController
                 } else {
                     $sendResult =false;
 
-                    $data['status'] = 2;
+                    $data['status'] = 0;
                     Sms::create($data);
                 }
             }
@@ -227,7 +227,7 @@ class SmsController extends QuarkController
                 Sms::create($data);
             } else {
                 $sendResult =false;
-                $data['status'] = 2;
+                $data['status'] = 0;
                 Sms::create($data);
             }
         }

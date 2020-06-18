@@ -27,7 +27,7 @@ class CreateGoodsCategoriesTable extends Migration
             $table->string('lists_tpl')->nullable();
             $table->string('detail_tpl')->nullable();
             $table->integer('page_num')->default('10')->comment('分页数量');
-            $table->tinyInteger('status')->default('1');
+            $table->boolean('status')->default(1);
             $table->timestamps();
             $table->softDeletes();
         });

@@ -24,7 +24,7 @@ class CreateMerchantsTable extends Migration
             $table->string('bank_number')->nullable()->comment('开户行帐号');
             $table->string('last_login_ip')->nullable()->default('');
             $table->timestamp('last_login_time')->nullable();
-            $table->tinyInteger('status')->default(2);
+            $table->boolean('status')->default(0);
             $table->timestamps();
             $table->softDeletes();
         });

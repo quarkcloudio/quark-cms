@@ -25,7 +25,7 @@ class CommentController extends QuarkController
         $grid->column('title','评论标题');
         $grid->column('content','内容');
         $grid->column('created_at','评论时间');
-        $grid->column('status','状态')->using(['1'=>'已审核','2'=>'已禁用','3'=>'待审核'])->width(80);
+        $grid->column('status','状态')->using(['1'=>'已审核','0'=>'已禁用','2'=>'待审核'])->width(80);
 
         $grid->column('actions','操作')->width(100)->rowActions(function($rowAction) {
             $rowAction->menu('edit', '编辑');
@@ -46,7 +46,7 @@ class CommentController extends QuarkController
                 $model->update(['status'=>1]);
             });
             $batch->option('forbid', '禁用')->model(function($model) {
-                $model->update(['status'=>2]);
+                $model->update(['status'=>0]);
             });
             $batch->option('delete', '删除')->model(function($model) {
                 $model->delete();
@@ -55,7 +55,7 @@ class CommentController extends QuarkController
 
         $grid->search(function($search) {
 
-            $search->equal('status', '所选状态')->select([''=>'全部',1=>'已审核',2=>'已禁用',3=>'待审核'])->placeholder('选择状态')->width(110);
+            $search->equal('status', '所选状态')->select([''=>'全部',1=>'已审核',0=>'已禁用',2=>'待审核'])->placeholder('选择状态')->width(110);
 
             $search->where('title', '搜索内容',function ($query) {
                 $query->where('title', 'like', "%{input}%");

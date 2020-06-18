@@ -35,7 +35,7 @@ class CreateVideosTable extends Migration
             $table->integer('comment')->default(0)->nullable()->comment('评论数量');
             $table->integer('view')->default(0)->nullable()->comment('浏览数量');
             $table->string('comment_status')->default('open');
-            $table->tinyInteger('status')->default(1);
+            $table->boolean('status')->default(1);
             $table->timestamps();
             $table->softDeletes();
         });

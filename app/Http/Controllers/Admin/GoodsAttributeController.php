@@ -24,18 +24,18 @@ class GoodsAttributeController extends QuarkController
     {
         $grid = Quark::grid(new GoodsAttribute)->title($this->title);
         $grid->column('id','ID');
-        $grid->column('name','属性名称')->link();
+        $grid->column('name','属性名称')->link('#/goodsAttribute/edit');
         $grid->column('goodsType.name','属性类型');
         $grid->column('description','属性描述');
         $grid->column('style','显示样式')->using([1 => '多选', 2 => '单选', 3 => '文本']);
         $grid->column('sort','排序')->editable()->sorter()->width(100);
         $grid->column('status','状态')->editable('switch',[
             'on'  => ['value' => 1, 'text' => '正常'],
-            'off' => ['value' => 2, 'text' => '禁用']
+            'off' => ['value' => 0, 'text' => '禁用']
         ])->width(100);
 
         $grid->column('actions','操作')->width(100)->rowActions(function($rowAction) {
-            $rowAction->menu('edit', '编辑');
+            $rowAction->menu('myEdit', '编辑')->link('#/goodsAttribute/edit');
             $rowAction->menu('delete', '删除')->model(function($model) {
                 $model->delete();
             })->withConfirm('确认要删除吗？','删除后数据将无法恢复，请谨慎操作！');
@@ -43,7 +43,7 @@ class GoodsAttributeController extends QuarkController
 
         // 头部操作
         $grid->actions(function($action) {
-            $action->button('myCreate', '新增')->link('#/goodsAttribute/create');
+            $action->button('myCreate', '新增')->type('primary')->link('#/goodsAttribute/create');
             $action->button('refresh', '刷新');
         });
 
@@ -54,7 +54,7 @@ class GoodsAttributeController extends QuarkController
                 $model->update(['status'=>1]);
             });
             $batch->option('forbid', '禁用')->model(function($model) {
-                $model->update(['status'=>2]);
+                $model->update(['status'=>0]);
             });
             $batch->option('delete', '删除')->model(function($model) {
                 $model->delete();
@@ -77,7 +77,7 @@ class GoodsAttributeController extends QuarkController
             })->placeholder('搜索内容');
 
             $search->equal('status', '所选状态')
-            ->select([''=>'全部',1=>'正常',2=>'已禁用'])
+            ->select([''=>'全部',1=>'正常',0=>'已禁用'])
             ->placeholder('选择状态')
             ->width(110)
             ->advanced();
@@ -121,7 +121,6 @@ class GoodsAttributeController extends QuarkController
         $description            =   $request->json('description');
         $style                  =   $request->json('style');
         $attributeValues        =   $request->json('attribute_values');
-        $attributeValuesSort    =   $request->json('attribute_values_sort');
         $sort                   =   $request->json('sort');
         $status                 =   $request->json('status');
         
@@ -133,7 +132,7 @@ class GoodsAttributeController extends QuarkController
             return $this->error('属性名称必须填写！');
         }
 
-        if ($status == true) {
+        if ($status === true) {
             $status = 1;
         } else {
             $status = 2; //禁用
@@ -152,16 +151,19 @@ class GoodsAttributeController extends QuarkController
         if(!empty($result) && !empty($attributeValues)) {
             foreach($attributeValues as $key => $attributeValue) {
                 $data1['goods_attribute_id'] = $result->id;
-                $data1['vname'] = $attributeValue;
-                $data1['sort'] = $attributeValuesSort[$key];
+                $data1['vname'] = $attributeValue['vname'];
+                if(isset($attributeValue['sort'])) {
+                    $data1['sort'] = $attributeValue['sort'];
+                }
+
                 $result1 = GoodsAttributeValue::create($data1);
             }
         }
 
         if($result) {
-            return $this->success('操作成功！','attributeIndex');
+            return success('操作成功！','/quark/engine?api=admin/goodsAttribute/index&component=table');
         } else {
-            return $this->error('操作失败！');
+            return error('操作失败！');
         }
     }
 
@@ -176,26 +178,22 @@ class GoodsAttributeController extends QuarkController
         $id = $request->get('id');
 
         if(empty($id)) {
-            return $this->error('参数错误！');
+            return error('参数错误！');
         }
 
         $goodsAttribute = GoodsAttribute::find($id)->toArray();
 
         $goodsAttributeValues = GoodsAttributeValue::where('goods_attribute_id',$goodsAttribute['id'])->get();
 
-        $data['goods_attribute'] = $goodsAttribute;
-        $data['goods_attribute_values'] = $goodsAttributeValues;
-        $data['goods_types'] = GoodsType::where('status',1)->get();
+        $goodsAttribute['attribute_values'] = $goodsAttributeValues;
 
-        $data['keys'] = [];
-        foreach($goodsAttributeValues as $key => $value) {
-            $data['keys'][] = $key;
-        }
+        $data['goods_attribute'] = $goodsAttribute;
+        $data['goods_types'] = GoodsType::where('status',1)->get();
         
         if(!empty($data)) {
-            return $this->success('操作成功！','',$data);
+            return success('操作成功！','',$data);
         } else {
-            return $this->error('操作失败！');
+            return error('操作失败！');
         }
     }
 
@@ -212,8 +210,7 @@ class GoodsAttributeController extends QuarkController
         $name                   =   $request->json('name');
         $description            =   $request->json('description');
         $style                  =   $request->json('style');
-        $attributeValues        =   array_unique($request->json('attribute_values'));
-        $attributeValuesSort    =   $request->json('attribute_values_sort');
+        $attributeValues        =   $request->json('attribute_values');
         $sort                   =   $request->json('sort');
         $status                 =   $request->json('status');
         
@@ -229,7 +226,7 @@ class GoodsAttributeController extends QuarkController
             return $this->error('属性名称必须填写！');
         }
 
-        if ($status == true) {
+        if ($status === true) {
             $status = 1;
         } else {
             $status = 2; //禁用
@@ -245,49 +242,46 @@ class GoodsAttributeController extends QuarkController
 
         $result = GoodsAttribute::where('id',$id)->update($data);
 
-        $hasAttributeValues = [];
         $hasAttributeIds = [];
 
         if($result!==false && !empty($attributeValues)) {
 
-            $goodsAttributeValues = GoodsAttributeValue::where('goods_attribute_id',$id)->get();
-            
-            foreach($goodsAttributeValues as $key => $goodsAttributeValue) {
-                foreach($attributeValues as $key1 => $attributeValue) {
-                    if($goodsAttributeValue['vname'] == $attributeValue) {
-
-                        // 已存在的属性
-                        unset($attributeValues[$key1]);
-
-                        // 已存在的属性id
-                        $hasAttributeIds[] = $goodsAttributeValue['id'];
-
-                        $data1['sort'] = $attributeValuesSort[$key1];
-
-                        // 更新数据
-                        GoodsAttributeValue::where('id',$goodsAttributeValue['id'])->update($data1);
-                    }
+            foreach($attributeValues as $key1 => $attributeValue) {
+                if(isset($attributeValue['id'])) {
+                    $hasAttributeIds[] = $attributeValue['id'];
                 }
             }
 
+            // 删除去掉的属性
             GoodsAttributeValue::whereNotIn('id',$hasAttributeIds)
             ->where('goods_attribute_id',$id)
             ->delete();
 
-            foreach($attributeValues as $key2 => $attributeValue) {
-                if($attributeValue) {
-                    $data2['goods_attribute_id'] = $id;
-                    $data2['vname'] = $attributeValue;
-                    $data2['sort'] = $attributeValuesSort[$key2];
-                    $result1 = GoodsAttributeValue::create($data2);
+            foreach($attributeValues as $key1 => $attributeValue) {
+                if(isset($attributeValue['id'])) {
+
+                    // 已存在的属性
+                    $data1['sort'] = $attributeValue['sort'];
+                    $data1['vname'] = $attributeValue['vname'];
+
+                    // 更新数据
+                    GoodsAttributeValue::where('id',$attributeValue['id'])->update($data1);
+                } else {
+                    // 不存在的属性id
+                    $data1['goods_attribute_id'] = $id;
+                    $data1['sort'] = $attributeValue['sort'];
+                    $data1['vname'] = $attributeValue['vname'];
+
+                    // 创建数据
+                    GoodsAttributeValue::create($data1);
                 }
             }
         }
 
-        if ($result!==false) {
-            return $this->success('操作成功！','attributeIndex');
+        if ($result !== false) {
+            return success('操作成功！','/quark/engine?api=admin/goodsAttribute/index&component=table');
         } else {
-            return $this->error('操作失败！');
+            return error('操作失败！');
         }
     }
 }

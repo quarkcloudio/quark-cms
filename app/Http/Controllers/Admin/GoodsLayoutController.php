@@ -28,7 +28,7 @@ class GoodsLayoutController extends QuarkController
         $grid->column('position','模板位置')->using([1=>'详情顶部',2=>'详情底部',3=>'包装清单',4=>'售后保障']);
         $grid->column('status','状态')->editable('switch',[
             'on'  => ['value' => 1, 'text' => '正常'],
-            'off' => ['value' => 2, 'text' => '禁用']
+            'off' => ['value' => 0, 'text' => '禁用']
         ])->width(100);
 
         $grid->column('actions','操作')->width(100)->rowActions(function($rowAction) {
@@ -51,7 +51,7 @@ class GoodsLayoutController extends QuarkController
                 $model->update(['status'=>1]);
             });
             $batch->option('forbid', '禁用')->model(function($model) {
-                $model->update(['status'=>2]);
+                $model->update(['status'=>0]);
             });
             $batch->option('delete', '删除')->model(function($model) {
                 $model->delete();
@@ -73,7 +73,7 @@ class GoodsLayoutController extends QuarkController
             })->placeholder('搜索内容');
 
             $search->equal('status', '所选状态')
-            ->select([''=>'全部',1=>'正常',2=>'已禁用'])
+            ->select([''=>'全部',1=>'正常',0=>'已禁用'])
             ->placeholder('选择状态')
             ->width(110)->advanced();
 

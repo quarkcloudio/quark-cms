@@ -16,7 +16,7 @@ class CreateGoodsExpressesTable extends Migration
         Schema::create('goods_expresses', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('name')->comment('快递名称');
-            $table->tinyInteger('status')->default(1);
+            $table->boolean('status')->default(1);
             $table->timestamps();
         });
     }

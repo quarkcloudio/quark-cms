@@ -17,7 +17,7 @@ class CreateMessageReadsTable extends Migration
             $table->increments('id')->unsigned();
             $table->integer('message_id');
             $table->integer('uid');
-            $table->tinyInteger('status')->default(1);
+            $table->boolean('status')->default(1);
             $table->timestamps();
         });
     }

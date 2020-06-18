@@ -25,7 +25,7 @@ class CreateCommentsTable extends Migration
             $table->integer('ding')->default(0)->nullable()->comment('顶');
             $table->integer('cai')->default(0)->nullable()->comment('踩');
             $table->tinyInteger('report')->default(0)->nullable()->comment('举报（1：淫秽色情，2：垃圾广告，3：违法信息，4：其他）');
-            $table->tinyInteger('status')->default(1);
+            $table->tinyInteger('status')->default(2);
             $table->tinyInteger('rate')->default(0)->nullable()->comment('评分（1，2，3，4，5）');
             $table->timestamps();
         });

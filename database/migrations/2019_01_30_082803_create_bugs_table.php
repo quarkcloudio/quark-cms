@@ -17,7 +17,7 @@ class CreateBugsTable extends Migration
             $table->increments('id')->unsigned();
             $table->longText('content');
             $table->text('cover_ids')->nullable();
-            $table->tinyInteger('status')->default(1);
+            $table->boolean('status')->default(1);
             $table->timestamps();
         });
     }

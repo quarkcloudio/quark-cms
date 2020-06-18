@@ -23,7 +23,7 @@ class CreateGoodsBrandsTable extends Migration
             $table->string('description')->nullable()->comment('品牌描述');
             $table->tinyInteger('is_recommend')->nullable()->comment('是否推荐');
             $table->integer('sort')->nullable();
-            $table->tinyInteger('status')->default(1);
+            $table->boolean('status')->default(1);
             $table->timestamps();
         });
     }

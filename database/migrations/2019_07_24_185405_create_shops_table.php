@@ -48,7 +48,7 @@ class CreateShopsTable extends Migration
             $table->string('open_times')->nullable()->comment('营业时间段：09:00~12:00,13:00~14:00');            
             $table->tinyInteger('open_status')->default(1)->comment('1:营业,2:打烊');
             $table->tinyInteger('is_self')->nullable()->comment('是否为自营店');
-            $table->tinyInteger('status')->default(2);
+            $table->boolean('status')->default(0);
             $table->timestamps();
         });
     }

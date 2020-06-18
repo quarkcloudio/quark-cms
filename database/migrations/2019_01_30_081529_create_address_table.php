@@ -23,7 +23,7 @@ class CreateAddressTable extends Migration
             $table->string('street');
             $table->string('phone');
             $table->tinyInteger('default')->default(0);
-            $table->tinyInteger('status')->default(1);
+            $table->boolean('status')->default(1);
             $table->timestamps();
         });
     }

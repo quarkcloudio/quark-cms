@@ -21,7 +21,7 @@ class CreateBannersTable extends Migration
             $table->string('url')->comment('例如：https://www.baidu.com，/article/1.html');
             $table->string('cover_id');
             $table->integer('sort')->default(0)->nullable();
-            $table->tinyInteger('status')->default(0);
+            $table->boolean('status')->default(1);
             $table->timestamp('deadline')->nullable();
             $table->timestamps();
             $table->softDeletes();

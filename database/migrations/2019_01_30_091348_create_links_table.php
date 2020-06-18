@@ -19,7 +19,7 @@ class CreateLinksTable extends Migration
             $table->string('title')->comment('标题');
             $table->string('url')->comment('访问地址');
             $table->longText('cover_id')->nullable()->comment('封面图');
-            $table->tinyInteger('status')->default(1);
+            $table->boolean('status')->default(1);
             $table->timestamps();
         });
     }

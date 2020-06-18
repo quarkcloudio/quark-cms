@@ -17,7 +17,7 @@ class CreateGoodsCategoryRelationshipsTable extends Migration
             $table->bigIncrements('id');
             $table->integer('goods_id')->unsigned()->nullable()->comment('商品ID');
             $table->string('goods_category_id')->nullable()->comment('商品分类ID');
-            $table->tinyInteger('status')->default(1);
+            $table->boolean('status')->default(1);
             $table->timestamps();
         });
     }

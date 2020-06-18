@@ -29,7 +29,7 @@ class GoodsTypeController extends QuarkController
         $grid->column('sort','排序')->editable()->sorter()->width(100);
         $grid->column('status','状态')->editable('switch',[
             'on'  => ['value' => 1, 'text' => '正常'],
-            'off' => ['value' => 2, 'text' => '禁用']
+            'off' => ['value' => 0, 'text' => '禁用']
         ])->width(100);
 
         $grid->column('actions','操作')->width(480)->rowActions(function($rowAction) {
@@ -78,7 +78,7 @@ class GoodsTypeController extends QuarkController
                 $model->update(['status'=>1]);
             });
             $batch->option('forbid', '禁用')->model(function($model) {
-                $model->update(['status'=>2]);
+                $model->update(['status'=>0]);
             });
             $batch->option('delete', '删除')->model(function($model) {
                 $model->delete();
@@ -87,7 +87,7 @@ class GoodsTypeController extends QuarkController
 
         $grid->search(function($search) {
             $search->equal('status', '所选状态')
-            ->select([''=>'全部',1=>'正常',2=>'已禁用'])
+            ->select([''=>'全部',1=>'正常',0=>'已禁用'])
             ->placeholder('选择状态')
             ->width(110);
 

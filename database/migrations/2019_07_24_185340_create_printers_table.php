@@ -20,7 +20,7 @@ class CreatePrintersTable extends Migration
             $table->string('phone')->comment('手机卡号码');
             $table->string('client_id')->comment('应用ID');
             $table->string('client_secret')->comment('应用密钥');
-            $table->tinyInteger('status')->default(1);
+            $table->boolean('status')->default(1);
             $table->timestamps();
         });
     }

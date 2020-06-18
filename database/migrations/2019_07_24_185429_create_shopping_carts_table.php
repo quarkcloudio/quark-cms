@@ -20,7 +20,7 @@ class CreateShoppingCartsTable extends Migration
             $table->integer('goods_id')->unsigned()->default(0);
             $table->integer('sku_id');
             $table->integer('num');
-            $table->tinyInteger('status')->default(1);
+            $table->boolean('status')->default(1);
             $table->timestamps();
         });
     }

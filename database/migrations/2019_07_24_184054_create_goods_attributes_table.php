@@ -22,7 +22,7 @@ class CreateGoodsAttributesTable extends Migration
             $table->string('description')->nullable()->comment('属性或规格描述');
             $table->tinyInteger('style')->nullable()->comment('显示样式：1多选，2单选，3文本，多选：以复选框的形式让商家勾选属性值；');
             $table->integer('sort')->nullable()->comment('排序');
-            $table->tinyInteger('status')->nullable()->comment('状态'); 
+            $table->boolean('status')->default(1);
             $table->tinyInteger('type')->nullable()->comment('1:spu商品属性,2:sku商品规格用于销售');     
         });
     }

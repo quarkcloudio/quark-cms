@@ -186,11 +186,10 @@ Route::group([
 
     // 商品属性
     $router->get('admin/goodsAttribute/index', 'GoodsAttributeController@index')->name('api/admin/goodsAttribute/index');
-    $router->get('admin/goodsAttribute/show', 'GoodsAttributeController@show')->name('api/admin/goodsAttribute/show');
     $router->get('admin/goodsAttribute/create', 'GoodsAttributeController@create')->name('api/admin/goodsAttribute/create');
     $router->post('admin/goodsAttribute/store', 'GoodsAttributeController@store')->name('api/admin/goodsAttribute/store');
     $router->get('admin/goodsAttribute/edit', 'GoodsAttributeController@edit')->name('api/admin/goodsAttribute/edit');
-    $router->post('admin/goodsAttribute/update', 'GoodsAttributeController@update')->name('api/admin/goodsAttribute/update');
+    $router->post('admin/goodsAttribute/save', 'GoodsAttributeController@save')->name('api/admin/goodsAttribute/save');
     $router->any('admin/goodsAttribute/action', 'GoodsAttributeController@action')->name('api/admin/goodsAttribute/action');
     $router->post('admin/goodsAttribute/destroy', 'GoodsAttributeController@destroy')->name('api/admin/goodsAttribute/destroy');
 

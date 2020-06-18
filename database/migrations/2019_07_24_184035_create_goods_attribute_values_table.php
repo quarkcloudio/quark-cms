@@ -18,7 +18,7 @@ class CreateGoodsAttributeValuesTable extends Migration
             $table->increments('id');             
             $table->integer('goods_attribute_id')->nullable()->comment('商品属性id');
             $table->string('vname')->nullable()->comment('属性值名称');
-            $table->string('sort')->nullable();      
+            $table->tinyInteger('sort')->default(0);
         });
     }
 
