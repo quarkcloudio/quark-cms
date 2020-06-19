@@ -168,12 +168,14 @@ Route::group([
     $router->post('admin/goods/changeStatus', 'GoodsController@changeStatus')->name('api/admin/goods/changeStatus');
     $router->get('admin/goods/attribute', 'GoodsController@attribute')->name('api/admin/goods/attribute');
 
-    $router->get('admin/goods/categoryIndex', 'GoodsController@categoryIndex')->name('api/admin/goods/categoryIndex');
-    $router->get('admin/goods/categoryCreate', 'GoodsController@categoryCreate')->name('api/admin/goods/categoryCreate');
-    $router->post('admin/goods/categoryStore', 'GoodsController@categoryStore')->name('api/admin/goods/categoryStore');
-    $router->get('admin/goods/categoryEdit', 'GoodsController@categoryEdit')->name('api/admin/goods/categoryEdit');
-    $router->post('admin/goods/categorySave', 'GoodsController@categorySave')->name('api/admin/goods/categorySave');
-    $router->post('admin/goods/categoryChangeStatus', 'GoodsController@categoryChangeStatus')->name('api/admin/goods/categoryChangeStatus');
+    $router->get('admin/goodsCategory/index', 'GoodsCategoryController@index')->name('api/admin/goodsCategory/index');
+    $router->get('admin/goodsCategory/show', 'GoodsCategoryController@show')->name('api/admin/goodsCategory/show');
+    $router->get('admin/goodsCategory/create', 'GoodsCategoryController@create')->name('api/admin/goodsCategory/create');
+    $router->post('admin/goodsCategory/store', 'GoodsCategoryController@store')->name('api/admin/goodsCategory/store');
+    $router->get('admin/goodsCategory/edit', 'GoodsCategoryController@edit')->name('api/admin/goodsCategory/edit');
+    $router->post('admin/goodsCategory/update', 'GoodsCategoryController@update')->name('api/admin/goodsCategory/update');
+    $router->any('admin/goodsCategory/action', 'GoodsCategoryController@action')->name('api/admin/goodsCategory/action');
+    $router->post('admin/goodsCategory/destroy', 'GoodsCategoryController@destroy')->name('api/admin/goodsCategory/destroy');
 
     $router->get('admin/goodsType/index', 'GoodsTypeController@index')->name('api/admin/goodsType/index');
     $router->get('admin/goodsType/show', 'GoodsTypeController@show')->name('api/admin/goodsType/show');
@@ -194,12 +196,13 @@ Route::group([
     $router->post('admin/goodsAttribute/destroy', 'GoodsAttributeController@destroy')->name('api/admin/goodsAttribute/destroy');
 
     // 商品规格
-    $router->get('admin/goods/specificationIndex', 'GoodsController@specificationIndex')->name('api/admin/goods/specificationIndex');
-    $router->get('admin/goods/specificationCreate', 'GoodsController@specificationCreate')->name('api/admin/goods/specificationCreate');
-    $router->post('admin/goods/specificationStore', 'GoodsController@specificationStore')->name('api/admin/goods/specificationStore');
-    $router->get('admin/goods/specificationEdit', 'GoodsController@specificationEdit')->name('api/admin/goods/specificationEdit');
-    $router->post('admin/goods/specificationSave', 'GoodsController@specificationSave')->name('api/admin/goods/specificationSave');
-    $router->post('admin/goods/specificationChangeStatus', 'GoodsController@specificationChangeStatus')->name('api/admin/goods/specificationChangeStatus');
+    $router->get('admin/goodsSpecification/index', 'GoodsSpecificationController@index')->name('api/admin/goodsSpecification/index');
+    $router->get('admin/goodsSpecification/create', 'GoodsSpecificationController@create')->name('api/admin/goodsSpecification/create');
+    $router->post('admin/goodsSpecification/store', 'GoodsSpecificationController@store')->name('api/admin/goodsSpecification/store');
+    $router->get('admin/goodsSpecification/edit', 'GoodsSpecificationController@edit')->name('api/admin/goodsSpecification/edit');
+    $router->post('admin/goodsSpecification/save', 'GoodsSpecificationController@save')->name('api/admin/goodsSpecification/save');
+    $router->any('admin/goodsSpecification/action', 'GoodsSpecificationController@action')->name('api/admin/goodsSpecification/action');
+    $router->post('admin/goodsSpecification/destroy', 'GoodsSpecificationController@destroy')->name('api/admin/goodsSpecification/destroy');
 
     $router->get('admin/goodsUnit/index', 'GoodsUnitController@index')->name('api/admin/goodsUnit/index');
     $router->get('admin/goodsUnit/create', 'GoodsUnitController@create')->name('api/admin/goodsUnit/create');

@@ -45,7 +45,7 @@ class MenusTableSeeder extends Seeder
 
             ['id' =>'46','name' => '商品管理','guard_name' => 'admin','icon' => '','type'=>'default','pid' => '38','sort' => '0','path' => '/mall/goods','show'  => '1','status' => '1'],
             ['id' =>'47','name' => '商品列表','guard_name' => 'admin','icon' => '','type'=>'default','pid' => '46','sort' => '0','path' => '/mall/goods/index','show'  => '1','status' => '1'],
-            ['id' =>'48','name' => '商品分类','guard_name' => 'admin','icon' => '','type'=>'default','pid' => '46','sort' => '0','path' => '/mall/goods/categoryIndex','show'  => '1','status' => '1'],
+            ['id' =>'48','name' => '商品分类','guard_name' => 'admin','icon' => '','type'=>'default','pid' => '46','sort' => '0','path' => '/quark/engine?api=admin/goodsCategory/index&component=table','show'  => '1','status' => '1'],
             ['id' =>'49','name' => '品牌管理','guard_name' => 'admin','icon' => '','type'=>'default','pid' => '38','sort' => '0','path' => '/mall/goodsBrand','show'  => '1','status' => '1'],
             ['id' =>'50','name' => '品牌列表','guard_name' => 'admin','icon' => '','type'=>'default','pid' => '49','sort' => '0','path' => '/quark/engine?api=admin/goodsBrand/index&component=table','show'  => '1','status' => '1'],
             ['id' =>'51','name' => '商品类型','guard_name' => 'admin','icon' => '','type'=>'default','pid' => '46','sort' => '0','path' => '/quark/engine?api=admin/goodsType/index&component=table','show'  => '1','status' => '1'],

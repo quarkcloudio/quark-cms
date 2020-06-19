@@ -7,12 +7,15 @@ use Illuminate\Http\Request;
 use App\Models\GoodsType;
 use App\Models\GoodsAttribute;
 use App\Models\GoodsAttributeValue;
+use App\Models\GoodsCategory;
+use App\Models\GoodsCategoryRelationship;
+use App\Models\GoodsBrand;
 use DB;
 use Quark;
 
-class GoodsSpecificationController extends QuarkController
+class GoodsCategoryController extends QuarkController
 {
-    public $title = '商品规格';
+    public $title = '商品分类';
 
     /**
      * 列表页面
@@ -22,20 +25,20 @@ class GoodsSpecificationController extends QuarkController
      */
     protected function table()
     {
-        $grid = Quark::grid(new GoodsAttribute)->title($this->title);
+        $grid = Quark::grid(new GoodsCategory)->title($this->title)->tree();
         $grid->column('id','ID');
-        $grid->column('name','规格名称')->link('#/admin/goodsSpecification/edit');
-        $grid->column('goodsType.name','规格类型');
-        $grid->column('description','规格描述');
-        $grid->column('style','显示样式')->using([1 => '多选', 2 => '单选', 3 => '文本']);
+        $grid->column('title','标题')->link('#/admin/goodsCategory/edit');
         $grid->column('sort','排序')->editable()->sorter()->width(100);
+        $grid->column('name','缩略名');
+        $grid->column('page_num','分页数量');
+        $grid->column('created_at','创建时间');
         $grid->column('status','状态')->editable('switch',[
             'on'  => ['value' => 1, 'text' => '正常'],
             'off' => ['value' => 0, 'text' => '禁用']
         ])->width(100);
 
         $grid->column('actions','操作')->width(100)->rowActions(function($rowAction) {
-            $rowAction->menu('myEdit', '编辑')->link('#/admin/goodsSpecification/edit');
+            $rowAction->menu('myEdit', '编辑')->link('#/admin/goodsCategory/edit');
             $rowAction->menu('delete', '删除')->model(function($model) {
                 $model->delete();
             })->withConfirm('确认要删除吗？','删除后数据将无法恢复，请谨慎操作！');
@@ -43,7 +46,7 @@ class GoodsSpecificationController extends QuarkController
 
         // 头部操作
         $grid->actions(function($action) {
-            $action->button('myCreate', '新增')->type('primary')->link('#/admin/goodsSpecification/create');
+            $action->button('myCreate', '新增')->type('primary')->link('#/admin/goodsCategory/create');
             $action->button('refresh', '刷新');
         });
 
@@ -63,30 +66,18 @@ class GoodsSpecificationController extends QuarkController
 
         $grid->search(function($search) {
 
-            $goodsTypes = GoodsType::where('status',1)->get();
-
-            $options[''] = '全部';
-            foreach ($goodsTypes as $key => $value) {
-                $options[$value['id']] = $value['name'];
-            }
-
-            $search->equal('goods_type_id', '商品类型')->select($options)->placeholder('请选择商品类型')->width(110);
-
-            $search->where('name', '搜索内容',function ($query) {
-                $query->where('name', 'like', "%{input}%");
-            })->placeholder('搜索内容');
-
             $search->equal('status', '所选状态')
             ->select([''=>'全部',1=>'正常',0=>'已禁用'])
             ->placeholder('选择状态')
-            ->width(110)
-            ->advanced();
+            ->width(110);
+
+            $search->where('title', '搜索内容',function ($query) {
+                $query->where('title', 'like', "%{input}%");
+            })->placeholder('搜索内容');
 
         })->expand(false);
 
-        $grid->model()
-        ->where('type', 2)
-        ->paginate(10);
+        $grid->model()->paginate(1000);
 
         return $grid;
     }
@@ -99,9 +90,38 @@ class GoodsSpecificationController extends QuarkController
      */
     public function create(Request $request)
     {
-        $id   =   $request->json('id');
+        $categorys         = GoodsCategory::where('status',1)->get()->toArray();
+        $categoryTrees     = list_to_tree($categorys);
+        $categoryTreeLists = tree_to_ordered_list($categoryTrees,0,'title');
 
-        $data['goods_types'] = GoodsType::where('status',1)->get();
+        // 模板数据
+        $getCategorys = [];
+
+        $getCategorys[0]['name'] = '请选择分类';
+        $getCategorys[0]['value'] = '0';
+
+        foreach ($categoryTreeLists as $key => $categoryTreeList) {
+            $getCategorys[$key+1]['name'] = $categoryTreeList['title'];
+            $getCategorys[$key+1]['value'] = $categoryTreeList['id'];
+        }
+
+        $goodsBrands = GoodsBrand::where('status',1)->select('id as key','name as title')->get();
+
+        $data['categorys'] = $getCategorys;
+        $data['goodsBrands'] = $goodsBrands;
+        $data['goodsBrandSelectedKeys'] = [];
+
+        $goodsTypes[0]['name'] = '请选择商品类型';
+        $goodsTypes[0]['value'] = '0';
+
+        $getGoodsTypes = GoodsType::where('status',1)->select('name','id as value')->get();
+
+        foreach ($getGoodsTypes as $key => $getGoodsType) {
+            $goodsTypes[$key+1]['name'] = $getGoodsType['name'];
+            $goodsTypes[$key+1]['value'] = $getGoodsType['value'];
+        }
+
+        $data['goodsTypes'] = $goodsTypes;
 
         if(!empty($data)) {
             return success('获取成功！','',$data);
@@ -131,7 +151,7 @@ class GoodsSpecificationController extends QuarkController
         }
 
         if (empty($name)) {
-            return $this->error('规格名称必须填写！');
+            return $this->error('属性名称必须填写！');
         }
 
         if ($status == true) {
@@ -146,7 +166,7 @@ class GoodsSpecificationController extends QuarkController
         $data['sort']           = $sort;
         $data['status']         = $status;
         $data['style']          = $style;
-        $data['type']           = 2;
+        $data['type']           = 1;
 
         $result = GoodsAttribute::create($data);
 
@@ -163,7 +183,7 @@ class GoodsSpecificationController extends QuarkController
         }
 
         if($result) {
-            return success('操作成功！','/quark/engine?api=admin/goodsSpecification/index&component=table');
+            return success('操作成功！','/quark/engine?api=admin/goodsAttribute/index&component=table');
         } else {
             return error('操作失败！');
         }
@@ -240,7 +260,7 @@ class GoodsSpecificationController extends QuarkController
         $data['sort']           = $sort;
         $data['status']         = $status;
         $data['style']          = $style;
-        $data['type']           = 2;
+        $data['type']           = 1;
 
         $result = GoodsAttribute::where('id',$id)->update($data);
 
@@ -281,7 +301,7 @@ class GoodsSpecificationController extends QuarkController
         }
 
         if ($result !== false) {
-            return success('操作成功！','/quark/engine?api=admin/goodsSpecification/index&component=table');
+            return success('操作成功！','/quark/engine?api=admin/goodsAttribute/index&component=table');
         } else {
             return error('操作失败！');
         }

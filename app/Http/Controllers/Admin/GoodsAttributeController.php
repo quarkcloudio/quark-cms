@@ -24,7 +24,7 @@ class GoodsAttributeController extends QuarkController
     {
         $grid = Quark::grid(new GoodsAttribute)->title($this->title);
         $grid->column('id','ID');
-        $grid->column('name','属性名称')->link('#/goodsAttribute/edit');
+        $grid->column('name','属性名称')->link('#/admin/goodsAttribute/edit');
         $grid->column('goodsType.name','属性类型');
         $grid->column('description','属性描述');
         $grid->column('style','显示样式')->using([1 => '多选', 2 => '单选', 3 => '文本']);
@@ -35,7 +35,7 @@ class GoodsAttributeController extends QuarkController
         ])->width(100);
 
         $grid->column('actions','操作')->width(100)->rowActions(function($rowAction) {
-            $rowAction->menu('myEdit', '编辑')->link('#/goodsAttribute/edit');
+            $rowAction->menu('myEdit', '编辑')->link('#/admin/goodsAttribute/edit');
             $rowAction->menu('delete', '删除')->model(function($model) {
                 $model->delete();
             })->withConfirm('确认要删除吗？','删除后数据将无法恢复，请谨慎操作！');
@@ -43,7 +43,7 @@ class GoodsAttributeController extends QuarkController
 
         // 头部操作
         $grid->actions(function($action) {
-            $action->button('myCreate', '新增')->type('primary')->link('#/goodsAttribute/create');
+            $action->button('myCreate', '新增')->type('primary')->link('#/admin/goodsAttribute/create');
             $action->button('refresh', '刷新');
         });
 
@@ -84,7 +84,9 @@ class GoodsAttributeController extends QuarkController
 
         })->expand(false);
 
-        $grid->model()->paginate(10);
+        $grid->model()
+        ->where('type', 1)
+        ->paginate(10);
 
         return $grid;
     }
@@ -132,10 +134,10 @@ class GoodsAttributeController extends QuarkController
             return $this->error('属性名称必须填写！');
         }
 
-        if ($status === true) {
+        if ($status == true) {
             $status = 1;
         } else {
-            $status = 2; //禁用
+            $status = 0; //禁用
         }
 
         $data['goods_type_id']  = $goodsTypeId;
@@ -226,10 +228,10 @@ class GoodsAttributeController extends QuarkController
             return $this->error('属性名称必须填写！');
         }
 
-        if ($status === true) {
+        if ($status == true) {
             $status = 1;
         } else {
-            $status = 2; //禁用
+            $status = 0; //禁用
         }
 
         $data['goods_type_id']  = $goodsTypeId;
