@@ -194,6 +194,7 @@ Route::group([
     $router->post('admin/goodsAttribute/save', 'GoodsAttributeController@save')->name('api/admin/goodsAttribute/save');
     $router->any('admin/goodsAttribute/action', 'GoodsAttributeController@action')->name('api/admin/goodsAttribute/action');
     $router->post('admin/goodsAttribute/destroy', 'GoodsAttributeController@destroy')->name('api/admin/goodsAttribute/destroy');
+    $router->get('admin/goodsAttribute/search', 'GoodsAttributeController@search')->name('api/admin/goodsAttribute/search');
 
     // 商品规格
     $router->get('admin/goodsSpecification/index', 'GoodsSpecificationController@index')->name('api/admin/goodsSpecification/index');
@@ -203,6 +204,8 @@ Route::group([
     $router->post('admin/goodsSpecification/save', 'GoodsSpecificationController@save')->name('api/admin/goodsSpecification/save');
     $router->any('admin/goodsSpecification/action', 'GoodsSpecificationController@action')->name('api/admin/goodsSpecification/action');
     $router->post('admin/goodsSpecification/destroy', 'GoodsSpecificationController@destroy')->name('api/admin/goodsSpecification/destroy');
+    $router->get('admin/goodsSpecification/search', 'GoodsSpecificationController@search')->name('api/admin/goodsSpecification/search');
+
 
     $router->get('admin/goodsUnit/index', 'GoodsUnitController@index')->name('api/admin/goodsUnit/index');
     $router->get('admin/goodsUnit/create', 'GoodsUnitController@create')->name('api/admin/goodsUnit/create');

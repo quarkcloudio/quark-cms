@@ -286,4 +286,54 @@ class GoodsAttributeController extends QuarkController
             return error('操作失败！');
         }
     }
+
+    /**
+     * 筛选列表页面
+     *
+     * @param  Request  $request
+     * @return Response
+     */
+    protected function search(Request $request)
+    {
+        $search = $request->input('search');
+        $attributeSelectedIds = $request->input('attributeSelectedIds');
+
+        $query = GoodsAttribute::query();
+
+        if(isset($search['attributeName'])) {
+            $query->where('name','like','%'.$search['attributeName'].'%');
+        }
+
+        if(isset($search['attributeGoodsTypeId'])) {
+            $query->where('goods_type_id',$search['attributeGoodsTypeId']);
+        }
+
+        if(isset($attributeSelectedIds)) {
+            $query->whereNotIn('id', $attributeSelectedIds);
+        }
+
+        $goodsAttributes = $query->where('status',1)->where('type',1)->paginate(10);
+
+        $getGoodsAttributes = $goodsAttributes->toArray();
+
+        foreach ($getGoodsAttributes['data'] as $key => $list) {
+
+            $goodsAttributeValues = GoodsAttributeValue::where('goods_attribute_id',$list['id'])->pluck('vname')->toArray();
+
+            $getGoodsAttributes['data'][$key]['goods_attribute_values'] = implode(',',$goodsAttributeValues);
+        }
+
+        // 表格分页
+        $data['dataSource'] = $getGoodsAttributes['data'];
+
+        // 表格分页
+        $pagination['defaultCurrent'] = 1;
+        $pagination['current'] = $goodsAttributes->currentPage();
+        $pagination['pageSize'] = $goodsAttributes->perPage();
+        $pagination['total'] = $goodsAttributes->total();
+
+        $data['pagination'] = $pagination;
+
+        return success('获取成功！','',$data);
+    }
 }
