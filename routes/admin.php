@@ -173,7 +173,7 @@ Route::group([
     $router->get('admin/goodsCategory/create', 'GoodsCategoryController@create')->name('api/admin/goodsCategory/create');
     $router->post('admin/goodsCategory/store', 'GoodsCategoryController@store')->name('api/admin/goodsCategory/store');
     $router->get('admin/goodsCategory/edit', 'GoodsCategoryController@edit')->name('api/admin/goodsCategory/edit');
-    $router->post('admin/goodsCategory/update', 'GoodsCategoryController@update')->name('api/admin/goodsCategory/update');
+    $router->post('admin/goodsCategory/save', 'GoodsCategoryController@save')->name('api/admin/goodsCategory/save');
     $router->any('admin/goodsCategory/action', 'GoodsCategoryController@action')->name('api/admin/goodsCategory/action');
     $router->post('admin/goodsCategory/destroy', 'GoodsCategoryController@destroy')->name('api/admin/goodsCategory/destroy');
 

@@ -3,7 +3,33 @@
 namespace App\Http\Controllers\Admin;
 
 use Illuminate\Http\Request;
-use QuarkCMS\QuarkAdmin\Controllers\QuarkController;
+use App\Http\Controllers\Controller;
+use App\Services\Helper;
+use App\Builder\Forms\Controls\ID;
+use App\Builder\Forms\Controls\Input;
+use App\Builder\Forms\Controls\Text;
+use App\Builder\Forms\Controls\TextArea;
+use App\Builder\Forms\Controls\InputNumber;
+use App\Builder\Forms\Controls\Checkbox;
+use App\Builder\Forms\Controls\Radio;
+use App\Builder\Forms\Controls\Select;
+use App\Builder\Forms\Controls\SwitchButton;
+use App\Builder\Forms\Controls\DatePicker;
+use App\Builder\Forms\Controls\RangePicker;
+use App\Builder\Forms\Controls\Editor;
+use App\Builder\Forms\Controls\Image;
+use App\Builder\Forms\Controls\File;
+use App\Builder\Forms\Controls\Button;
+use App\Builder\Forms\Controls\Popconfirm;
+use App\Builder\Forms\Controls\Area;
+use App\Builder\Forms\Controls\Map;
+use App\Builder\Forms\Controls\SearchInput;
+use App\Builder\Forms\FormBuilder;
+use App\Builder\Lists\Tables\Table;
+use App\Builder\Lists\Tables\Column;
+use App\Builder\Lists\ListBuilder;
+use App\Builder\Tabs;
+use App\Builder\TabPane;
 use App\Models\Goods;
 use App\Models\GoodsCategory;
 use App\Models\GoodsCategoryRelationship;
@@ -20,11 +46,13 @@ use App\Models\GoodsSku;
 use App\Models\GoodsPhoto;
 use App\Models\Shop;
 use DB;
-use Quark;
 
-class GoodsController extends QuarkController
+class GoodsController extends BuilderController
 {
-    public $title = '商品';
+    public function __construct()
+    {
+        $this->pageTitle = '商品';
+    }
 
     /**
      * 列表页面
@@ -32,76 +60,117 @@ class GoodsController extends QuarkController
      * @param  Request  $request
      * @return Response
      */
-    protected function table()
+    public function index(Request $request)
     {
-        $grid = Quark::grid(new Goods)->title($this->title);
-        $grid->column('id','ID');
-        $grid->column('cover_id','商品封面')->image();
-        $grid->column('goods_name','标题')->link('#/admin/goods/edit');
-        $grid->column('tags','商品标签');
-        $grid->column('goods_price','售价');
-        $grid->column('stock_num','库存');
-        $grid->column('created_at','发布时间');
-        $grid->column('status','状态')->editable('switch',[
-            'on'  => ['value' => 1, 'text' => '销售中'],
-            'off' => ['value' => 3, 'text' => '已下架']
-        ])->width(100);
+        // 获取参数
+        $current   = intval($request->get('current',1));
+        $pageSize  = intval($request->get('pageSize',10));
+        $search    = $request->get('search');
+            
+        // 定义对象
+        $query = Goods::query();
 
-        $grid->column('actions','操作')->width(100)->rowActions(function($rowAction) {
-            $rowAction->menu('myEdit', '编辑')->link('#/admin/goods/edit');
-            $rowAction->menu('delete', '删除')->model(function($model) {
-                $model->delete();
-            })->withConfirm('确认要删除吗？','删除后数据将无法恢复，请谨慎操作！');
-        });
+        // 查询
+        if(!empty($search)) {
 
-        // 头部操作
-        $grid->actions(function($action) {
-            $action->button('myCreate', '新增')->type('primary')->link('#/admin/goods/create');
-            $action->button('refresh', '刷新');
-        });
-
-        // select样式的批量操作
-        $grid->batchActions(function($batch) {
-            $batch->option('', '批量操作');
-            $batch->option('resume', '上架')->model(function($model) {
-                $model->update(['status'=>1]);
-            });
-            $batch->option('forbid', '下架')->model(function($model) {
-                $model->update(['status'=>3]);
-            });
-            $batch->option('delete', '删除')->model(function($model) {
-                $model->delete();
-            })->withConfirm('确认要删除吗？','删除后数据将无法恢复，请谨慎操作！');
-        })->style('select',['width'=>120]);
-
-        $grid->search(function($search) {
-            $categorys = GoodsCategory::where('status',1)->get();
-            $options[''] = '全部';
-            foreach ($categorys as $key => $value) {
-                $options[$value['id']] = $value['title'];
+            // 用户名
+            if(isset($search['goods_name'])) {
+                $query->where('goods_name','like','%'.$search['goods_name'].'%');
             }
 
-            $search->equal('category_id', '商品分类')->select($options)->placeholder('选择分类')->width(110);
-            $search->where('goods_name', '搜索内容',function ($query) {
-                $query->where('goods_name', 'like', "%{input}%");
-            })->placeholder('搜索内容');
+            // 状态
+            if(isset($search['status'])) {
+                if(!empty($search['status'])) {
+                    $query->where('status',$search['status']);
+                }
+            }
 
-            $search->equal('status', '所选状态')
-            ->select([''=>'全部',1=>'出售中',2=>'审核中',3=>'已下架',4=>'违规下架'])
-            ->placeholder('选择状态')
-            ->width(110)
-            ->advanced();
-
-            $search->between('created_at', '发布时间')->datetime()->advanced();
-        })->expand(false);
-
-        if(ADMINID == 1) {
-            $grid->model()->paginate(10);
-        } else {
-            $grid->model()->where('adminid',ADMINID)->paginate(10);
+            // 时间范围
+            if(isset($search['dateRange'])) {
+                if(!empty($search['dateRange'][0]) || !empty($search['dateRange'][1])) {
+                    $query->whereBetween('created_at', [$search['dateRange'][0], $search['dateRange'][1]]);
+                }
+            }
         }
 
-        return $grid;
+        // 查询数量
+        $total = $query
+        ->where('status', '>', 0)
+        ->count();
+
+        // 查询列表
+        $lists = $query
+        ->skip(($current-1)*$pageSize)
+        ->take($pageSize)
+        ->where('status', '>', 0)
+        ->orderBy('id', 'desc')
+        ->get()
+        ->toArray();
+
+        // 默认页码
+        $pagination['defaultCurrent'] = 1;
+        // 当前页码
+        $pagination['current'] = $current;
+        // 分页数量
+        $pagination['pageSize'] = $pageSize;
+        // 总数量
+        $pagination['total'] = $total;
+
+        $status = [
+            [
+                'name'=>'所有状态',
+                'value'=>'0',
+            ],
+            [
+                'name'=>'正常',
+                'value'=>'1',
+            ],
+            [
+                'name'=>'禁用',
+                'value'=>'2',
+            ],
+        ];
+
+        $searchs = [
+            Select::make('状态','status')->option($status)->value('0'),
+            Input::make('搜索内容','goods_name'),
+            Button::make('搜索')->onClick('search'),
+        ];
+
+        $columns = [
+            Column::make('ID','id'),
+            Column::make('商品封面','cover_id')->isImage(),
+            Column::make('商品名称','goods_name')->withA('admin/mall/'.$this->controllerName().'/edit'),
+            Column::make('商品标签','tags'),
+            Column::make('售价','goods_price'),
+            Column::make('库存','stock_num'),
+            Column::make('状态','status')->withTag("text === '已禁用' ? 'red' : 'blue'"),
+            Column::make('发布时间','created_at'),
+        ];
+
+        $headerButtons = [
+            Button::make('新增'.$this->pageTitle)->icon('plus-circle')->type('primary')->href('admin/mall/'.$this->controllerName().'/create'),
+        ];
+
+        $actions = [
+            Button::make('启用|禁用')->type('link')->onClick('changeStatus','1|2','admin/'.$this->controllerName().'/changeStatus'),
+            Button::make('编辑')->type('link')->href('admin/mall/'.$this->controllerName().'/edit'),
+            Popconfirm::make('删除')->type('link')->title('确定删除吗？')->onConfirm('changeStatus','-1','admin/'.$this->controllerName().'/changeStatus'),
+        ];
+
+        foreach ($lists as $key => $value) {
+            $lists[$key]['cover_id'] = Helper::getPicture($value['cover_id']);
+        }
+
+        $lists = Helper::listsFormat($lists);
+
+        $data = $this->listBuilder($columns,$lists,$pagination,$searchs,[],$headerButtons,null,$actions);
+
+        if(!empty($data)) {
+            return $this->success('获取成功！','',$data);
+        } else {
+            return $this->success('获取失败！');
+        }
     }
 
     /**
@@ -118,7 +187,7 @@ class GoodsController extends QuarkController
         ->get()
         ->toArray();
 
-        $categoryTrees = list_to_tree($categorys,'id','pid','children',0);
+        $categoryTrees = Helper::listToTree($categorys,'id','pid','children',0);
 
         $shops = Shop::where('status',1)
         ->select('id','title')
@@ -169,7 +238,7 @@ class GoodsController extends QuarkController
         $data['packingLayouts'] = $packingLayouts;
         $data['serviceLayouts'] = $serviceLayouts;
 
-        return success('获取成功！','',$data);
+        return $this->success('获取成功！','',$data);
     }
 
     /**
@@ -241,7 +310,7 @@ class GoodsController extends QuarkController
         $data['shopGoodsAttributes'] = $shopGoodsAttributes;
         $data['goodsAttributes'] = $goodsAttributes;
 
-        return success('获取成功！','',$data);
+        return $this->success('获取成功！','',$data);
     }
 
     /**
@@ -308,23 +377,23 @@ class GoodsController extends QuarkController
         }
 
         if(empty($shopId)) {
-            return error('请选择所属商家！');
+            return $this->error('请选择所属商家！');
         }
 
         if(empty($goodsCategoryId)) {
-            return error('请选择所属分类！');
+            return $this->error('请选择所属分类！');
         }
 
         if(empty($goodsName)) {
-            return error('请填写商品名称！');
+            return $this->error('请填写商品名称！');
         }
 
         if(empty($goodsSkus)) {
             if(empty($goodsPrice)) {
-                return error('请填写店铺价！');
+                return $this->error('请填写店铺价！');
             }
             if(empty($stockNum)) {
-                return error('请填写商品库存！');
+                return $this->error('请填写商品库存！');
             }
         }
 
@@ -392,19 +461,19 @@ class GoodsController extends QuarkController
             foreach($goodsSkus as $key => $value) {
 
                 if(!isset($value['stock_num'])) {
-                    return error('请填写库存！');
+                    return $this->error('请填写库存！');
                 }
 
                 if(!isset($value['goods_price'])) {
-                    return error('请填写商品价格！');
+                    return $this->error('请填写商品价格！');
                 }
 
                 if(empty($value['stock_num'])) {
-                    return error('请填写库存！');
+                    return $this->error('请填写库存！');
                 }
 
                 if(empty($value['goods_price'])) {
-                    return error('请填写商品价格！');
+                    return $this->error('请填写商品价格！');
                 }
             }
         }
@@ -497,11 +566,11 @@ class GoodsController extends QuarkController
                     $propertyNames = trim($propertyNames);
 
                     if(!isset($value['stock_num'])) {
-                        return error('请填写库存！');
+                        return $this->error('请填写库存！');
                     }
 
                     if(!isset($value['goods_price'])) {
-                        return error('请填写商品价格！');
+                        return $this->error('请填写商品价格！');
                     }
 
                     if(!isset($value['cost_price'])) {
@@ -521,11 +590,11 @@ class GoodsController extends QuarkController
                     }
 
                     if(empty($value['stock_num'])) {
-                        return error('请填写库存！');
+                        return $this->error('请填写库存！');
                     }
 
                     if(empty($value['goods_price'])) {
-                        return error('请填写商品价格！');
+                        return $this->error('请填写商品价格！');
                     }
 
                     $data2['properties'] = $properties;
@@ -570,9 +639,9 @@ class GoodsController extends QuarkController
         }
 
         if ($result) {
-            return success('操作成功！','/mall/goods/imageCreate?id='.$result->id);
+            return $this->success('操作成功！','/mall/goods/imageCreate?id='.$result->id);
         } else {
-            return error('操作失败！');
+            return $this->error('操作失败！');
         }
     }
 
@@ -587,7 +656,7 @@ class GoodsController extends QuarkController
         $id = $request->get('id');
 
         if(empty($id)) {
-            return error('参数错误！');
+            return $this->error('参数错误！');
         }
 
         $data = Goods::find($id)->toArray();
@@ -788,7 +857,7 @@ class GoodsController extends QuarkController
         $data['packingLayouts'] = $packingLayouts;
         $data['serviceLayouts'] = $serviceLayouts;
 
-        return success('获取成功！','',$data);
+        return $this->success('获取成功！','',$data);
     }
 
     protected function getParentCategory($id,$categorys)
@@ -870,23 +939,23 @@ class GoodsController extends QuarkController
         }
 
         if(empty($shopId)) {
-            return error('请选择所属商家！');
+            return $this->error('请选择所属商家！');
         }
 
         if(empty($goodsCategoryId)) {
-            return error('请选择所属分类！');
+            return $this->error('请选择所属分类！');
         }
 
         if(empty($goodsName)) {
-            return error('请填写商品名称！');
+            return $this->error('请填写商品名称！');
         }
 
         if(empty($goodsSkus)) {
             if(empty($goodsPrice)) {
-                return error('请填写店铺价！');
+                return $this->error('请填写店铺价！');
             }
             if(empty($stockNum)) {
-                return error('请填写商品库存！');
+                return $this->error('请填写商品库存！');
             }
         }
 
@@ -954,19 +1023,19 @@ class GoodsController extends QuarkController
             foreach($goodsSkus as $key => $value) {
 
                 if(!isset($value['stock_num'])) {
-                    return error('请填写库存！');
+                    return $this->error('请填写库存！');
                 }
 
                 if(!isset($value['goods_price'])) {
-                    return error('请填写商品价格！');
+                    return $this->error('请填写商品价格！');
                 }
 
                 if(empty($value['stock_num'])) {
-                    return error('请填写库存！');
+                    return $this->error('请填写库存！');
                 }
 
                 if(empty($value['goods_price'])) {
-                    return error('请填写商品价格！');
+                    return $this->error('请填写商品价格！');
                 }
             }
         }
@@ -1068,11 +1137,11 @@ class GoodsController extends QuarkController
                     }
 
                     if(!isset($value['stock_num'])) {
-                        return error('请填写库存！');
+                        return $this->error('请填写库存！');
                     }
 
                     if(!isset($value['goods_price'])) {
-                        return error('请填写商品价格！');
+                        return $this->error('请填写商品价格！');
                     }
 
                     if(!isset($value['cost_price'])) {
@@ -1092,11 +1161,11 @@ class GoodsController extends QuarkController
                     }
 
                     if(empty($value['stock_num'])) {
-                        return error('请填写库存！');
+                        return $this->error('请填写库存！');
                     }
 
                     if(empty($value['goods_price'])) {
-                        return error('请填写商品价格！');
+                        return $this->error('请填写商品价格！');
                     }
 
                     $data2['properties'] = $properties;
@@ -1148,9 +1217,9 @@ class GoodsController extends QuarkController
         }
 
         if ($result) {
-            return success('操作成功！');
+            return $this->success('操作成功！');
         } else {
-            return error('操作失败！');
+            return $this->error('操作失败！');
         }
     }
 
@@ -1177,7 +1246,7 @@ class GoodsController extends QuarkController
             }
         }
 
-        return success('操作成功！','/mall/goods/complete?id='.$goodsId);
+        return $this->success('操作成功！','/mall/goods/complete?id='.$goodsId);
     }
 
     /**
@@ -1191,7 +1260,7 @@ class GoodsController extends QuarkController
         $id = $request->get('id');
 
         if(empty($id)) {
-            return error('参数错误！');
+            return $this->error('参数错误！');
         }
 
         $goodsPhotos = GoodsPhoto::where('goods_id',$id)
@@ -1209,7 +1278,7 @@ class GoodsController extends QuarkController
             }
         }
 
-        return success('操作成功！','',$data);
+        return $this->success('操作成功！','',$data);
     }
 
     /**
@@ -1235,7 +1304,7 @@ class GoodsController extends QuarkController
             }
         }
 
-        return success('操作成功！');
+        return $this->success('操作成功！');
     }
 
     /**
@@ -1253,9 +1322,9 @@ class GoodsController extends QuarkController
         $result['goodsIndexUrl'] = '#/admin/mall/goods/index';
 
         if ($result) {
-            return success('操作成功！','',$result);
+            return $this->success('操作成功！','',$result);
         } else {
-            return error('操作失败！');
+            return $this->error('操作失败！');
         }
     }
 
@@ -1271,7 +1340,7 @@ class GoodsController extends QuarkController
         $status = $request->json('status');
 
         if(empty($id) || empty($status)) {
-            return error('参数错误！');
+            return $this->error('参数错误！');
         }
 
         // 定义对象
@@ -1286,9 +1355,9 @@ class GoodsController extends QuarkController
         $result = $query->update(['status'=>$status]);
 
         if ($result) {
-            return success('操作成功！');
+            return $this->success('操作成功！');
         } else {
-            return error('操作失败！');
+            return $this->error('操作失败！');
         }
     }
 }

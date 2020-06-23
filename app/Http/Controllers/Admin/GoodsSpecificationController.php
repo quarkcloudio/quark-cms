@@ -263,7 +263,9 @@ class GoodsSpecificationController extends QuarkController
                 if(isset($attributeValue['id'])) {
 
                     // 已存在的属性
-                    $data1['sort'] = $attributeValue['sort'];
+                    if(isset($attributeValue['sort'])) {
+                        $data1['sort'] = $attributeValue['sort'];
+                    }
                     $data1['vname'] = $attributeValue['vname'];
 
                     // 更新数据
@@ -271,7 +273,9 @@ class GoodsSpecificationController extends QuarkController
                 } else {
                     // 不存在的属性id
                     $data1['goods_attribute_id'] = $id;
-                    $data1['sort'] = $attributeValue['sort'];
+                    if(isset($attributeValue['sort'])) {
+                        $data1['sort'] = $attributeValue['sort'];
+                    }
                     $data1['vname'] = $attributeValue['vname'];
 
                     // 创建数据

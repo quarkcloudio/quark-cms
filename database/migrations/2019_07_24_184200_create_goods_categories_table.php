@@ -19,7 +19,7 @@ class CreateGoodsCategoriesTable extends Migration
             $table->integer('pid')->nullable()->default('0');
             $table->string('title');
             $table->integer('sort')->nullable()->default('0');
-            $table->string('cover_id')->nullable()->default('0');
+            $table->integer('cover_id')->nullable()->default('0');
             $table->string('goods_brand_ids')->nullable()->comment('关联品牌');
             $table->string('name')->comment('分类缩略名');
             $table->string('description')->nullable()->comment('分类描述');

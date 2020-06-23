@@ -10,6 +10,7 @@ use App\Models\GoodsAttributeValue;
 use App\Models\GoodsCategory;
 use App\Models\GoodsCategoryRelationship;
 use App\Models\GoodsBrand;
+use App\Models\GoodsCategoryAttribute;
 use DB;
 use Quark;
 
@@ -97,12 +98,9 @@ class GoodsCategoryController extends QuarkController
         // 模板数据
         $getCategorys = [];
 
-        $getCategorys[0]['name'] = '请选择分类';
-        $getCategorys[0]['value'] = '0';
-
         foreach ($categoryTreeLists as $key => $categoryTreeList) {
-            $getCategorys[$key+1]['name'] = $categoryTreeList['title'];
-            $getCategorys[$key+1]['value'] = $categoryTreeList['id'];
+            $getCategorys[$key]['name'] = $categoryTreeList['title'];
+            $getCategorys[$key]['value'] = $categoryTreeList['id'];
         }
 
         $goodsBrands = GoodsBrand::where('status',1)->select('id as key','name as title')->get();
@@ -111,14 +109,11 @@ class GoodsCategoryController extends QuarkController
         $data['goodsBrands'] = $goodsBrands;
         $data['goodsBrandSelectedKeys'] = [];
 
-        $goodsTypes[0]['name'] = '请选择商品类型';
-        $goodsTypes[0]['value'] = '0';
-
         $getGoodsTypes = GoodsType::where('status',1)->select('name','id as value')->get();
 
         foreach ($getGoodsTypes as $key => $getGoodsType) {
-            $goodsTypes[$key+1]['name'] = $getGoodsType['name'];
-            $goodsTypes[$key+1]['value'] = $getGoodsType['value'];
+            $goodsTypes[$key]['name'] = $getGoodsType['name'];
+            $goodsTypes[$key]['value'] = $getGoodsType['value'];
         }
 
         $data['goodsTypes'] = $goodsTypes;
@@ -138,52 +133,107 @@ class GoodsCategoryController extends QuarkController
      */
     public function store(Request $request)
     {
-        $goodsTypeId            =   $request->json('goods_type_id');
-        $name                   =   $request->json('name');
-        $description            =   $request->json('description');
-        $style                  =   $request->json('style');
-        $attributeValues        =   $request->json('attribute_values');
-        $sort                   =   $request->json('sort');
-        $status                 =   $request->json('status');
+        $title          =   $request->json('title','');
+        $name           =   $request->json('name');
+        $description    =   $request->json('description');
+        $sort           =   $request->json('sort');
+        $pid            =   $request->json('pid');
+        $coverId        =   $request->json('cover_id');
+        $indexTpl       =   $request->json('index_tpl');
+        $listsTpl       =   $request->json('lists_tpl');
+        $detailTpl      =   $request->json('detail_tpl');
+        $pageNum        =   $request->json('page_num');
+        $status         =   $request->json('status');
+        $brandIds       =   $request->json('brand_ids');
+
+        $attributes          =   $request->json('attributes');
+        $specifications      =   $request->json('specifications');
         
-        if (empty($goodsTypeId)) {
-            return $this->error('请选择商品类型！');
+        if (empty($title)) {
+            return error('标题必须填写！');
         }
 
         if (empty($name)) {
-            return $this->error('属性名称必须填写！');
+            return error('名称必须填写！');
+        }
+
+        if (empty($pageNum)) {
+            return error('分页数量必须填写！');
+        }
+
+        $hasTitle = GoodsCategory::where('title',$title)->where('status',1)->first();
+
+        if($hasTitle) {
+            return error('此分类标题已存在！');
         }
 
         if ($status == true) {
             $status = 1;
         } else {
-            $status = 0; //禁用
+            $status = 2; //禁用
+        }
+        
+        if($coverId) {
+            $coverId = $coverId[0]['id'];
+        } else {
+            $coverId = 0;
         }
 
-        $data['goods_type_id']  = $goodsTypeId;
+        $data['title']          = $title;
         $data['name']           = $name;
         $data['description']    = $description;
         $data['sort']           = $sort;
+        $data['pid']            = $pid;
+        $data['cover_id']       = $coverId;
+        $data['index_tpl']      = $indexTpl;
+        $data['lists_tpl']      = $listsTpl;
+        $data['detail_tpl']     = $detailTpl;
+        $data['page_num']       = $pageNum;
         $data['status']         = $status;
-        $data['style']          = $style;
-        $data['type']           = 1;
+        $data['goods_brand_ids'] = json_encode($brandIds);
 
-        $result = GoodsAttribute::create($data);
+        $result = GoodsCategory::create($data);
 
-        if(!empty($result) && !empty($attributeValues)) {
-            foreach($attributeValues as $key => $attributeValue) {
-                $data1['goods_attribute_id'] = $result->id;
-                $data1['vname'] = $attributeValue['vname'];
-                if(isset($attributeValue['sort'])) {
-                    $data1['sort'] = $attributeValue['sort'];
+        if($result) {
+            if($attributes) {
+                foreach ($attributes as $key => $attribute) {
+                    $data1['goods_category_id'] = $result->id;
+                    $data1['goods_attribute_id'] = $attribute['id'];
+
+                    if(isset($attribute['group'])) {
+                        $data1['gorup_name'] = $attribute['group'];
+                    }
+
+                    if(isset($attribute['sort'])) {
+                        $data1['sort'] = $attribute['sort'];
+                    }
+
+                    $data1['type'] = 1;
+                    GoodsCategoryAttribute::create($data1);
                 }
+            }
 
-                $result1 = GoodsAttributeValue::create($data1);
+            if($specifications) {
+                foreach ($specifications as $key => $specification) {
+                    $data2['goods_category_id'] = $result->id;
+                    $data2['goods_attribute_id'] = $specification['id'];
+
+                    if(isset($specification['group'])) {
+                        $data2['gorup_name'] = $specification['group'];
+                    }
+
+                    if(isset($specification['sort'])) {
+                        $data2['sort'] = $specification['sort'];
+                    }
+
+                    $data2['type'] = 2;
+                    GoodsCategoryAttribute::create($data2);
+                }
             }
         }
 
         if($result) {
-            return success('操作成功！','/quark/engine?api=admin/goodsAttribute/index&component=table');
+            return success('操作成功！','/quark/engine?api=admin/goodsCategory/index&component=table');
         } else {
             return error('操作失败！');
         }
@@ -203,14 +253,96 @@ class GoodsCategoryController extends QuarkController
             return error('参数错误！');
         }
 
-        $goodsAttribute = GoodsAttribute::find($id)->toArray();
+        $categorys         = GoodsCategory::where('status',1)->get()->toArray();
+        $categoryTrees     = list_to_tree($categorys);
+        $categoryTreeLists = tree_to_ordered_list($categoryTrees,0,'title');
 
-        $goodsAttributeValues = GoodsAttributeValue::where('goods_attribute_id',$goodsAttribute['id'])->get();
+        // 模板数据
+        $getCategorys = [];
 
-        $goodsAttribute['attribute_values'] = $goodsAttributeValues;
+        foreach ($categoryTreeLists as $key => $categoryTreeList) {
+            $getCategorys[$key]['name'] = $categoryTreeList['title'];
+            $getCategorys[$key]['value'] = $categoryTreeList['id'];
+        }
 
-        $data['goods_attribute'] = $goodsAttribute;
-        $data['goods_types'] = GoodsType::where('status',1)->get();
+        $data = GoodsCategory::find($id)->toArray();
+
+        $cover_id = $data['cover_id'];
+
+        if($cover_id) {
+            unset($data['cover_id']);
+            $data['cover_id'][0]['id'] =$cover_id;
+            $data['cover_id'][0]['uid'] =$cover_id;
+            $data['cover_id'][0]['name'] = get_picture($cover_id,'name');
+            $data['cover_id'][0]['url'] = get_picture($cover_id);
+        }
+
+        $goodsBrands = GoodsBrand::where('status',1)->select('id as key','name as title')->get();
+
+        $data['categorys'] = $getCategorys;
+        $data['goodsBrands'] = $goodsBrands;
+        $data['goodsBrandSelectedKeys'] = json_decode($data['goods_brand_ids']);
+
+        $getGoodsTypes = GoodsType::where('status',1)->select('name','id as value')->get();
+
+        foreach ($getGoodsTypes as $key => $getGoodsType) {
+            $goodsTypes[$key]['name'] = $getGoodsType['name'];
+            $goodsTypes[$key]['value'] = $getGoodsType['value'];
+        }
+
+        $data['goodsTypes'] = $goodsTypes;
+
+        $attributeSelectedIds = GoodsCategoryAttribute::where('goods_category_id',$id)
+        ->where('type',1)
+        ->pluck('goods_attribute_id');
+        $data['attributeSelectedIds'] = $attributeSelectedIds;
+
+        $specificationSelectedIds = GoodsCategoryAttribute::where('goods_category_id',$id)
+        ->where('type',2)
+        ->pluck('goods_attribute_id');
+        $data['specificationSelectedIds'] = $specificationSelectedIds;
+
+        // 定义对象
+        $attributeSelectedDatas = GoodsAttribute::whereIn('id', $attributeSelectedIds)
+        ->where('status', '>', 0)
+        ->where('type', 1)
+        ->orderBy('id', 'desc')
+        ->get()
+        ->toArray();
+
+        $data['attributeSelectedKeys'] = [];
+
+        foreach ($attributeSelectedDatas as $key => $attributeSelectedData) {
+            $goodsAttributeValues = GoodsAttributeValue::where('goods_attribute_id',$attributeSelectedData['id'])->pluck('vname')->toArray();
+            $attributeSelectedDatas[$key]['goods_attribute_values'] = implode(',',$goodsAttributeValues);
+            $data['attributeSelectedKeys'][] = $key;
+        }
+
+        $data['attributeSelectedData'] = $attributeSelectedDatas;
+
+        // 定义对象
+        $specificationSelectedDatas = GoodsAttribute::whereIn('id', $specificationSelectedIds)
+        ->where('status', '>', 0)
+        ->where('type', 2)
+        ->orderBy('id', 'desc')
+        ->get()
+        ->toArray();
+
+        $data['specificationSelectedKeys'] = [];
+
+        foreach ($specificationSelectedDatas as $key => $specificationSelectedData) {
+            $goodsAttributeValues = GoodsAttributeValue::where('goods_attribute_id',$specificationSelectedData['id'])->pluck('vname')->toArray();
+            $specificationSelectedDatas[$key]['goods_attribute_values'] = implode(',',$goodsAttributeValues);
+            $data['specificationSelectedKeys'][] = $key;
+        }
+
+        $data['specificationSelectedData'] = $specificationSelectedDatas;
+
+        if ($data['status'] == 1) {
+            $data['status'] = true;
+        } else {
+            $data['status'] = false;
+        }
         
         if(!empty($data)) {
             return success('操作成功！','',$data);
@@ -227,25 +359,39 @@ class GoodsCategoryController extends QuarkController
      */
     public function save(Request $request)
     {
-        $id                     =   $request->json('id');
-        $goodsTypeId            =   $request->json('goods_type_id');
-        $name                   =   $request->json('name');
-        $description            =   $request->json('description');
-        $style                  =   $request->json('style');
-        $attributeValues        =   $request->json('attribute_values');
-        $sort                   =   $request->json('sort');
-        $status                 =   $request->json('status');
-        
-        if (empty($id)) {
-            return $this->error('参数错误！');
-        }
+        $id             =   $request->json('id');
+        $title          =   $request->json('title','');
+        $name           =   $request->json('name');
+        $description    =   $request->json('description');
+        $sort           =   $request->json('sort');
+        $pid            =   $request->json('pid');
+        $coverId        =   $request->json('cover_id');
+        $indexTpl       =   $request->json('index_tpl');
+        $listsTpl       =   $request->json('lists_tpl');
+        $detailTpl      =   $request->json('detail_tpl');
+        $pageNum        =   $request->json('page_num');
+        $status         =   $request->json('status');
+        $brandIds       =   $request->json('brand_ids');
 
-        if (empty($goodsTypeId)) {
-            return $this->error('请选择商品类型！');
+        $attributes          =   $request->json('attributes');
+        $specifications      =   $request->json('specifications');
+        
+        if (empty($title)) {
+            return $this->error('标题必须填写！');
         }
 
         if (empty($name)) {
-            return $this->error('属性名称必须填写！');
+            return $this->error('名称必须填写！');
+        }
+
+        if (empty($pageNum)) {
+            return $this->error('分页数量必须填写！');
+        }
+
+        $hasTitle = GoodsCategory::where('id','<>',$id)->where('title',$title)->where('status',1)->first();
+
+        if($hasTitle) {
+            return $this->error('此分类标题已存在！');
         }
 
         if ($status == true) {
@@ -253,55 +399,70 @@ class GoodsCategoryController extends QuarkController
         } else {
             $status = 0; //禁用
         }
+        
+        if($coverId) {
+            $coverId = $coverId[0]['id'];
+        } else {
+            $coverId = 0;
+        }
 
-        $data['goods_type_id']  = $goodsTypeId;
+        $data['title']          = $title;
         $data['name']           = $name;
         $data['description']    = $description;
         $data['sort']           = $sort;
+        $data['pid']            = $pid;
+        $data['cover_id']       = $coverId;
+        $data['index_tpl']      = $indexTpl;
+        $data['lists_tpl']      = $listsTpl;
+        $data['detail_tpl']     = $detailTpl;
+        $data['page_num']       = $pageNum;
         $data['status']         = $status;
-        $data['style']          = $style;
-        $data['type']           = 1;
+        $data['goods_brand_ids'] = json_encode($brandIds);
 
-        $result = GoodsAttribute::where('id',$id)->update($data);
+        $result = GoodsCategory::where('id',$id)->update($data);
 
-        $hasAttributeIds = [];
+        if($result !== false) {
+            GoodsCategoryAttribute::where('goods_category_id',$id)->delete();
 
-        if($result!==false && !empty($attributeValues)) {
+            if($attributes) {
+                foreach ($attributes as $key => $attribute) {
+                    $data1['goods_category_id'] = $id;
+                    $data1['goods_attribute_id'] = $attribute['id'];
 
-            foreach($attributeValues as $key1 => $attributeValue) {
-                if(isset($attributeValue['id'])) {
-                    $hasAttributeIds[] = $attributeValue['id'];
+                    if(isset($attribute['group'])) {
+                        $data1['gorup_name'] = $attribute['group'];
+                    }
+
+                    if(isset($attribute['sort'])) {
+                        $data1['sort'] = $attribute['sort'];
+                    }
+
+                    $data1['type'] = 1;
+                    GoodsCategoryAttribute::create($data1);
                 }
             }
+            
+            if($specifications) {
+                foreach ($specifications as $key => $specification) {
+                    $data2['goods_category_id'] = $id;
+                    $data2['goods_attribute_id'] = $specification['id'];
 
-            // 删除去掉的属性
-            GoodsAttributeValue::whereNotIn('id',$hasAttributeIds)
-            ->where('goods_attribute_id',$id)
-            ->delete();
+                    if(isset($specification['group'])) {
+                        $data2['gorup_name'] = $specification['group'];
+                    }
 
-            foreach($attributeValues as $key1 => $attributeValue) {
-                if(isset($attributeValue['id'])) {
+                    if(isset($specification['sort'])) {
+                        $data2['sort'] = $specification['sort'];
+                    }
 
-                    // 已存在的属性
-                    $data1['sort'] = $attributeValue['sort'];
-                    $data1['vname'] = $attributeValue['vname'];
-
-                    // 更新数据
-                    GoodsAttributeValue::where('id',$attributeValue['id'])->update($data1);
-                } else {
-                    // 不存在的属性id
-                    $data1['goods_attribute_id'] = $id;
-                    $data1['sort'] = $attributeValue['sort'];
-                    $data1['vname'] = $attributeValue['vname'];
-
-                    // 创建数据
-                    GoodsAttributeValue::create($data1);
+                    $data2['type'] = 2;
+                    GoodsCategoryAttribute::create($data2);
                 }
             }
         }
 
         if ($result !== false) {
-            return success('操作成功！','/quark/engine?api=admin/goodsAttribute/index&component=table');
+            return success('操作成功！','/quark/engine?api=admin/goodsCategory/index&component=table');
         } else {
             return error('操作失败！');
         }
