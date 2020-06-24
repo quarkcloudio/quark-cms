@@ -570,7 +570,7 @@ class GoodsController extends QuarkController
         }
 
         if ($result) {
-            return success('操作成功！','/mall/goods/imageCreate?id='.$result->id);
+            return success('操作成功！','/goods/imageCreate?id='.$result->id);
         } else {
             return error('操作失败！');
         }
@@ -1177,7 +1177,7 @@ class GoodsController extends QuarkController
             }
         }
 
-        return success('操作成功！','/mall/goods/complete?id='.$goodsId);
+        return success('操作成功！','/goods/complete?id='.$goodsId);
     }
 
     /**
@@ -1248,45 +1248,12 @@ class GoodsController extends QuarkController
     {
         $goodsId = $request->get('id'); // 商品ID
 
-        $result['viewGoodsUrl'] = url('mall/goods/detail?id='.$goodsId);
-        $result['createGoodsUrl'] = '#/admin/mall/goods/create';
-        $result['goodsIndexUrl'] = '#/admin/mall/goods/index';
+        $result['viewGoodsUrl'] = url('goods/detail?id='.$goodsId);
+        $result['createGoodsUrl'] = '#/admin/goods/create';
+        $result['goodsIndexUrl'] = '#/quark/engine?api=admin/goods/index&component=table';
 
         if ($result) {
             return success('操作成功！','',$result);
-        } else {
-            return error('操作失败！');
-        }
-    }
-
-    /**
-     * 改变数据状态
-     *
-     * @param  Request  $request
-     * @return Response
-     */
-    public function changeStatus(Request $request)
-    {
-        $id = $request->json('id');
-        $status = $request->json('status');
-
-        if(empty($id) || empty($status)) {
-            return error('参数错误！');
-        }
-
-        // 定义对象
-        $query = Goods::query();
-
-        if(is_array($id)) {
-            $query->whereIn('id',$id);
-        } else {
-            $query->where('id',$id);
-        }
-
-        $result = $query->update(['status'=>$status]);
-
-        if ($result) {
-            return success('操作成功！');
         } else {
             return error('操作失败！');
         }
