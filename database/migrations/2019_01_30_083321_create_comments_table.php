@@ -17,10 +17,10 @@ class CreateCommentsTable extends Migration
             $table->increments('id')->unsigned();
             $table->integer('pid')->default(0)->nullable();
             $table->integer('uid');
-            $table->integer('object_id')->comment('评论对象的id（article/page/order等的id）');
+            $table->integer('object_id')->comment('评论对象的id（article/page/goods等的id）');
             $table->string('title')->nullable();
             $table->text('cover_ids')->nullable()->comment('晒图');
-            $table->string('type')->default('ARTICLE')->comment('评论类型（ARTICLE/PAGE/ORDER等）');
+            $table->string('type')->default('ARTICLE')->comment('评论类型（ARTICLE/PAGE/GOODS等）');
             $table->longText('content');
             $table->integer('ding')->default(0)->nullable()->comment('顶');
             $table->integer('cai')->default(0)->nullable()->comment('踩');

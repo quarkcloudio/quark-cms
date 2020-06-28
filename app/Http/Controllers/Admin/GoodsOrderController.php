@@ -2,29 +2,9 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\Controller;
+use QuarkCMS\QuarkAdmin\Controllers\QuarkController;
+use Quark;
 use Illuminate\Http\Request;
-use App\Builder\Forms\Controls\ID;
-use App\Builder\Forms\Controls\Input;
-use App\Builder\Forms\Controls\Text;
-use App\Builder\Forms\Controls\TextArea;
-use App\Builder\Forms\Controls\InputNumber;
-use App\Builder\Forms\Controls\Checkbox;
-use App\Builder\Forms\Controls\Radio;
-use App\Builder\Forms\Controls\Select;
-use App\Builder\Forms\Controls\SwitchButton;
-use App\Builder\Forms\Controls\DatePicker;
-use App\Builder\Forms\Controls\RangePicker;
-use App\Builder\Forms\Controls\Editor;
-use App\Builder\Forms\Controls\Image;
-use App\Builder\Forms\Controls\File;
-use App\Builder\Forms\Controls\Button;
-use App\Builder\Forms\Controls\Popconfirm;
-use App\Builder\Forms\FormBuilder;
-use App\Builder\Lists\Tables\Table;
-use App\Builder\Lists\Tables\Column;
-use App\Builder\Lists\ListBuilder;
-use App\Services\Helper;
 use EasyWeChat\Factory;
 use App\Models\Goods;
 use App\Models\Category;
@@ -38,12 +18,9 @@ use App\Models\GoodsExpress;
 use App\User;
 use DB;
 
-class GoodsOrderController extends BuilderController
+class GoodsOrderController extends QuarkController
 {
-    public function __construct()
-    {
-        $this->pageTitle = '订单列表';
-    }
+    public $title = '订单列表';
 
     /**
      * 订单列表页
@@ -282,9 +259,9 @@ class GoodsOrderController extends BuilderController
         $data['search'] = $search;
 
         $q['search'] = $search;
-        $q['token'] = Helper::token($request);
+        $q['token'] = token($request);
 
-        $exportUrl = url('api/admin/'.$this->controllerName().'/export?'.http_build_query($q));
+        $exportUrl = url('api/admin/goodsOrder/export?'.http_build_query($q));
         $data['exportUrl'] = $exportUrl;
 
         if(!empty($lists)) {
@@ -292,9 +269,9 @@ class GoodsOrderController extends BuilderController
             $data['lists'] = $lists;
             $data['pagination'] = $pagination;
 
-            return $this->success('获取成功！','',$data);
+            return success('获取成功！','',$data);
         } else {
-            return $this->success('获取失败！');
+            return success('获取失败！');
         }   
     }
 
@@ -532,7 +509,7 @@ class GoodsOrderController extends BuilderController
 
         $order['goodsOrderDeliveries'] = $goodsOrderDeliveries;
 
-        return $this->success('获取成功！','',$order);
+        return success('获取成功！','',$order);
     }
 
     /**
@@ -625,7 +602,7 @@ class GoodsOrderController extends BuilderController
         ->get()
         ->toArray();
 
-        return $this->success('获取成功！','',$order);
+        return success('获取成功！','',$order);
     }
 
     /**
@@ -642,16 +619,16 @@ class GoodsOrderController extends BuilderController
         $expressNo = $request->input('express_no');
 
         if(empty($orderId)) {
-            return $this->error('参数错误');
+            return error('参数错误');
         }
 
         if($expressType == 2) {
             if(empty($expressId)) {
-                return $this->error('请选择快递公司');
+                return error('请选择快递公司');
             }
 
             if(empty($expressNo)) {
-                return $this->error('请填写快递单号');
+                return error('请填写快递单号');
             }
         }
 
@@ -719,7 +696,7 @@ class GoodsOrderController extends BuilderController
             GoodsOrderStatusRecord::create($data2);
         }
 
-        return $this->success('获取成功！','/mall/goodsOrder/deliveryIndex');
+        return success('获取成功！','/mall/goodsOrder/deliveryIndex');
     }
 
     /**
@@ -931,9 +908,9 @@ class GoodsOrderController extends BuilderController
         $data['search'] = $search;
 
         $q['search'] = $search;
-        $q['token'] = Helper::token($request);
+        $q['token'] = token($request);
 
-        $exportUrl = url('api/admin/'.$this->controllerName().'/export?'.http_build_query($q));
+        $exportUrl = url('api/admin/goodsOrder/export?'.http_build_query($q));
         $data['exportUrl'] = $exportUrl;
 
         if(!empty($lists)) {
@@ -941,9 +918,9 @@ class GoodsOrderController extends BuilderController
             $data['lists'] = $lists;
             $data['pagination'] = $pagination;
 
-            return $this->success('获取成功！','',$data);
+            return success('获取成功！','',$data);
         } else {
-            return $this->success('获取失败！');
+            return success('获取失败！');
         }
     }
 
@@ -1050,9 +1027,9 @@ class GoodsOrderController extends BuilderController
         $data['search'] = $search;
 
         $q['search'] = $search;
-        $q['token'] = Helper::token($request);
+        $q['token'] = token($request);
 
-        $exportUrl = url('api/admin/'.$this->controllerName().'/deliveryExport?'.http_build_query($q));
+        $exportUrl = url('api/admin/goodsOrder/deliveryExport?'.http_build_query($q));
         $data['exportUrl'] = $exportUrl;
 
         if(!empty($lists)) {
@@ -1060,9 +1037,9 @@ class GoodsOrderController extends BuilderController
             $data['lists'] = $lists;
             $data['pagination'] = $pagination;
 
-            return $this->success('获取成功！','',$data);
+            return success('获取成功！','',$data);
         } else {
-            return $this->success('获取失败！');
+            return success('获取失败！');
         }
     }
 
@@ -1140,7 +1117,7 @@ class GoodsOrderController extends BuilderController
         $data['goodsOrderDeliveryInfo'] = $goodsOrderDeliveryInfo;
         $data['goodsOrderDeliveryDetails'] = $goodsOrderDeliveryDetails;
 
-        return $this->success('获取成功！','',$data);
+        return success('获取成功！','',$data);
     }
 
     /**
@@ -1218,7 +1195,7 @@ class GoodsOrderController extends BuilderController
         $data['goodsOrderDeliveryDetails'] = $goodsOrderDeliveryDetails;
         $data['goodsExpresses'] = GoodsExpress::where('status',1)->get()->toArray();
 
-        return $this->success('获取成功！','',$data);
+        return success('获取成功！','',$data);
     }
 
     /**
@@ -1235,16 +1212,16 @@ class GoodsOrderController extends BuilderController
         $expressNo = $request->input('express_no');
 
         if(empty($id)) {
-            return $this->error('参数错误');
+            return error('参数错误');
         }
 
         if($expressType == 2) {
             if(empty($expressId)) {
-                return $this->error('请选择快递公司');
+                return error('请选择快递公司');
             }
 
             if(empty($expressNo)) {
-                return $this->error('请填写快递单号');
+                return error('请填写快递单号');
             }
 
             $data['goods_express_id'] = $expressId;
@@ -1259,9 +1236,9 @@ class GoodsOrderController extends BuilderController
         $result = GoodsOrderDelivery::where('id',$id)->update($data);
 
         if($result) {
-            return $this->success('操作成功！','/mall/goodsOrder/deliveryIndex');
+            return success('操作成功！','/mall/goodsOrder/deliveryIndex');
         } else {
-            return $this->error('操作失败！');
+            return error('操作失败！');
         }
     }
 

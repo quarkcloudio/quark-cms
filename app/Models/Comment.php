@@ -43,6 +43,11 @@ class Comment extends Model
         return $this->hasOne('App\Models\Post', 'id', 'object_id');
     }
 
+    public function goods()
+    {
+        return $this->hasOne('App\Models\Goods', 'id', 'object_id');
+    }
+
     public function user()
     {
         return $this->hasOne('App\User', 'id', 'uid');

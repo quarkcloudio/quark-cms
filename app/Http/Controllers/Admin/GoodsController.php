@@ -19,6 +19,7 @@ use App\Models\GoodsLayout;
 use App\Models\GoodsSku;
 use App\Models\GoodsPhoto;
 use App\Models\Shop;
+use Illuminate\Support\Arr;
 use DB;
 use Quark;
 
@@ -265,8 +266,7 @@ class GoodsController extends QuarkController
         $pricingMode               =   $request->json('pricing_mode'); // 计价方式
         $goodsUnitId               =   $request->json('goods_unit_id',''); // 商品单位
         $goodsBrandId              =   $request->json('goods_brand_id',''); // 商品品牌
-        $shopGoodsAttributeNames   =   $request->json('shop_goods_attribute_names'); // 店铺自定义属性名称
-        $shopGoodsAttributeValues  =   $request->json('shop_goods_attribute_values'); // 店铺自定义属性值
+        $goodsShopSpus             =   $request->json('goods_shop_spus'); // 店铺自定义属性名称
         $goodsSkus                 =   $request->json('goods_skus'); // 商品规格
         $goodsMoq                  =   $request->json('goods_moq'); // 最小起订量
         $goodsPrice                =   $request->json('goods_price'); // 店铺价
@@ -331,7 +331,7 @@ class GoodsController extends QuarkController
         if ($status == true) {
             $status = 1;
         } else {
-            $status = 2;
+            $status = 3;
         }
 
         $data['goods_name'] = $goodsName;
@@ -430,10 +430,8 @@ class GoodsController extends QuarkController
             $shopAttrs = [];
 
             // "other_attr_name":"产地","other_attr_value":"唐山",
-            if(!empty($shopGoodsAttributeNames)) {
-                foreach($shopGoodsAttributeNames as $key => $shopGoodsAttributeName) {
-                    $shopAttrs[] = ['attribute_name' => $shopGoodsAttributeName,'attribute_value' => $shopGoodsAttributeValues[$key]];
-                }
+            if(!empty($goodsShopSpus)) {
+                $shopAttrs = $goodsShopSpus;
             }
 
             // 商家自定义属性
@@ -597,7 +595,7 @@ class GoodsController extends QuarkController
         ->get()
         ->toArray();
 
-        $categoryTrees = Helper::listToTree($categorys,'id','pid','children',0);
+        $categoryTrees = list_to_tree($categorys,'id','pid','children',0);
 
         $shops = Shop::where('status',1)
         ->select('id','title')
@@ -667,13 +665,7 @@ class GoodsController extends QuarkController
             $systemGoodsAttributes[$key]['goods_attribute_value_id'] = json_decode($goodsInfoAttributeValue['goods_attribute_value_id']);
         }
 
-        $shopGoodsAttributes = json_decode($data['goods_shop_spus']);
-        $data['shopGoodsAttributes'] = $shopGoodsAttributes;
-        $data['keys'] = [];
-        foreach($shopGoodsAttributes as $key => $shopGoodsAttribute)
-        {
-            $data['keys'][] = $key;
-        }
+        $data['goods_shop_spus'] = json_decode($data['goods_shop_spus']);
 
         $goodsAttributes = GoodsAttribute::join('goods_category_attributes', 'goods_category_attributes.goods_attribute_id', '=', 'goods_attributes.id')
         ->where('goods_category_attributes.type',2)
@@ -682,7 +674,6 @@ class GoodsController extends QuarkController
         ->select('goods_attributes.id','goods_attributes.name','goods_attributes.style')
         ->get()
         ->toArray();
-
 
         foreach($goodsAttributes as $key => $goodsAttribute)
         {
@@ -741,7 +732,6 @@ class GoodsController extends QuarkController
 
         // 模板数据
         $data['systemGoodsAttributes'] = $systemGoodsAttributes ? $systemGoodsAttributes : false;
-        $data['shopGoodsAttributes'] = $shopGoodsAttributes ? $shopGoodsAttributes : false;
         $data['goodsAttributes'] = $goodsAttributes ? $goodsAttributes : false;
         $data['goodsSkus'] = $goodsSkus;
 
@@ -755,16 +745,16 @@ class GoodsController extends QuarkController
 
         $data['cover_id'][0]['id'] =$coverId;
         $data['cover_id'][0]['uid'] =$coverId;
-        $data['cover_id'][0]['name'] = Helper::getPicture($coverId,'name');
-        $data['cover_id'][0]['url'] = Helper::getPicture($coverId);
+        $data['cover_id'][0]['name'] = get_picture($coverId,'name');
+        $data['cover_id'][0]['url'] = get_picture($coverId);
 
         $videoId = $data['video_id'];
         unset($data['video_id']);
 
         $data['video_id'][0]['id'] =$videoId;
         $data['video_id'][0]['uid'] =$videoId;
-        $data['video_id'][0]['name'] = Helper::getFile($videoId,'name');
-        $data['video_id'][0]['url'] = Helper::getFile($videoId);
+        $data['video_id'][0]['name'] = get_file($videoId,'name');
+        $data['video_id'][0]['url'] = get_file($videoId);
 
         if ($data['is_expired_refund'] == 1) {
             $data['is_expired_refund'] = true;
@@ -798,8 +788,8 @@ class GoodsController extends QuarkController
         ->first();
 
         if($getCategory->pid && $getCategory->pid != 0) {
-            $categorys[] = $getCategory->pid;
-            $this->getParentCategory($getCategory->pid,$categorys);
+            $categorys = Arr::prepend($categorys, $getCategory->pid);
+            return $this->getParentCategory($getCategory->pid,$categorys);
         } else {
             return $categorys;
         }
@@ -827,8 +817,7 @@ class GoodsController extends QuarkController
         $pricingMode               =   $request->json('pricing_mode'); // 计价方式
         $goodsUnitId               =   $request->json('goods_unit_id',''); // 商品单位
         $goodsBrandId              =   $request->json('goods_brand_id',''); // 商品品牌
-        $shopGoodsAttributeNames   =   $request->json('shop_goods_attribute_names'); // 店铺自定义属性名称
-        $shopGoodsAttributeValues  =   $request->json('shop_goods_attribute_values'); // 店铺自定义属性值
+        $goodsShopSpus             =   $request->json('goods_shop_spus'); // 店铺自定义属性名称
         $goodsSkus                 =   $request->json('goods_skus'); // 商品规格
         $goodsMoq                  =   $request->json('goods_moq'); // 最小起订量
         $goodsPrice                =   $request->json('goods_price'); // 店铺价
@@ -893,7 +882,7 @@ class GoodsController extends QuarkController
         if ($status == true) {
             $status = 1;
         } else {
-            $status = 2;
+            $status = 3;
         }
 
         $data['goods_name'] = $goodsName;
@@ -991,11 +980,9 @@ class GoodsController extends QuarkController
 
             $shopAttrs = [];
 
-            // "attribute_name":"产地","attribute_value":"唐山",
-            if(!empty($shopGoodsAttributeNames)) {
-                foreach($shopGoodsAttributeNames as $key => $shopGoodsAttributeName) {
-                    $shopAttrs[] = ['attribute_name' => $shopGoodsAttributeName,'attribute_value' => $shopGoodsAttributeValues[$key]];
-                }
+            // "other_attr_name":"产地","other_attr_value":"唐山",
+            if(!empty($goodsShopSpus)) {
+                $shopAttrs = $goodsShopSpus;
             }
 
             // 商家自定义属性
@@ -1204,8 +1191,8 @@ class GoodsController extends QuarkController
             foreach($goodsPhotos as $key => $value) {
                 $data['cover_id'][$key]['id'] =$value['cover_id'];
                 $data['cover_id'][$key]['uid'] =$value['cover_id'];
-                $data['cover_id'][$key]['name'] = Helper::getPicture($value['cover_id'],'name');
-                $data['cover_id'][$key]['url'] = Helper::getPicture($value['cover_id']);
+                $data['cover_id'][$key]['name'] = get_picture($value['cover_id'],'name');
+                $data['cover_id'][$key]['url'] = get_picture($value['cover_id']);
             }
         }
 

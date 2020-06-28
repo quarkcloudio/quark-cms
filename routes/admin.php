@@ -164,8 +164,7 @@ Route::group([
     $router->get('admin/goods/imageEdit', 'GoodsController@imageEdit')->name('api/admin/goods/imageEdit');
     $router->post('admin/goods/imageSave', 'GoodsController@imageSave')->name('api/admin/goods/imageSave');
     $router->get('admin/goods/complete', 'GoodsController@complete')->name('api/admin/goods/complete');
-
-    $router->post('admin/goods/changeStatus', 'GoodsController@changeStatus')->name('api/admin/goods/changeStatus');
+    $router->any('admin/goods/action', 'GoodsController@action')->name('api/admin/goods/action');
     $router->get('admin/goods/attribute', 'GoodsController@attribute')->name('api/admin/goods/attribute');
 
     $router->get('admin/goodsCategory/index', 'GoodsCategoryController@index')->name('api/admin/goodsCategory/index');
@@ -243,10 +242,14 @@ Route::group([
     $router->get('admin/goodsOrder/deliveryEdit', 'GoodsOrderController@deliveryEdit')->name('api/admin/goodsOrder/deliveryEdit');
     $router->post('admin/goodsOrder/deliverySave', 'GoodsOrderController@deliverySave')->name('api/admin/goodsOrder/deliverySave');
 
-    $router->get('admin/goodsOrder/commentIndex', 'GoodsOrderController@commentIndex')->name('api/admin/goodsOrder/commentIndex');
-    $router->get('admin/goodsOrder/commentEdit', 'GoodsOrderController@commentEdit')->name('api/admin/goodsOrder/commentEdit');
-    $router->post('admin/goodsOrder/commentSave', 'GoodsOrderController@commentSave')->name('api/admin/goodsOrder/commentSave');
-    $router->post('admin/goodsOrder/commentChangeStatus', 'GoodsOrderController@commentChangeStatus')->name('api/admin/goodsOrder/commentChangeStatus');
+    $router->get('admin/goodsComment/index', 'GoodsCommentController@index')->name('api/admin/goodsComment/index');
+    $router->get('admin/goodsComment/show', 'GoodsCommentController@show')->name('api/admin/goodsComment/show');
+    $router->get('admin/goodsComment/create', 'GoodsCommentController@create')->name('api/admin/goodsComment/create');
+    $router->post('admin/goodsComment/store', 'GoodsCommentController@store')->name('api/admin/goodsComment/store');
+    $router->get('admin/goodsComment/edit', 'GoodsCommentController@edit')->name('api/admin/goodsComment/edit');
+    $router->post('admin/goodsComment/update', 'GoodsCommentController@update')->name('api/admin/goodsComment/update');
+    $router->any('admin/goodsComment/action', 'GoodsCommentController@action')->name('api/admin/goodsComment/action');
+    $router->post('admin/goodsComment/destroy', 'GoodsCommentController@destroy')->name('api/admin/goodsComment/destroy');
     
     $router->get('admin/goodsOrder/afterSaleIndex', 'GoodsOrderController@afterSaleIndex')->name('api/admin/goodsOrder/afterSaleIndex');
     $router->get('admin/goodsOrder/afterSaleEdit', 'GoodsOrderController@afterSaleEdit')->name('api/admin/goodsOrder/afterSaleEdit');

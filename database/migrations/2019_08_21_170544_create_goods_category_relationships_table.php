@@ -16,7 +16,7 @@ class CreateGoodsCategoryRelationshipsTable extends Migration
         Schema::create('goods_category_relationships', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->integer('goods_id')->unsigned()->nullable()->comment('商品ID');
-            $table->string('goods_category_id')->nullable()->comment('商品分类ID');
+            $table->integer('goods_category_id')->nullable()->comment('商品分类ID');
             $table->boolean('status')->default(1);
             $table->timestamps();
         });
