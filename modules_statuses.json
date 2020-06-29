@@ -4,5 +4,6 @@
     "Miniprogram": true,
     "Mobile": true,
     "Tools": true,
-    "Wechat": true
+    "Wechat": true,
+    "Portal": true
 }
