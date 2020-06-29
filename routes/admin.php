@@ -251,9 +251,9 @@ Route::group([
     $router->any('admin/goodsComment/action', 'GoodsCommentController@action')->name('api/admin/goodsComment/action');
     $router->post('admin/goodsComment/destroy', 'GoodsCommentController@destroy')->name('api/admin/goodsComment/destroy');
     
-    $router->get('admin/goodsOrder/afterSaleIndex', 'GoodsOrderController@afterSaleIndex')->name('api/admin/goodsOrder/afterSaleIndex');
-    $router->get('admin/goodsOrder/afterSaleEdit', 'GoodsOrderController@afterSaleEdit')->name('api/admin/goodsOrder/afterSaleEdit');
-    $router->post('admin/goodsOrder/afterSaleSave', 'GoodsOrderController@afterSaleSave')->name('api/admin/goodsOrder/afterSaleSave');
-    $router->post('admin/goodsOrder/afterSaleChangeStatus', 'GoodsOrderController@afterSaleChangeStatus')->name('api/admin/goodsOrder/afterSaleChangeStatus');
-    
+    $router->get('admin/goodsAfterSale/index', 'GoodsAfterSaleController@index')->name('api/admin/goodsAfterSale/index');
+    $router->get('admin/goodsAfterSale/show', 'GoodsAfterSaleController@show')->name('api/admin/goodsAfterSale/show');
+    $router->get('admin/goodsAfterSale/edit', 'GoodsAfterSaleController@edit')->name('api/admin/goodsAfterSale/edit');
+    $router->post('admin/goodsAfterSale/update', 'GoodsAfterSaleController@update')->name('api/admin/goodsAfterSale/update');
+
 });

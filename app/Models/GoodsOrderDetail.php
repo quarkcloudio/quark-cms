@@ -13,6 +13,15 @@ class GoodsOrderDetail extends Model
      */
     public $timestamps = true;
     
+    /**
+     * 增加自定义属性
+     *
+     * @var bool
+     */
+    protected $appends = [
+        'total_amount',
+    ];
+
     protected $casts = [
         'created_at' => 'datetime:Y-m-d H:i:s',
         'updated_at' => 'datetime:Y-m-d H:i:s',
@@ -40,4 +49,14 @@ class GoodsOrderDetail extends Model
         'cover_id',
         'status'
     ];
+
+    /**
+     * 获取订单详情支付金额
+     *
+     * @var array
+     */
+    public function getTotalAmountAttribute()
+    {
+        return number_format($this->goods_price*$this->num,2);
+    }
 }

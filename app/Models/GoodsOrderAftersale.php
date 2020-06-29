@@ -29,7 +29,7 @@ class GoodsOrderAftersale extends Model
         'order_id',
         'goods_order_id',
         'goods_order_detail_id',
-        'order_refund_id',
+        'goods_id',
         'refund_amount',
         'refund_consignee_name',
         'refund_consignee_phone',
@@ -43,4 +43,24 @@ class GoodsOrderAftersale extends Model
         'aftersale_type',
         'status'
     ];
+
+    public function goods()
+    {
+        return $this->hasOne('App\Models\Goods', 'id', 'goods_id');
+    }
+
+    public function goodsOrderDetail()
+    {
+        return $this->hasOne('App\Models\GoodsOrderDetail', 'id', 'goods_order_detail_id');
+    }
+
+    public function user()
+    {
+        return $this->hasOne('App\User', 'id', 'uid');
+    }
+
+    public function shop()
+    {
+        return $this->hasOne('App\Models\Shop', 'id', 'shop_id');
+    }
 }
