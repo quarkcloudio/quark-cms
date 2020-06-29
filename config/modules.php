@@ -1,83 +1,213 @@
 <?php
 
+use Nwidart\Modules\Activators\FileActivator;
+
 return [
 
     /*
     |--------------------------------------------------------------------------
-    | Default Location
+    | Module Namespace
     |--------------------------------------------------------------------------
     |
-    | This option controls the default module location that gets used while
-    | using this package. This location is used when another is not explicitly
-    | specified when exucuting a given module function or command.
+    | Default module namespace.
     |
     */
 
-    'default_location' => 'app',
+    'namespace' => 'Modules',
 
     /*
     |--------------------------------------------------------------------------
-    | Locations
+    | Module Stubs
     |--------------------------------------------------------------------------
     |
-    | Here you may define all of the module locations for your application as
-    | well as their drivers and other configuration options. This gives you
-    | the flexibility to structure modules as you see fit in each location.
+    | Default module stubs.
     |
     */
 
-    'locations' => [
-        'app' => [
-            'driver'    => 'local',
-            'path'      => app_path('Modules'),
-            'namespace' => 'App\\Modules\\',
-            'enabled'   => true,
-            'provider'  => 'ModuleServiceProvider',
-            'manifest'  => 'module.json',
-            'mapping'   => [
-                
-                // Here you may configure the class mapping, effectively
-                // customizing your generated default module structure.
-
-                'Config'              => 'Config',
-                'Database/Factories'  => 'Database/Factories',
-                'Database/Migrations' => 'Database/Migrations',
-                'Database/Seeds'      => 'Database/Seeds',
-                'Http/Controllers'    => 'Http/Controllers',
-                'Http/Middleware'     => 'Http/Middleware',
-                'Providers'           => 'Providers',
-                'Resources/Lang'      => 'Resources/Lang',
-                'Resources/Views'     => 'Resources/Views',
-                'Routes'              => 'Routes'
+    'stubs' => [
+        'enabled' => false,
+        'path' => base_path() . '/vendor/nwidart/laravel-modules/src/Commands/stubs',
+        'files' => [
+            'routes/web' => 'Routes/web.php',
+            'routes/api' => 'Routes/api.php',
+            'views/index' => 'Resources/views/index.blade.php',
+            'views/master' => 'Resources/views/layouts/master.blade.php',
+            'scaffold/config' => 'Config/config.php',
+            'composer' => 'composer.json',
+            'assets/js/app' => 'Resources/assets/js/app.js',
+            'assets/sass/app' => 'Resources/assets/sass/app.scss',
+            'webpack' => 'webpack.mix.js',
+            'package' => 'package.json',
+        ],
+        'replacements' => [
+            'routes/web' => ['LOWER_NAME', 'STUDLY_NAME'],
+            'routes/api' => ['LOWER_NAME'],
+            'webpack' => ['LOWER_NAME'],
+            'json' => ['LOWER_NAME', 'STUDLY_NAME', 'MODULE_NAMESPACE', 'PROVIDER_NAMESPACE'],
+            'views/index' => ['LOWER_NAME'],
+            'views/master' => ['LOWER_NAME', 'STUDLY_NAME'],
+            'scaffold/config' => ['STUDLY_NAME'],
+            'composer' => [
+                'LOWER_NAME',
+                'STUDLY_NAME',
+                'VENDOR',
+                'AUTHOR_NAME',
+                'AUTHOR_EMAIL',
+                'MODULE_NAMESPACE',
+                'PROVIDER_NAMESPACE',
             ],
+        ],
+        'gitkeep' => true,
+    ],
+    'paths' => [
+        /*
+        |--------------------------------------------------------------------------
+        | Modules path
+        |--------------------------------------------------------------------------
+        |
+        | This path used for save the generated module. This path also will be added
+        | automatically to list of scanned folders.
+        |
+        */
+
+        'modules' => base_path('modules'),
+        /*
+        |--------------------------------------------------------------------------
+        | Modules assets path
+        |--------------------------------------------------------------------------
+        |
+        | Here you may update the modules assets path.
+        |
+        */
+
+        'assets' => public_path('modules'),
+        /*
+        |--------------------------------------------------------------------------
+        | The migrations path
+        |--------------------------------------------------------------------------
+        |
+        | Where you run 'module:publish-migration' command, where do you publish the
+        | the migration files?
+        |
+        */
+
+        'migration' => base_path('database/migrations'),
+        /*
+        |--------------------------------------------------------------------------
+        | Generator path
+        |--------------------------------------------------------------------------
+        | Customise the paths where the folders will be generated.
+        | Set the generate key to false to not generate that folder
+        */
+        'generator' => [
+            'config' => ['path' => 'Config', 'generate' => true],
+            'command' => ['path' => 'Console', 'generate' => true],
+            'migration' => ['path' => 'Database/Migrations', 'generate' => true],
+            'seeder' => ['path' => 'Database/Seeders', 'generate' => true],
+            'factory' => ['path' => 'Database/factories', 'generate' => true],
+            'model' => ['path' => 'Entities', 'generate' => true],
+            'routes' => ['path' => 'Routes', 'generate' => true],
+            'controller' => ['path' => 'Http/Controllers', 'generate' => true],
+            'filter' => ['path' => 'Http/Middleware', 'generate' => true],
+            'request' => ['path' => 'Http/Requests', 'generate' => true],
+            'provider' => ['path' => 'Providers', 'generate' => true],
+            'assets' => ['path' => 'Resources/assets', 'generate' => true],
+            'lang' => ['path' => 'Resources/lang', 'generate' => true],
+            'views' => ['path' => 'Resources/views', 'generate' => true],
+            'test' => ['path' => 'Tests/Unit', 'generate' => true],
+            'test-feature' => ['path' => 'Tests/Feature', 'generate' => true],
+            'repository' => ['path' => 'Repositories', 'generate' => false],
+            'event' => ['path' => 'Events', 'generate' => false],
+            'listener' => ['path' => 'Listeners', 'generate' => false],
+            'policies' => ['path' => 'Policies', 'generate' => false],
+            'rules' => ['path' => 'Rules', 'generate' => false],
+            'jobs' => ['path' => 'Jobs', 'generate' => false],
+            'emails' => ['path' => 'Emails', 'generate' => false],
+            'notifications' => ['path' => 'Notifications', 'generate' => false],
+            'resource' => ['path' => 'Transformers', 'generate' => false],
+        ],
+    ],
+    /*
+    |--------------------------------------------------------------------------
+    | Scan Path
+    |--------------------------------------------------------------------------
+    |
+    | Here you define which folder will be scanned. By default will scan vendor
+    | directory. This is useful if you host the package in packagist website.
+    |
+    */
+
+    'scan' => [
+        'enabled' => false,
+        'paths' => [
+            base_path('vendor/*/*'),
+        ],
+    ],
+    /*
+    |--------------------------------------------------------------------------
+    | Composer File Template
+    |--------------------------------------------------------------------------
+    |
+    | Here is the config for composer.json file, generated by this package
+    |
+    */
+
+    'composer' => [
+        'vendor' => 'nwidart',
+        'author' => [
+            'name' => 'Nicolas Widart',
+            'email' => 'n.widart@gmail.com',
+        ],
+    ],
+    /*
+    |--------------------------------------------------------------------------
+    | Caching
+    |--------------------------------------------------------------------------
+    |
+    | Here is the config for setting up caching feature.
+    |
+    */
+    'cache' => [
+        'enabled' => false,
+        'key' => 'laravel-modules',
+        'lifetime' => 60,
+    ],
+    /*
+    |--------------------------------------------------------------------------
+    | Choose what laravel-modules will register as custom namespaces.
+    | Setting one to false will require you to register that part
+    | in your own Service Provider class.
+    |--------------------------------------------------------------------------
+    */
+    'register' => [
+        'translations' => true,
+        /**
+         * load files on boot or register method
+         *
+         * Note: boot not compatible with asgardcms
+         *
+         * @example boot|register
+         */
+        'files' => 'register',
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Activators
+    |--------------------------------------------------------------------------
+    |
+    | You can define new types of activators here, file, database etc. The only
+    | required parameter is 'class'.
+    | The file activator will store the activation status in storage/installed_modules
+    */
+    'activators' => [
+        'file' => [
+            'class' => FileActivator::class,
+            'statuses-file' => base_path('modules_statuses.json'),
+            'cache-key' => 'activator.installed',
+            'cache-lifetime' => 604800,
         ],
     ],
 
-    /*
-    |--------------------------------------------------------------------------
-    | Default Driver
-    |--------------------------------------------------------------------------
-    |
-    | Here you may specify the default module storage driver that should be
-    | used by the package. A "local" driver is available out of the box that
-    | uses the local filesystem to store and maintain module manifests.
-    |
-    */
-
-    'default_driver' => 'local',
-
-    /*
-     |--------------------------------------------------------------------------
-     | Drivers
-     |--------------------------------------------------------------------------
-     |
-     | Here you may configure as many module drivers as you wish. Use the
-     | local driver class as a basis for creating your own. The possibilities
-     | are endless!
-     |
-     */
-
-    'drivers' => [
-        'local' => 'Caffeinated\Modules\Repositories\LocalRepository',
-    ],
+    'activator' => 'file',
 ];

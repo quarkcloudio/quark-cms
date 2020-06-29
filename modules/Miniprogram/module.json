@@ -1,0 +1,13 @@
+{
+    "name": "Miniprogram",
+    "alias": "miniprogram",
+    "description": "",
+    "keywords": [],
+    "order": 0,
+    "providers": [
+        "Modules\\Miniprogram\\Providers\\MiniprogramServiceProvider"
+    ],
+    "aliases": {},
+    "files": [],
+    "requires": []
+}

@@ -11,9 +11,9 @@
     "require": {
         "php": "^7.2.5",
         "anam/phantommagick": "^2.0",
-        "caffeinated/modules": "^6.1",
         "endroid/qr-code": "^2.5",
         "fideloper/proxy": "^4.2",
+        "fruitcake/laravel-cors": "^1.0",
         "guzzlehttp/guzzle": "^6.3",
         "intervention/image": "^2.5",
         "laravel/framework": "7.0",
@@ -21,13 +21,13 @@
         "laravel/tinker": "^2.0",
         "lokielse/omnipay-alipay": "^3.0",
         "maatwebsite/excel": "^3.1.17",
+        "nwidart/laravel-modules": "^7.1",
         "overtrue/easy-sms": "^1.0",
         "overtrue/pinyin": "^4.0",
         "overtrue/socialite": "^2.0",
         "overtrue/wechat": "^4.1",
-        "quarkcms/quark-admin": "^0.0.9",
-        "topthink/think-image": "^1.0",
-        "fruitcake/laravel-cors": "^1.0"
+        "quarkcms/quark-admin": "^0.1.0",
+        "topthink/think-image": "^1.0"
     },
     "require-dev": {
         "facade/ignition": "^2.0",
@@ -48,7 +48,8 @@
     },
     "autoload": {
         "psr-4": {
-            "App\\": "app/"
+            "App\\": "app/",
+            "Modules\\": "modules/"
         },
         "classmap": [
             "database/seeds",

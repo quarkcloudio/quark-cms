@@ -1,0 +1,8 @@
+{
+    "Api": true,
+    "Cashier": true,
+    "Miniprogram": true,
+    "Mobile": true,
+    "Tools": true,
+    "Wechat": true
+}

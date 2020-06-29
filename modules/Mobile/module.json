@@ -1,0 +1,13 @@
+{
+    "name": "Mobile",
+    "alias": "mobile",
+    "description": "",
+    "keywords": [],
+    "order": 0,
+    "providers": [
+        "Modules\\Mobile\\Providers\\MobileServiceProvider"
+    ],
+    "aliases": {},
+    "files": [],
+    "requires": []
+}
