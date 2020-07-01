@@ -26,8 +26,6 @@ class CreateUsersTable extends Migration
             $table->string('avatar')->nullable();
             $table->decimal('money',10,2)->nullable()->default(0.00);
             $table->integer('score')->nullable()->default(0);
-            $table->string('wechat_openid')->nullable()->default('');
-            $table->string('wechat_unionid')->nullable()->default('');
             $table->string('qq_openid')->nullable()->default('');
             $table->string('weibo_uid')->nullable()->default('');
             $table->string('last_login_ip')->nullable()->default('');

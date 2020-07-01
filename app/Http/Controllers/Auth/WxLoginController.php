@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\User;
+use App\WechatUser;
 use App\Models\ActionLog;
 use EasyWeChat\Factory;
 use Str;
@@ -60,7 +61,7 @@ class WxLoginController extends Controller
         $user = Auth::user();
         // 未登录
         if (empty($user)) {
-            Session::put('target_url', $targetUrl);
+            session('target_url', $targetUrl);
             return $oauth->redirect();
         }
     }
@@ -72,142 +73,118 @@ class WxLoginController extends Controller
      */
     public function callback(Request $request)
     {
-        $app = Factory::officialAccount(wechat_config());
+        $app = Factory::officialAccount(wechat_config('FWH'));
         $oauth = $app->oauth;
 
         // 获取 OAuth 授权结果用户信息
         $wechatUser = $oauth->user()->toArray();
 
-        // 定义对象
-        $query = User::query()->where('wechat_openid', $wechatUser['original']['openid']);
-
-        if(isset($wechatUser['original']['unionid'])) {
-            $query->orWhere('wechat_unionid', $wechatUser['original']['unionid']);
+        if(!isset($wechatUser['original']['unionid'])) {
+            return error('unionid不能为空，请前往微信开放平台绑定！');
         }
 
-        $user = $query->first();
+        $openid = $wechatUser['original']['openid'];
+        $unionid = $wechatUser['original']['unionid'];
+        $nickname = $wechatUser['nickname'];
+        $sex = $wechatUser['original']['sex'];
+        $avatar = $wechatUser['avatar'];
 
-        if(empty($user)) {
+        if(empty($openid) || empty($unionid) || empty($nickname) || empty($avatar)) {
+            return error('参数错误！');
+        }
+
+        $wechatUser = WechatUser::where('unionid', $unionid)->first();
+
+        // 不存在用户的情况，则为新用户
+        if(empty($wechatUser)) {
 
             // 组合数组
-            $data['username'] = Str::random(8).'-'.time(); // 临时用户名
-            $data['email'] = Str::random(8).'-'.time(); // 临时邮箱
-            $data['phone'] = Str::random(8).'-'.time(); // 临时手机号
-            $data['nickname'] = filter_emoji($wechatUser['nickname']);
-            $data['sex'] = $wechatUser['original']['sex'];
-            $data['password'] = bcrypt(env('APP_KEY'));
+            $wechatUserData['nickname'] = $nickname;
+            $wechatUserData['sex'] = $sex;
 
             // 将微信头像保存到服务器
-            $avatarInfo = download_picture_to_storage($wechatUser['avatar']);
+            $avatarInfo = download_picture_to_storage($avatar);
 
             if($avatarInfo['status'] == 'error') {
                 return $avatarInfo;
             }
 
-            $data['avatar'] = $avatarInfo['data']['id'];
-            $data['wechat_openid'] = $wechatUser['original']['openid'];
-            
-            if(isset($wechatUser['original']['unionid'])) {
-                $data['wechat_unionid'] = $wechatUser['original']['unionid'];
-            }
-            $data['last_login_ip'] =  $request->getClientIp();
-            $data['last_login_time'] = date('Y-m-d H:i:s');
+            $wechatUserData['avatar'] = $avatarInfo['data']['id'];
+            $wechatUserData['openid'] = $openid;
+            $wechatUserData['unionid'] = $unionid;
+            $wechatUserData['type'] = 'FWH';
 
-            $uid = User::insertGetId($data);
+            // 写入wechat_users表
+            $wechatUserId = WechatUser::insertGetId($wechatUserData);
 
-            if(empty($uid)) {
-                return error('创建用户错误！');
+            if(empty($wechatUserId)) {
+                return error('写入wechatuser表出错！');
             }
 
-            $updateData['phone'] = $updateData['email'] = $updateData['username'] = Str::random(8).'-'.$uid;
+            // 存储微信用户表
+            session('wechat_user_id', $wechatUserId);
 
-            $updateResult = User::where('id',$uid)->update($updateData);
-
-            if(empty($updateResult)) {
-                return error('更新临时用户名错误！');
-            }
-
+            // 注册账户
+            return redirect(url('wxRegister'));
         } else {
 
-            // 存在则登录
-            $uid = $user['id'];
+            $hasThisWechatUser = WechatUser::where('unionid', $unionid)
+            ->where('openid',$openid)
+            ->where('type','FWH')
+            ->first();
+            
+            // 不存在本次登录的openid时，插入WechatUser
+            if(!$hasThisWechatUser) {
+
+                // 写入wechat_users表
+                $wechatUserData['nickname'] = $nickname;
+                $wechatUserData['sex'] = $sex;
+
+                // 将微信头像保存到服务器
+                $avatarInfo = download_picture_to_storage($avatar);
+
+                if($avatarInfo['status'] == 'error') {
+                    return $avatarInfo;
+                }
+
+                $wechatUserData['avatar'] = $avatarInfo['data']['id'];
+                $wechatUserData['openid'] = $openid;
+                $wechatUserData['unionid'] = $unionid;
+                $wechatUserData['type'] = 'FWH';
+
+                // 写入wechat_users表
+                $wechatUserId = WechatUser::insertGetId($wechatUserData);
+
+                if(empty($wechatUserId)) {
+                    return error('写入wechatuser表出错！');
+                }
+
+                // 存储微信用户表
+                session('wechat_user_id', $wechatUserId);
+            }
+
+            // 注册账户
+            if(empty($wechatUser['uid'])) {
+                return redirect(url('wxRegister'));
+            }
+
+            $uid = $wechatUser['uid'];
+
+            // 快捷登录
+            $loginResult = Auth::loginUsingId($uid);
+
+            if($loginResult) {
+                return success('登录成功！');
+            } else {
+                return error('登录失败，请重试！');
+            }
         }
 
-        // 快捷登录
-        Auth::loginUsingId($uid);
+        $targetUrl = session('target_url');
 
-        $targetUrl = Session::get('target_url');
         // 跳转
         if($targetUrl) {
             return redirect(url($targetUrl));
-        }
-    }
-
-    /**
-     * 微信账号绑定WEB注册账号
-     */
-    public function bindAccount(Request $request)
-    {
-        $uid = auth('web')->user()->id;
-        // post请求返回数据
-        if($request->isMethod('post')) {
-            $phone = $request->input('phone');
-
-            if(empty($phone)) {
-                return error('请填写手机号！');
-            }
-
-            $hasPhone = User::where('phone',$phone)->first();
-
-            if($hasPhone) {
-                return error('此手机号已经注册过了！');
-            }
-
-            $data['phone'] = $phone;
-            $result = User::where('id',$uid)->update($data);
-
-            if($result) {
-                return success('绑定成功！');
-            } else {
-                return error('错误！');
-            }
-        } else {
-            $user = User::where('id',$uid)->first();
-            return view('wechat/user/bindAccount',compact('user'));
-        }
-    }
-
-    /**
-     * 绑定手机号
-     */
-    public function bindPhone(Request $request)
-    {
-        $uid = auth('web')->user()->id;
-        // post请求返回数据
-        if($request->isMethod('post')) {
-            $phone = $request->input('phone');
-
-            if(empty($phone)) {
-                return error('请填写手机号！');
-            }
-
-            $hasPhone = User::where('phone',$phone)->first();
-
-            if($hasPhone) {
-                return error('此手机号已经注册过了！');
-            }
-
-            $data['phone'] = $phone;
-            $result = User::where('id',$uid)->update($data);
-
-            if($result) {
-                return success('绑定成功！');
-            } else {
-                return error('错误！');
-            }
-        } else {
-            $user = User::where('id',$uid)->first();
-            return view('wechat/user/bindPhone',compact('user'));
         }
     }
 }

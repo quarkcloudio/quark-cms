@@ -21,6 +21,7 @@ Route::get('logout', 'Auth\\LoginController@logout')->name('logout');
 // 微信登录
 Route::any('wxLogin/login', 'Auth\\WxLoginController@login')->name('wxLogin/login');
 Route::any('wxLogin/callback', 'Auth\\WxLoginController@callback')->name('wxLogin/callback');
+Route::any('wxLogin/bindAccount', 'Auth\\WxLoginController@bindAccount')->name('wxLogin/bindAccount');
 
 // 微信小程序登录
 Route::any('wxMpLogin/login', 'Auth\\WxMpLoginController@login')->name('api/wxMpLogin/login');

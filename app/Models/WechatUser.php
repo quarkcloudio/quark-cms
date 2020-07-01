@@ -25,8 +25,9 @@ class WechatUser extends Model
      */
     protected $fillable = [
         'id',
-        'wechat_openid',
-        'wechat_unionid',
+        'uid',
+        'openid',
+        'unionid',
         'type',
         'created_at',
         'updated_at'
