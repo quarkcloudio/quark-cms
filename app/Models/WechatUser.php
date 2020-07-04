@@ -23,13 +23,5 @@ class WechatUser extends Model
      *
      * @var array
      */
-    protected $fillable = [
-        'id',
-        'uid',
-        'openid',
-        'unionid',
-        'type',
-        'created_at',
-        'updated_at'
-    ];
+    protected $guarded = [];
 }

@@ -61,7 +61,7 @@ class WxLoginController extends Controller
         $user = Auth::user();
         // 未登录
         if (empty($user)) {
-            session('target_url', $targetUrl);
+            session(['target_url'=> $targetUrl]);
             return $oauth->redirect();
         }
     }
@@ -122,7 +122,7 @@ class WxLoginController extends Controller
             }
 
             // 存储微信用户表
-            session('wechat_user_id', $wechatUserId);
+            session(['wechat_user_id'=> $wechatUserId]);
 
             // 注册账户
             return redirect(url('wxRegister'));
@@ -160,7 +160,7 @@ class WxLoginController extends Controller
                 }
 
                 // 存储微信用户表
-                session('wechat_user_id', $wechatUserId);
+                session(['wechat_user_id'=> $wechatUserId]);
             }
 
             // 注册账户

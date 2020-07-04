@@ -63,7 +63,7 @@ class LoginController extends Controller
             ->count();
             
             if($loginErrorCount > 6) {
-                $getCaptcha = Session::get('captcha');
+                $getCaptcha = session('captcha');
                 if(empty($captcha) || ($captcha != $getCaptcha)) {
                     return $this->error('验证码错误！');
                 }
@@ -108,7 +108,7 @@ class LoginController extends Controller
                 action_log(0,$remark,'USER');
 
                 // 清除验证码
-                Session::put('captcha','');
+                session(['captcha'=>null]);
                 
                 return error('用户名或密码错误！');
             }

@@ -31,7 +31,7 @@ class CaptchaController extends Controller
         $builder->setMaxFrontLines(0);
         // 可以设置图片宽高及字体
         $builder->build($width = 100, $height = 40, $font = null);
-        Session::put('captcha', $builder->getPhrase());  //将图形验证码的值写入到session中
+        session(['captcha' => $builder->getPhrase()]);
         return response($builder->output())->header('Content-type','image/jpeg');
     }
 }

@@ -19,7 +19,7 @@ class SmsController extends Controller
         $phone = $request->input('phone');
         $captcha = $request->input('captcha');
         $type = $request->input('type');
-        $getCaptcha = Session::get('captcha');
+        $getCaptcha = session('captcha');
 
         // 图形验证码
         if (empty($captcha) || ($captcha != $getCaptcha)) {
