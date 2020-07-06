@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\User;
-use App\WechatUser;
+use App\Models\WechatUser;
 use App\Models\ActionLog;
 use EasyWeChat\Factory;
 use Str;

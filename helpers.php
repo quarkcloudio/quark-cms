@@ -405,7 +405,7 @@ if(!function_exists('filter_emoji')) {
  * @author tangtanglove <dai_hang_love@126.com>
  */
 if(!function_exists('wechat_config')) {
-    function wechat_config($type)
+    function wechat_config($type = 'fwh')
     {
         switch ($type) {
             case 'dyh':
