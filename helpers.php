@@ -6,7 +6,7 @@ use QuarkCMS\QuarkAdmin\Models\File;
 use QuarkCMS\QuarkAdmin\Models\Config;
 use App\Models\Category;
 use App\Models\Sms;
-use App\Models\Wechat;
+use App\Models\WechatUser;
 use App\Models\Printer;
 use App\User;
 use App\Excels\Export;
@@ -75,15 +75,12 @@ if(!function_exists('sioo_send_sms')) {
             return error('接口配置错误！');
         }
 
-        // 转换内容类型
-        $msg  = mb_convert_encoding($content,'GBK','utf-8');
-
         // 接口url
         $url = "https://submit.10690221.com/send/ordinarykv?uid="
         .$uid
         ."&password=".md5($password)
         ."&mobile=".$phone
-        ."&msg=".$msg;
+        ."&msg=".$content;
 
         $client = new HttpClient();
 
@@ -408,7 +405,7 @@ if(!function_exists('filter_emoji')) {
  * @author tangtanglove <dai_hang_love@126.com>
  */
 if(!function_exists('wechat_config')) {
-    function wechat_config($type = 'fwh')
+    function wechat_config($type)
     {
         switch ($type) {
             case 'dyh':
