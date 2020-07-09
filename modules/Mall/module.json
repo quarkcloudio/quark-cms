@@ -1,0 +1,13 @@
+{
+    "name": "Mall",
+    "alias": "mall",
+    "description": "",
+    "keywords": [],
+    "order": 0,
+    "providers": [
+        "Modules\\Mall\\Providers\\MallServiceProvider"
+    ],
+    "aliases": {},
+    "files": [],
+    "requires": []
+}
