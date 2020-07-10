@@ -16,6 +16,7 @@ class MallDatabaseSeeder extends Seeder
     {
         Model::unguard();
 
-        // $this->call("OthersTableSeeder");
+        $this->call("Modules\Mall\Database\Seeders\GoodsExpresseSeeder");
+        $this->call("Modules\Mall\Database\Seeders\MenusTableSeeder");
     }
 }
