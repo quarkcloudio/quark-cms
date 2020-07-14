@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Support\Facades\Route;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -11,20 +13,22 @@
 |
 */
 
-// Home未登录路由组
-$router->get('/', 'Home\\IndexController@index')->name('/');
-$router->get('index', 'Home\\IndexController@index')->name('index');
-$router->get('index/index', 'Home\\IndexController@index')->name('index/index');
-$router->get('page/index', 'Home\\PageController@index')->name('page/index');
-$router->get('article/index', 'Home\\ArticleController@index')->name('article/index');
-$router->get('article/list', 'Home\\ArticleController@list')->name('article/list');
-$router->get('article/detail', 'Home\\ArticleController@detail')->name('article/detail');
-$router->get('video/index', 'Home\\VideoController@index')->name('video/index');
-$router->get('video/list', 'Home\\VideoController@list')->name('video/list');
-$router->get('video/detail', 'Home\\VideoController@detail')->name('video/detail');
-$router->any('search/index', 'Home\\SearchController@index')->name('search/index');
+Auth::routes();
 
-// Home已登录路由组
+// 未登录路由组
+$router->get('/', 'IndexController@index')->name('/');
+$router->get('index', 'IndexController@index')->name('index');
+$router->get('index/index', 'IndexController@index')->name('index/index');
+$router->get('page/index', 'PageController@index')->name('page/index');
+$router->get('article/index', 'ArticleController@index')->name('article/index');
+$router->get('article/list', 'ArticleController@list')->name('article/list');
+$router->get('article/detail', 'ArticleController@detail')->name('article/detail');
+$router->get('video/index', 'VideoController@index')->name('video/index');
+$router->get('video/list', 'VideoController@list')->name('video/list');
+$router->get('video/detail', 'VideoController@detail')->name('video/detail');
+$router->any('search/index', 'SearchController@index')->name('search/index');
+
+// 已登录路由组
 Route::group(['middleware' => ['auth']],function ($router) {
-    $router->get('user/index', 'Home\\UserController@index')->name('user/index');
+    $router->get('user/index', 'UserController@index')->name('user/index');
 });

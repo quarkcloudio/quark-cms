@@ -3,18 +3,17 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Auth;
 use EasyWeChat\Factory;
 
 class AppServiceProvider extends ServiceProvider
 {
     /**
-     * Bootstrap any application services.
+     * Register any application services.
      *
      * @return void
      */
-    public function boot()
+    public function register()
     {
         // layout布局使用基于闭包的composers
         view()->composer('*', function ($view) {
@@ -44,17 +43,14 @@ class AppServiceProvider extends ServiceProvider
             ->with('nickname', $nickname)
             ->with('jsApi', $jsApi);
         });
-
-        // 将来升级到mysql5.7时，将下面注释掉
-        Schema::defaultStringLength(191);
     }
 
     /**
-     * Register any application services.
+     * Bootstrap any application services.
      *
      * @return void
      */
-    public function register()
+    public function boot()
     {
         //
     }

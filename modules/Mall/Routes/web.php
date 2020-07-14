@@ -2,14 +2,15 @@
 
 /*
 |--------------------------------------------------------------------------
-| Mall Web Routes
+| Web Routes
 |--------------------------------------------------------------------------
 |
-| 商城路由组
+| Here is where you can register web routes for your application. These
+| routes are loaded by the RouteServiceProvider within a group which
+| contains the "web" middleware group. Now create something great!
 |
 */
 
-// 后台管理
 Route::group([
     'prefix'        => config('quark.route.prefix'),
     'namespace'     => config('quark.route.namespace'),
@@ -147,7 +148,6 @@ Route::group([
 
 });
 
-// 前台
 Route::prefix('mall')->group(function() {
     Route::get('/', 'MallController@index');
 });

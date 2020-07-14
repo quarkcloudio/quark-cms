@@ -35,7 +35,6 @@ class Install extends Command
         }
 
         $this->call('key:generate');
-        $this->call('passport:install');
         $this->call('storage:link');
     }
 }
