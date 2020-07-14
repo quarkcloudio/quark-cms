@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use DateTimeInterface;
 
 class Video extends Model
 {
@@ -48,10 +49,21 @@ class Video extends Model
         'status'
     ];
 
+    protected $dates = ['delete_at'];
+
+    /**
+     * 为数组 / JSON 序列化准备日期。
+     *
+     * @param  \DateTimeInterface  $date
+     * @return string
+     */
+    protected function serializeDate(DateTimeInterface $date)
+    {
+        return $date->format($this->dateFormat ?: 'Y-m-d H:i:s');
+    }
+
     public function category()
     {
         return $this->hasOne('App\Models\Category', 'id', 'category_id');
     }
-
-    protected $dates = ['delete_at'];
 }

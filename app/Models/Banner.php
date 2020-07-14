@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use DateTimeInterface;
 
 class Banner extends Model
 {
@@ -15,12 +16,7 @@ class Banner extends Model
      * @var bool
      */
     public $timestamps = true;
-     
-    protected $casts = [
-        'created_at' => 'datetime:Y-m-d H:i:s',
-        'updated_at' => 'datetime:Y-m-d H:i:s',
-    ];
-
+    
     /**
      * The attributes that are mass assignable.
      *
@@ -30,10 +26,31 @@ class Banner extends Model
         'category_id','title', 'url_type', 'url','cover_id','sort','deadline','status'
     ];
 
+    protected $casts = [
+        'created_at' => 'datetime:Y-m-d H:i:s',
+        'updated_at' => 'datetime:Y-m-d H:i:s',
+    ];
+
+    protected $dates = ['delete_at'];
+
+    /**
+     * 为数组 / JSON 序列化准备日期。
+     *
+     * @param  \DateTimeInterface  $date
+     * @return string
+     */
+    protected function serializeDate(DateTimeInterface $date)
+    {
+        return $date->format($this->dateFormat ?: 'Y-m-d H:i:s');
+    }
+
+    /**
+     * 广告图分类
+     *
+     * @var bool
+     */
     public function category()
     {
         return $this->hasOne('App\Models\BannerCategory', 'id', 'category_id');
     }
-
-     protected $dates = ['delete_at'];
 }

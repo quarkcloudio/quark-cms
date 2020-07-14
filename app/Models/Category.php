@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use DateTimeInterface;
 
 class Category extends Model
 {
@@ -16,11 +17,6 @@ class Category extends Model
      */
     public $timestamps = true;
     
-    protected $casts = [
-        'created_at' => 'datetime:Y-m-d H:i:s',
-        'updated_at' => 'datetime:Y-m-d H:i:s',
-    ];
-
     /**
      * The attributes that are mass assignable.
      *
@@ -43,6 +39,22 @@ class Category extends Model
         'status',
         'type',
     ];
+
+    protected $casts = [
+        'created_at' => 'datetime:Y-m-d H:i:s',
+        'updated_at' => 'datetime:Y-m-d H:i:s',
+    ];
      
     protected $dates = ['delete_at'];
+
+    /**
+     * 为数组 / JSON 序列化准备日期。
+     *
+     * @param  \DateTimeInterface  $date
+     * @return string
+     */
+    protected function serializeDate(DateTimeInterface $date)
+    {
+        return $date->format($this->dateFormat ?: 'Y-m-d H:i:s');
+    }
 }

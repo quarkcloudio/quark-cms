@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use DateTimeInterface;
 
 class Comment extends Model
 {    
@@ -12,11 +13,6 @@ class Comment extends Model
      * @var bool
      */
     public $timestamps = true;
-    
-    protected $casts = [
-        'created_at' => 'datetime:Y-m-d H:i:s',
-        'updated_at' => 'datetime:Y-m-d H:i:s',
-    ];
 
     /**
      * The attributes that are mass assignable.
@@ -37,6 +33,22 @@ class Comment extends Model
         'status',
         'rate'
     ];
+
+    protected $casts = [
+        'created_at' => 'datetime:Y-m-d H:i:s',
+        'updated_at' => 'datetime:Y-m-d H:i:s',
+    ];
+
+    /**
+     * 为数组 / JSON 序列化准备日期。
+     *
+     * @param  \DateTimeInterface  $date
+     * @return string
+     */
+    protected function serializeDate(DateTimeInterface $date)
+    {
+        return $date->format($this->dateFormat ?: 'Y-m-d H:i:s');
+    }
 
     public function article()
     {
