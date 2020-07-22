@@ -101,11 +101,11 @@ class NavigationController extends QuarkController
         $form->text('title','标题')
         ->rules(['required','max:190'],['required'=>'标题必须填写','max'=>'名称不能超过190个字符']);
 
-        $navigations[0] = '根目录';
-        $getNavigations = Navigation::where('status',1)->get();
+        $navigations[0] = '根节点';
+        $getNavigations = Navigation::where('status',1)->get()->toArray();
 
         $navigationTrees = list_to_tree($getNavigations,'id','pid','children',0);
-        $navigationTreeLists = tree_to_ordered_list($navigationTrees,0,'name','children');
+        $navigationTreeLists = tree_to_ordered_list($navigationTrees,0,'title','children');
 
         foreach ($navigationTreeLists as $key => $value) {
             $navigations[$value['id']] = $value['title'];
@@ -113,7 +113,9 @@ class NavigationController extends QuarkController
 
         $form->select('pid','父节点')
         ->options($navigations)
-        ->width(200);
+        ->width(200)
+        ->value(0);
+
         $form->text('url','链接');
         $form->image('cover_id','图标')->mode('single');
         $form->number('sort','排序')->value(0);
