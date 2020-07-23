@@ -108,7 +108,8 @@ class ArticleCategoryController extends QuarkController
 
             $form->select('pid','父节点')
             ->options($categorys)
-            ->width(200);
+            ->width(200)
+            ->value(0);
 
             $form->textArea('description','描述')
             ->rules(['max:190'],['max'=>'名称不能超过190个字符']);
@@ -121,7 +122,7 @@ class ArticleCategoryController extends QuarkController
             ])->default(true);
 
         })->tab('扩展', function ($form) {
-            $form->image('cover_ids','封面图')->mode('single');
+            $form->image('cover_id','封面图')->mode('single');
             $form->text('index_tpl','频道模板');
             $form->text('lists_tpl','列表模板');
             $form->text('detail_tpl','详情模板');
