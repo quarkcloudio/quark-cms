@@ -313,7 +313,7 @@ if(!function_exists('get_content_picture')) {
     {
         preg_match_all("/<[img|IMG].*?src=[\'|\"](.*?(?:[\.gif|\.jpg|\.png]))[\'|\"].*?[\/]?>/",$content,$match);
 
-        $result = '';
+        $result = [];
 
         foreach ($match[1] as $key => $value) {
             if(strpos($value,'../') !== false) {
