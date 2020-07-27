@@ -5,7 +5,6 @@ namespace Modules\Tools\Http\Controllers;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Sms;
-use Session;
 
 class SmsController extends Controller
 {
@@ -76,6 +75,10 @@ class SmsController extends Controller
         if($result) {
             $data['status'] = 1;
             Sms::create($data);
+
+            // 清空图形验证码
+            session(['captcha' => null]);
+
             return success('短信已发送，请注意查收！');
         } else {
             $data['status'] = 2;
