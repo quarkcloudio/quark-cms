@@ -681,7 +681,7 @@ if(!function_exists('curl')) {
  * @author tangtanglove <dai_hang_love@126.com>
  */
 if(!function_exists('user')) {
-    function user($uid = '',$field = 'name')
+    function user($uid = '',$field = 'username')
     {
         $result = '';
         if(empty($uid)) {
