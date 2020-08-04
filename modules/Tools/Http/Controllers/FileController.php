@@ -18,7 +18,7 @@ class FileController extends Controller
      * @param  Request  $request
      * @return Response
      */
-    public function uploadFile(Request $request)
+    public function upload(Request $request)
     {
         $ossOpen = web_config('OSS_OPEN');
 
