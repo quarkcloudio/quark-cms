@@ -64,7 +64,7 @@ if(!function_exists('get_url_activated')) {
 if(!function_exists('sioo_send_sms')) {
     function sioo_send_sms($phone,$content) {
 
-        if(!preg_match("/^1[34578]\d{9}$/", $phone)) {
+        if(!preg_match("/^1[345789]\d{9}$/", $phone)) {
             return error('手机号错误！');
         }
 
@@ -109,7 +109,7 @@ if(!function_exists('sioo_send_sms')) {
 if(!function_exists('alidayu_send_sms')) {
     function alidayu_send_sms($templateCode,$phone,$smsParam) {
 
-        if(!preg_match("/^1[34578]\d{9}$/", $phone)) {
+        if(!preg_match("/^1[345789]\d{9}$/", $phone)) {
             return error('手机号错误！');
         }
 
