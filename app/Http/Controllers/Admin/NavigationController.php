@@ -30,7 +30,7 @@ class NavigationController extends QuarkController
         ])->width(100);
 
         $grid->column('actions','操作')->width(100)->rowActions(function($rowAction) {
-            $rowAction->menu('editWithModal', '编辑')->withModal('编辑广告位',function($modal) {
+            $rowAction->menu('editWithModal', '编辑')->withModal('编辑导航',function($modal) {
                 $modal->disableFooter();
                 $modal->form->ajax('admin/navigation/edit');
             });
