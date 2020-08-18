@@ -1,5 +1,6 @@
 {
     "Tools": true,
     "Cashier": true,
-    "Mall": false
+    "Mall": false,
+    "Wechat": false
 }
