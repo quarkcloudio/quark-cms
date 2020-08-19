@@ -36,6 +36,8 @@ class RouteServiceProvider extends ServiceProvider
         $this->mapApiRoutes();
 
         $this->mapWebRoutes();
+
+        $this->mapWithoutCsrfRoutes();
     }
 
     /**
@@ -65,5 +67,19 @@ class RouteServiceProvider extends ServiceProvider
             ->middleware('api')
             ->namespace($this->moduleNamespace)
             ->group(module_path('Wechat', '/Routes/api.php'));
+    }
+
+    /**
+     * Define the "server" routes for the application.
+     *
+     * These routes are typically stateless.
+     *
+     * @return void
+     */
+    protected function mapWithoutCsrfRoutes()
+    {
+        Route::middleware('api')
+            ->namespace($this->moduleNamespace)
+            ->group(module_path('Wechat', '/Routes/withoutCsrf.php'));
     }
 }

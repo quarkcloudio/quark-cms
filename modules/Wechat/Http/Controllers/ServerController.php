@@ -15,7 +15,6 @@ class ServerController extends Controller
      */
     public function token(Request $request)
     {
-
         $type = $request->get('type');
 
         switch ($type) {

@@ -26,7 +26,6 @@ Route::group(['prefix' => 'wechat'], function ($router) {
     $router->any('callback', 'Auth\\LoginController@callback')->name('wechat/callback');
     $router->get('register', 'Auth\\RegisterController@register')->name('wechat/register');
     $router->get('bindAccount', 'Auth\\RegisterController@bindAccount')->name('wechat/bindAccount');
-    $router->any('server/token', 'ServerController@token')->name('wechat/server/token');
 });
 
 // 需要登录，但不需要绑定WEB账号的路由组
