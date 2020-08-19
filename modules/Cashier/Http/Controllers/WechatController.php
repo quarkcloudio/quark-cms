@@ -47,7 +47,7 @@ class WechatController extends Controller
             'body'             => $body,
             'detail'           => $detail,
             'out_trade_no'     => $orderNo,
-            'total_fee'        => intval($totalFee*100), // 单位：分
+            'total_fee'        => intval(strval($totalFee*100)), // 单位：分
             'notify_url'       => $notifyUrl, // 支付结果通知网址，如果不设置则会使用配置里的默认地址
             'openid'           => $userInfo['wechat_openid']
         ];
