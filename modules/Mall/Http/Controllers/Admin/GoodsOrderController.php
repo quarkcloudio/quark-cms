@@ -1,20 +1,20 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace Modules\Mall\Http\Controllers\Admin;
 
 use QuarkCMS\QuarkAdmin\Controllers\QuarkController;
 use Quark;
 use Illuminate\Http\Request;
 use EasyWeChat\Factory;
-use App\Models\Goods;
+use Modules\Mall\Models\Goods;
 use App\Models\Category;
-use App\Models\Order;
-use App\Models\GoodsOrder;
-use App\Models\GoodsOrderDetail;
-use App\Models\GoodsOrderStatusRecord;
-use App\Models\GoodsOrderDelivery;
-use App\Models\GoodsOrderDeliveryDetail;
-use App\Models\GoodsExpress;
+use Modules\Mall\Models\Order;
+use Modules\Mall\Models\GoodsOrder;
+use Modules\Mall\Models\GoodsOrderDetail;
+use Modules\Mall\Models\GoodsOrderStatusRecord;
+use Modules\Mall\Models\GoodsOrderDelivery;
+use Modules\Mall\Models\GoodsOrderDeliveryDetail;
+use Modules\Mall\Models\GoodsExpress;
 use App\User;
 use DB;
 

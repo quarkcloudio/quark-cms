@@ -448,7 +448,7 @@ if(!function_exists('wechat_config')) {
                 'aes_key'   => $aesKey,
                 'oauth' => [
                     'scopes'   => ['snsapi_userinfo'],
-                    'callback' => url('wxLogin/callback'),
+                    'callback' => url('wechat/callback'),
                 ],
                 'log' => [
                     'level' => 'debug',

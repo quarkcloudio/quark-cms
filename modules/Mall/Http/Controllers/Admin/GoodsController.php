@@ -1,24 +1,24 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace Modules\Mall\Http\Controllers\Admin;
 
 use Illuminate\Http\Request;
 use QuarkCMS\QuarkAdmin\Controllers\QuarkController;
-use App\Models\Goods;
-use App\Models\GoodsCategory;
-use App\Models\GoodsCategoryRelationship;
-use App\Models\GoodsType;
-use App\Models\GoodsAttribute;
-use App\Models\GoodsAttributeValue;
-use App\Models\GoodsAttributeAlia;
-use App\Models\GoodsCategoryAttribute;
-use App\Models\GoodsInfoAttributeValue;
-use App\Models\GoodsBrand;
-use App\Models\GoodsUnit;
-use App\Models\GoodsLayout;
-use App\Models\GoodsSku;
-use App\Models\GoodsPhoto;
-use App\Models\Shop;
+use Modules\Mall\Models\Goods;
+use Modules\Mall\Models\GoodsCategory;
+use Modules\Mall\Models\GoodsCategoryRelationship;
+use Modules\Mall\Models\GoodsType;
+use Modules\Mall\Models\GoodsAttribute;
+use Modules\Mall\Models\GoodsAttributeValue;
+use Modules\Mall\Models\GoodsAttributeAlia;
+use Modules\Mall\Models\GoodsCategoryAttribute;
+use Modules\Mall\Models\GoodsInfoAttributeValue;
+use Modules\Mall\Models\GoodsBrand;
+use Modules\Mall\Models\GoodsUnit;
+use Modules\Mall\Models\GoodsLayout;
+use Modules\Mall\Models\GoodsSku;
+use Modules\Mall\Models\GoodsPhoto;
+use Modules\Mall\Models\Shop;
 use Illuminate\Support\Arr;
 use DB;
 use Quark;

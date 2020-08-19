@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace Modules\Mall\Http\Controllers\Admin;
 
 use QuarkCMS\QuarkAdmin\Controllers\QuarkController;
 use Illuminate\Http\Request;
-use App\Models\GoodsOrderAftersale;
-use App\Models\GoodsOrderAftersaleRecord;
+use Modules\Mall\Models\GoodsOrderAftersale;
+use Modules\Mall\Models\GoodsOrderAftersaleRecord;
 use DB;
 use Quark;
 

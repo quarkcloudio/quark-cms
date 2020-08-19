@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace Modules\Mall\Http\Controllers\Admin;
 
 use QuarkCMS\QuarkAdmin\Controllers\QuarkController;
 use Illuminate\Http\Request;
-use App\Models\GoodsUnit;
+use Modules\Mall\Models\GoodsUnit;
 use Validator;
 use DB;
 use Quark;

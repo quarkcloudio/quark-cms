@@ -66,11 +66,11 @@ class LoginController extends Controller
 
         // 定义对象
         $query = WechatUser::query()
-        ->where('wechat_openid', $wechatUser['original']['openid'])
+        ->where('openid', $wechatUser['original']['openid'])
         ->where('type','FWH');
 
         if(isset($wechatUser['original']['unionid'])) {
-            $query->orWhere('wechat_unionid', $wechatUser['original']['unionid']);
+            $query->orWhere('unionid', $wechatUser['original']['unionid']);
         }
 
         $getWechatUser = $query->first();

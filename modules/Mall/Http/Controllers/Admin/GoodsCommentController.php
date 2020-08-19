@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace Modules\Mall\Http\Controllers\Admin;
 
-use App\Models\Comment;
+use Modules\Mall\Models\Comment;
 use QuarkCMS\QuarkAdmin\Controllers\QuarkController;
 use Quark;
 

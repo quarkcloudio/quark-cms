@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace Modules\Mall\Http\Controllers\Admin;
 
 use QuarkCMS\QuarkAdmin\Controllers\QuarkController;
 use Illuminate\Http\Request;
-use App\Models\Shop;
-use App\Models\Area;
-use App\Models\Merchant;
-use App\Models\ShopCategory;
+use Modules\Mall\Models\Shop;
+use Modules\Mall\Models\Area;
+use Modules\Mall\Models\Merchant;
+use Modules\Mall\Models\ShopCategory;
 use App\User;
 use DB;
 use Quark;

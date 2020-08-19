@@ -37,8 +37,8 @@ class WechatServiceProvider extends ServiceProvider
      * @var array
      */
     protected $routeMiddleware = [
-        'wechat' => Middleware\WechatAuthMiddleware::class,
-        'wechat.bindaccount' => Middleware\WechatAuthWithBindMiddleware::class,
+        'wechat' => \Modules\Wechat\Http\Middleware\WechatAuthMiddleware::class,
+        'wechat.bindaccount' => \Modules\Wechat\Http\Middleware\WechatAuthWithBindMiddleware::class,
     ];
 
     /**

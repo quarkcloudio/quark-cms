@@ -1,16 +1,16 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace Modules\Mall\Http\Controllers\Admin;
 
 use QuarkCMS\QuarkAdmin\Controllers\QuarkController;
 use Illuminate\Http\Request;
-use App\Models\GoodsType;
-use App\Models\GoodsAttribute;
-use App\Models\GoodsAttributeValue;
-use App\Models\GoodsCategory;
-use App\Models\GoodsCategoryRelationship;
-use App\Models\GoodsBrand;
-use App\Models\GoodsCategoryAttribute;
+use Modules\Mall\Models\GoodsType;
+use Modules\Mall\Models\GoodsAttribute;
+use Modules\Mall\Models\GoodsAttributeValue;
+use Modules\Mall\Models\GoodsCategory;
+use Modules\Mall\Models\GoodsCategoryRelationship;
+use Modules\Mall\Models\GoodsBrand;
+use Modules\Mall\Models\GoodsCategoryAttribute;
 use DB;
 use Quark;
 
