@@ -4,10 +4,10 @@ namespace App\Http\Controllers\Admin;
 
 use App\Models\Post;
 use App\Models\Category;
-use QuarkCMS\QuarkAdmin\Controllers\QuarkController;
+use QuarkCMS\QuarkAdmin\Http\Controllers\Controller;
 use Quark;
 
-class ArticleController extends QuarkController
+class ArticleController extends Controller
 {
     public $title = '文章';
 
@@ -19,47 +19,83 @@ class ArticleController extends QuarkController
      */
     protected function table()
     {
-        $grid = Quark::grid(new Post)->title($this->title);
-        $grid->column('id','ID');
-        $grid->column('title','标题')->link();
-        $grid->column('level','排序')->editable()->sorter()->width(100);
-        $grid->column('author','作者');
-        $grid->column('category.title','分类');
-        $grid->column('created_at','发布时间');
-        $grid->column('status','状态')->editable('switch',[
+        $table = Quark::table(new Post)->title($this->title);
+        $table->column('id','ID');
+        $table->column('title','标题')->link();
+        $table->column('level','排序')->editable()->sorter()->width(100);
+        $table->column('author','作者');
+        $table->column('category_title','分类');
+        $table->column('created_at','发布时间');
+        $table->column('status','状态')->editable('switch',[
             'on'  => ['value' => 1, 'text' => '正常'],
             'off' => ['value' => 0, 'text' => '禁用']
         ])->width(100);
 
-        $grid->column('actions','操作')->width(100)->rowActions(function($rowAction) {
-            $rowAction->menu('edit', '编辑');
-            $rowAction->menu('show', '显示');
-            $rowAction->menu('delete', '删除')->model(function($model) {
-                $model->delete();
-            })->withConfirm('确认要删除吗？','删除后数据将无法恢复，请谨慎操作！');
+        $table->column('actions','操作')->width(120)->actions(function($action,$row) {
+
+            // 根据不同的条件定义不同的A标签形式行为
+            if($row['status'] === 1) {
+                $action->a('禁用')
+                ->withPopconfirm('确认要禁用数据吗？')
+                ->model()
+                ->where('id','{id}')
+                ->update(['status'=>0]);
+            } else {
+                $action->a('启用')
+                ->withPopconfirm('确认要启用数据吗？')
+                ->model()
+                ->where('id','{id}')
+                ->update(['status'=>1]);
+            }
+
+            // 跳转默认编辑页面
+            $action->a('编辑')->editLink();
+
+            $action->a('删除')
+            ->withPopconfirm('确认要删除吗？')
+            ->model()
+            ->where('id','{id}')
+            ->delete();
+
+            return $action;
         });
 
-        // 头部操作
-        $grid->actions(function($action) {
-            $action->button('create', '新增');
-            $action->button('refresh', '刷新');
+        $table->toolBar()->actions(function($action) {
+
+            // 跳转默认创建页面
+            return $action->button('创建'.$this->title)->type('primary')->icon('plus-circle')->createLink();
         });
 
-        // select样式的批量操作
-        $grid->batchActions(function($batch) {
-            $batch->option('', '批量操作');
-            $batch->option('resume', '启用')->model(function($model) {
-                $model->update(['status'=>1]);
-            });
-            $batch->option('forbid', '禁用')->model(function($model) {
-                $model->update(['status'=>0]);
-            });
-            $batch->option('delete', '删除')->model(function($model) {
-                $model->delete();
-            })->withConfirm('确认要删除吗？','删除后数据将无法恢复，请谨慎操作！');
-        })->style('select',['width'=>120]);
+        // 批量操作
+        $table->batchActions(function($action) {
+            // 跳转默认编辑页面
+            $action->a('批量删除')
+            ->withConfirm('确认要删除吗？','删除后数据将无法恢复，请谨慎操作！')
+            ->model()
+            ->whereIn('id','{ids}')
+            ->delete();
 
-        $grid->search(function($search) {
+            // 下拉菜单形式的行为
+            $action->dropdown('更多')->overlay(function($action) {
+                $action->item('禁用')
+                ->withConfirm('确认要禁用吗？','禁用后数据将无法使用，请谨慎操作！')
+                ->model()
+                ->whereIn('id','{ids}')
+                ->update(['status'=>0]);
+
+                $action->item('启用')
+                ->withConfirm('确认要启用吗？','启用后数据可以正常使用！')
+                ->model()
+                ->whereIn('id','{ids}')
+                ->update(['status'=>1]);
+
+                return $action;
+            });
+        });
+
+        // 搜索
+        $table->search(function($search) {
+
             $categorys = Category::where('type','ARTICLE')->where('status',1)->get();
             $options[''] = '全部';
             foreach ($categorys as $key => $value) {
@@ -67,21 +103,26 @@ class ArticleController extends QuarkController
             }
 
             $search->equal('category_id', '文章分类')->select($options)->placeholder('选择分类')->width(110);
-            $search->where('title', '搜索内容',function ($query) {
-                $query->where('title', 'like', "%{input}%");
-            })->placeholder('搜索内容');
 
-            $search->equal('status', '所选状态')->select([''=>'全部',1=>'正常',2=>'已禁用'])->placeholder('选择状态')->width(110)->advanced();
-            $search->between('created_at', '发布时间')->datetime()->advanced();
-        })->expand(false);
+            $search->where('title', '搜索内容',function ($model) {
+                $model->where('title', 'like', "%{input}%");
+            })->placeholder('名称');
+
+            $search->equal('status', '所选状态')
+            ->select([''=>'全部', 1=>'正常', 0=>'已禁用'])
+            ->placeholder('选择状态')
+            ->width(110);
+
+            $search->between('created_at', '发布时间')->datetime();
+        });
 
         if(ADMINID == 1) {
-            $grid->model()->where('type','ARTICLE')->paginate(10);
+            $table->model()->where('type','ARTICLE')->orderBy('id','desc')->paginate(request('pageSize',10));
         } else {
-            $grid->model()->where('adminid',ADMINID)->where('type','ARTICLE')->paginate(10);
+            $table->model()->where('adminid',ADMINID)->where('type','ARTICLE')->orderBy('id','desc')->paginate(request('pageSize',10));
         }
 
-        return $grid;
+        return $table;
     }
 
     /**
