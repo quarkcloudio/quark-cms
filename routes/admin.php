@@ -1,12 +1,12 @@
 <?php
 
-Quark::routes();
+use Illuminate\Routing\Router;
+use Illuminate\Support\Facades\Route;
 
 Route::group([
-    'prefix'        => config('quark.route.prefix'),
-    'namespace'     => config('quark.route.namespace'),
-    'middleware'    => config('quark.route.middleware'),
-], function ($router) {
+    'middleware' => 'admin',
+    'namespace' => 'App\\Http\\Controllers\\Admin'
+], function (Router $router) {
 
     $router->get('admin/dashboard/index', 'DashboardController@index')->name('api/admin/dashboard/index');
 

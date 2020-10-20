@@ -1,12 +1,9 @@
 <?php
 
-use QuarkCMS\QuarkAdmin\Models\ActionLog;
 use QuarkCMS\QuarkAdmin\Models\Picture;
 use QuarkCMS\QuarkAdmin\Models\File;
-use QuarkCMS\QuarkAdmin\Models\Config;
 use App\Models\Category;
 use App\Models\Sms;
-use App\Models\WechatUser;
 use App\Models\Printer;
 use App\User;
 use App\Excels\Export;
@@ -17,8 +14,6 @@ use Flc\Alidayu\Requests\AlibabaAliqinFcSmsNumSend;
 use Endroid\QrCode\QrCode;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Session;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use OSS\OssClient;
 use OSS\Core\OssException;
