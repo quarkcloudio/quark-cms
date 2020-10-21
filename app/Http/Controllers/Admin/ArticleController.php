@@ -21,7 +21,7 @@ class ArticleController extends Controller
     {
         $table = Quark::table(new Post)->title($this->title);
         $table->column('id','ID');
-        $table->column('title','标题')->link();
+        $table->column('title','标题')->editLink();
         $table->column('level','排序')->editable()->sorter()->width(100);
         $table->column('author','作者');
         $table->column('category_title','分类');
@@ -61,7 +61,6 @@ class ArticleController extends Controller
         });
 
         $table->toolBar()->actions(function($action) {
-
             // 跳转默认创建页面
             return $action->button('创建'.$this->title)->type('primary')->icon('plus-circle')->createLink();
         });
@@ -133,13 +132,13 @@ class ArticleController extends Controller
      */
     protected function form()
     {
-        $form = Quark::form(new Post);
+        $form = Quark::tabForm(new Post);
 
         $title = $form->isCreating() ? '创建'.$this->title : '编辑'.$this->title;
         $form->title($title);
 
         $form->tab('基本', function ($form) {
-            $form->id('id','ID');
+            $form->hidden('id');
 
             $form->text('title','标题')
             ->rules(['required','max:190'],['required'=>'标题必须填写','max'=>'名称不能超过190个字符']);
@@ -178,10 +177,9 @@ class ArticleController extends Controller
 
             $form->select('category_id','分类目录')
             ->options($categorys)
-            ->rules(['required'],['required'=>'请选择分类'])
-            ->width(200);
+            ->rules(['required'],['required'=>'请选择分类']);
 
-            $form->editor('content','内容');
+            $form->editor('content','内容')->width(800);
 
             $form->switch('status','状态')->options([
                 'on'  => '是',
@@ -206,6 +204,15 @@ class ArticleController extends Controller
 
         $form->saving(function ($form) {
             $form->request['adminid'] = ADMINID;
+        });
+
+        // 保存数据后回调
+        $form->saved(function ($form) {
+            if($form->model()) {
+                return success('操作成功！',frontend_url('admin/article/index'));
+            } else {
+                return error('操作失败，请重试！');
+            }
         });
 
         return $form;

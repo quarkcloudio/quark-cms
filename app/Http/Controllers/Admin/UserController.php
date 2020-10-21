@@ -3,15 +3,15 @@
 namespace App\Http\Controllers\Admin;
 
 use App\User;
-use QuarkCMS\QuarkAdmin\Controllers\QuarkController;
+use QuarkCMS\QuarkAdmin\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\DB;
 use App\Models\AccountLog;
 use Quark;
 use Validator;
-use DB;
 
-class UserController extends QuarkController
+class UserController extends Controller
 {
     public $title = '用户';
 
@@ -23,80 +23,101 @@ class UserController extends QuarkController
      */
     protected function table()
     {
-        $grid = Quark::grid(new User)->title($this->title);
-        $grid->column('id','ID');
-        $grid->column('avatar','头像')->image();
-        $grid->column('username','用户名')->link();
-        $grid->column('nickname','昵称');
-        $grid->column('phone','手机号');
-        $grid->column('email','邮箱');
-        $grid->column('created_at','注册时间');
-        $grid->column('status','状态')->editable('switch',[
+        $table = Quark::table(new User)->title($this->title);
+        $table->column('id','ID');
+        $table->column('avatar','头像')->image();
+        $table->column('username','用户名')->editLink();
+        $table->column('nickname','昵称');
+        $table->column('phone','手机号');
+        $table->column('email','邮箱');
+        $table->column('created_at','注册时间');
+        $table->column('status','状态')->editable('switch',[
             'on'  => ['value' => 1, 'text' => '正常'],
             'off' => ['value' => 0, 'text' => '禁用']
         ])->width(100);
 
-        $grid->column('actions','操作')->width(260)->rowActions(function($rowAction) {
+        $table->column('actions','操作')->width(260)->actions(function($action,$row) {
 
-            $rowAction->button('recharge', '充值')
-            ->type('default')
-            ->size('small')
-            ->withModal('用户充值',function($modal) {
-                $modal->disableFooter();
-                $modal->form->ajax('admin/user/recharge');
+            // 根据不同的条件定义不同的A标签形式行为
+            if($row['status'] === 1) {
+                $action->a('禁用')
+                ->withPopconfirm('确认要禁用数据吗？')
+                ->model()
+                ->where('id','{id}')
+                ->update(['status'=>0]);
+            } else {
+                $action->a('启用')
+                ->withPopconfirm('确认要启用数据吗？')
+                ->model()
+                ->where('id','{id}')
+                ->update(['status'=>1]);
+            }
+
+            // 跳转默认编辑页面
+            $action->a('编辑')->editLink();
+
+            $action->a('删除')
+            ->withPopconfirm('确认要删除吗？')
+            ->model()
+            ->where('id','{id}')
+            ->delete();
+
+            // 下拉菜单形式的行为
+            $action->dropdown('更多')->overlay(function($action) use($row) {
+                $action->item('详情')->showLink();
+                $action->item('充值')->modalForm(backend_url('api/admin/user/recharge?id='.$row['id']));
+                return $action;
             });
 
-            $rowAction->button('show', '显示')
-            ->type('default')
-            ->size('small');
-
-            $rowAction->button('edit', '编辑')
-            ->type('primary')
-            ->size('small');
-
-            $rowAction->button('delete', '删除')
-            ->type('default',true)
-            ->size('small')
-            ->model(function($model) {
-                $model->delete();
-            })->withConfirm('确认要删除吗？','删除后数据将无法恢复，请谨慎操作！');
-
-        },'button');
-
-        // 头部操作
-        $grid->actions(function($action) {
-            $action->button('create', '新增');
-            $action->button('refresh', '刷新');
+            return $action;
         });
 
-        // select样式的批量操作
-        $grid->batchActions(function($batch) {
-            $batch->option('', '批量操作');
-            $batch->option('resume', '启用')->model(function($model) {
-                $model->update(['status'=>1]);
-            });
-            $batch->option('forbid', '禁用')->model(function($model) {
-                $model->update(['status'=>0]);
-            });
-            $batch->option('delete', '删除')->model(function($model) {
-                $model->delete();
-            })->withConfirm('确认要删除吗？','删除后数据将无法恢复，请谨慎操作！');
-        })->style('select',['width'=>120]);
+        $table->toolBar()->actions(function($action) {
+            // 跳转默认创建页面
+            return $action->button('创建'.$this->title)->type('primary')->icon('plus-circle')->createLink();
+        });
 
-        $grid->search(function($search) {
+        // 批量操作
+        $table->batchActions(function($action) {
+            // 跳转默认编辑页面
+            $action->a('批量删除')
+            ->withConfirm('确认要删除吗？','删除后数据将无法恢复，请谨慎操作！')
+            ->model()
+            ->whereIn('id','{ids}')
+            ->delete();
+
+            // 下拉菜单形式的行为
+            $action->dropdown('更多')->overlay(function($action) {
+                $action->item('禁用')
+                ->withConfirm('确认要禁用吗？','禁用后数据将无法使用，请谨慎操作！')
+                ->model()
+                ->whereIn('id','{ids}')
+                ->update(['status'=>0]);
+
+                $action->item('启用')
+                ->withConfirm('确认要启用吗？','启用后数据可以正常使用！')
+                ->model()
+                ->whereIn('id','{ids}')
+                ->update(['status'=>1]);
+
+                return $action;
+            });
+        });
+
+        $table->search(function($search) {
 
             $search->where('usernameOrNickname', '搜索内容',function ($query) {
                 $query->where('username', 'like', "%{input}%")->orWhere('nickname', 'like', "%{input}%")->orWhere('phone', 'like', "%{input}%");
             })->placeholder('用户名/手机号/昵称');
 
-            $search->equal('status', '所选状态')->select([''=>'全部',1=>'正常',0=>'已禁用'])->placeholder('选择状态')->width(110)->advanced();
+            $search->equal('status', '所选状态')->select([''=>'全部',1=>'正常',0=>'已禁用'])->placeholder('选择状态');
             
-            $search->between('created_at', '注册时间')->datetime()->advanced();
-        })->expand(false);
+            $search->between('created_at', '注册时间')->datetime();
+        });
 
-        $grid->model()->paginate(10);
+        $table->model()->orderBy('id','desc')->paginate(request('pageSize',10));
 
-        return $grid;
+        return $table;
     }
 
     /**
@@ -107,14 +128,12 @@ class UserController extends QuarkController
      */
     protected function form()
     {
-        $id = request('id');
-
         $form = Quark::form(new User);
 
         $title = $form->isCreating() ? '创建'.$this->title : '编辑'.$this->title;
         $form->title($title);
 
-        $form->id('id','ID');
+        $form->hidden('id');
 
         $form->image('avatar','头像')->button('上传头像');
 
@@ -148,132 +167,34 @@ class UserController extends QuarkController
             'off' => '禁用'
         ])->default(true);
 
+        // 编辑页面展示前回调
+        $form->editing(function ($form) {
+            if(isset($form->initialValues['avatar'])) {
+                $form->initialValues['avatar'] = get_picture($form->initialValues['avatar'],0,'all');
+            }
+        });
+
+        // 保存数据前回调
+        $form->saving(function ($form) {
+            if(isset($form->data['password'])) {
+                $form->data['password'] = bcrypt($form->data['password']);
+            }
+
+            if(isset($form->data['avatar'])) {
+                $form->data['avatar'] = $form->data['avatar']['id'];
+            }
+        });
+
+        // 保存数据后回调
+        $form->saved(function ($form) {
+            if($form->model()) {
+                return success('操作成功！',frontend_url('admin/user/index'));
+            } else {
+                return error('操作失败，请重试！');
+            }
+        });
+
         return $form;
-    }
-
-    /**
-     * 保存方法
-     * 
-     * @param  Request  $request
-     * @return Response
-     */
-    public function store(Request $request)
-    {
-        $requestJson    =   $request->getContent();
-        $requestData    =   json_decode($requestJson,true);
-
-        // 删除modelName
-        unset($requestData['id']);
-        unset($requestData['actionUrl']);
-
-        // 表单验证错误提示信息
-        $messages = [
-            'unique' => '已经存在',
-        ];
-
-        // 表单验证规则
-        $rules = [
-            'username' => [Rule::unique('users')],
-            'email' =>  [Rule::unique('users')],
-            'phone' =>  [Rule::unique('users')],
-        ];
-
-        // 进行验证
-        $validator = Validator::make($requestData,$rules,$messages);
-
-        if ($validator->fails()) {
-            $errors = $validator->errors()->getMessages();
-
-            foreach($errors as $key => $value) {
-                if($key === 'username') {
-                    $errorMsg = '用户名'.$value[0];
-                }
-
-                if($key === 'email') {
-                    $errorMsg = '邮箱'.$value[0];
-                }
-
-                if($key === 'phone') {
-                    $errorMsg = '手机号'.$value[0];
-                }
-            }
-
-            return error($errorMsg);
-        }
-
-        if (!empty($requestData['password'])) {
-            $requestData['password'] = bcrypt($requestData['password']);
-        }
-
-        $result = User::create($requestData);
-
-        if ($result) {
-            return success('操作成功！','/quark/engine?api=admin/user/index&component=table');
-        } else {
-            return error('操作失败！');
-        }
-    }
-
-    /**
-     * 保存编辑数据
-     *
-     * @param  Request  $request
-     * @return Response
-     */
-    public function update(Request $request)
-    {
-        $requestJson    =   $request->getContent();
-        $requestData    =   json_decode($requestJson,true);
-
-        // 删除modelName
-        unset($requestData['actionUrl']);
-
-        // 表单验证错误提示信息
-        $messages = [
-            'unique' => '已经存在',
-        ];
-
-        // 表单验证规则
-        $rules = [
-            'username' => [Rule::unique('users')->ignore($requestData['id'])],
-            'email' =>  [Rule::unique('users')->ignore($requestData['id'])],
-            'phone' =>  [Rule::unique('users')->ignore($requestData['id'])],
-        ];
-
-        // 进行验证
-        $validator = Validator::make($requestData,$rules,$messages);
-
-        if ($validator->fails()) {
-            $errors = $validator->errors()->getMessages();
-
-            foreach($errors as $key => $value) {
-                if($key === 'username') {
-                    $errorMsg = '用户名'.$value[0];
-                }
-
-                if($key === 'email') {
-                    $errorMsg = '邮箱'.$value[0];
-                }
-
-                if($key === 'phone') {
-                    $errorMsg = '手机号'.$value[0];
-                }
-            }
-
-            return error($errorMsg);
-        }
-
-        if (!empty($requestData['password'])) {
-            $requestData['password'] = bcrypt($requestData['password']);
-        }
-
-        $result = User::where('id',$requestData['id'])->update($requestData);
-
-        if ($result) {
-            return success('操作成功！','/quark/engine?api=admin/user/index&component=table');
-        } else {
-            return error('操作失败！');
-        }
     }
 
     /**
@@ -373,14 +294,8 @@ class UserController extends QuarkController
 
             $layout['labelCol']['span'] = 4;
             $layout['wrapperCol']['span'] = 20;
-            $form->layout($layout);
-
-            $title = $form->isCreating() ? '创建'.$this->title : '编辑'.$this->title;
-            $form->title($title);
-
-            $form->setAction('admin/user/recharge');
-
-            $form->id('id','ID')->value($id);
+            $form->layout($layout)->title('账户充值')->api('admin/user/recharge');
+            $form->hidden('id')->value($id);
             $form->display('充值用户')->value($user['username'].'（'.$user['nickname'].'）');
             $form->display('当前余额')->style(['color'=>'#f81d22'])->value($user['money']);
             $form->display('当前积分')->style(['color'=>'#f81d22'])->value($user['score']);
@@ -389,9 +304,7 @@ class UserController extends QuarkController
             $form->textArea('remark','充值理由')
             ->rules(['required','max:190'],['required'=>'充值理由必须填写','max'=>'充值理由不能超过190个字符']);
 
-            $content = Quark::content()->body(['form'=>$form->render()]);
-
-            return success('获取成功！','',$content);
+            return success('获取成功！','',$form);
         }
     }
 

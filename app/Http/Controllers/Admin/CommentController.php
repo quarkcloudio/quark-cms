@@ -3,10 +3,10 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Models\Comment;
-use QuarkCMS\QuarkAdmin\Controllers\QuarkController;
+use QuarkCMS\QuarkAdmin\Http\Controllers\Controller;
 use Quark;
 
-class CommentController extends QuarkController
+class CommentController extends Controller
 {
     public $title = '评论';
 
@@ -18,55 +18,87 @@ class CommentController extends QuarkController
      */
     protected function table()
     {
-        $grid = Quark::grid(new Comment)->title($this->title);
-        $grid->column('id','ID');
-        $grid->column('article.title','评论对象')->link();
-        $grid->column('user.username','用户');
-        $grid->column('title','评论标题');
-        $grid->column('content','内容');
-        $grid->column('created_at','评论时间');
-        $grid->column('status','状态')->using(['1'=>'已审核','0'=>'已禁用','2'=>'待审核'])->width(80);
+        $table = Quark::table(new Comment)->title($this->title);
+        $table->column('id','ID');
+        $table->column('article.title','评论对象')->editLink();
+        $table->column('user.username','用户');
+        $table->column('title','评论标题');
+        $table->column('content','内容');
+        $table->column('created_at','评论时间');
+        $table->column('status','状态')->using(['1'=>'已审核','0'=>'已禁用','2'=>'待审核'])->width(80);
 
-        $grid->column('actions','操作')->width(100)->rowActions(function($rowAction) {
-            $rowAction->menu('edit', '编辑');
-            $rowAction->menu('delete', '删除')->model(function($model) {
-                $model->delete();
-            })->withConfirm('确认要删除吗？','删除后数据将无法恢复，请谨慎操作！');
+        $table->column('actions','操作')
+        ->width(120)
+        ->actions(function($action,$row) {
+
+            // 根据不同的条件定义不同的A标签形式行为
+            if($row['status'] === 1) {
+                $action->a('禁用')
+                ->withPopconfirm('确认要禁用数据吗？')
+                ->model()
+                ->where('id','{id}')
+                ->update(['status'=>0]);
+            } else {
+                $action->a('启用')
+                ->withPopconfirm('确认要启用数据吗？')
+                ->model()
+                ->where('id','{id}')
+                ->update(['status'=>1]);
+            }
+
+            // 跳转默认编辑页面
+            $action->a('编辑')->editLink();
+
+            $action->a('删除')
+            ->withPopconfirm('确认要删除吗？')
+            ->model()
+            ->where('id','{id}')
+            ->delete();
+
+            return $action;
         });
 
-        // 头部操作
-        $grid->actions(function($action) {
-            $action->button('refresh', '刷新');
+        // 批量操作
+        $table->batchActions(function($action) {
+            // 跳转默认编辑页面
+            $action->a('批量删除')
+            ->withConfirm('确认要删除吗？','删除后数据将无法恢复，请谨慎操作！')
+            ->model()
+            ->whereIn('id','{ids}')
+            ->delete();
+
+            // 下拉菜单形式的行为
+            $action->dropdown('更多')->overlay(function($action) {
+                $action->item('禁用')
+                ->withConfirm('确认要禁用吗？','禁用后数据将无法使用，请谨慎操作！')
+                ->model()
+                ->whereIn('id','{ids}')
+                ->update(['status'=>0]);
+
+                $action->item('审核')
+                ->withConfirm('确认要审核吗？','审核后数据可以正常使用！')
+                ->model()
+                ->whereIn('id','{ids}')
+                ->update(['status'=>1]);
+
+                return $action;
+            });
         });
 
-        // select样式的批量操作
-        $grid->batchActions(function($batch) {
-            $batch->option('', '批量操作');
-            $batch->option('resume', '审核')->model(function($model) {
-                $model->update(['status'=>1]);
-            });
-            $batch->option('forbid', '禁用')->model(function($model) {
-                $model->update(['status'=>0]);
-            });
-            $batch->option('delete', '删除')->model(function($model) {
-                $model->delete();
-            })->withConfirm('确认要删除吗？','删除后数据将无法恢复，请谨慎操作！');
-        })->style('select',['width'=>120]);
+        $table->search(function($search) {
 
-        $grid->search(function($search) {
-
-            $search->equal('status', '所选状态')->select([''=>'全部',1=>'已审核',0=>'已禁用',2=>'待审核'])->placeholder('选择状态')->width(110);
+            $search->equal('status', '所选状态')->select([''=>'全部',1=>'已审核',0=>'已禁用',2=>'待审核'])->placeholder('选择状态');
 
             $search->where('title', '搜索内容',function ($query) {
                 $query->where('title', 'like', "%{input}%");
             })->placeholder('搜索内容');
 
-            $search->between('created_at', '评论时间')->datetime()->advanced();
-        })->expand(false);
+            $search->between('created_at', '评论时间')->datetime();
+        });
 
-        $grid->model()->where('type','ARTICLE')->paginate(10);
+        $table->model()->where('type','ARTICLE')->orderBy('id','desc')->paginate(request('pageSize',10));
 
-        return $grid;
+        return $table;
     }
     
     /**
@@ -86,7 +118,7 @@ class CommentController extends QuarkController
         $title = $form->isCreating() ? '创建'.$this->title : '编辑'.$this->title;
         $form->title($title);
 
-        $form->id('id','ID');
+        $form->hidden('id');
         $form->display('文章')->value($comment->article()->first()->title);
         $form->display('标题')->value($comment['title']);
         $form->display('用户')->value($comment->user()->first()->username);
@@ -121,6 +153,15 @@ class CommentController extends QuarkController
         $form->radio('status','状态')->options([
             1=>'审核',2=>'禁用',3=>'待审核'
         ]);
+
+        // 保存数据后回调
+        $form->saved(function ($form) {
+            if($form->model()) {
+                return success('操作成功！',frontend_url('admin/comment/index'));
+            } else {
+                return error('操作失败，请重试！');
+            }
+        });
 
         return $form;
     }

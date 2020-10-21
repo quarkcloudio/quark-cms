@@ -123,5 +123,5 @@ Route::group([
     $router->any('admin/sms/action', 'SmsController@action')->name('api/admin/sms/action');
     $router->any('admin/sms/import', 'SmsController@import')->name('api/admin/sms/import');
     $router->post('admin/sms/sendImportSms', 'SmsController@sendImportSms')->name('api/admin/sms/sendImportSms');
-    $router->post('admin/sms/sendSms', 'SmsController@sendSms')->name('api/admin/sms/sendSms');
+    $router->any('admin/sms/sendSms', 'SmsController@sendSms')->name('api/admin/sms/sendSms');
 });

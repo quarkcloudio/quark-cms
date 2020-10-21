@@ -3,11 +3,11 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Models\Sms;
-use QuarkCMS\QuarkAdmin\Controllers\QuarkController;
+use QuarkCMS\QuarkAdmin\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Quark;
 
-class SmsController extends QuarkController
+class SmsController extends Controller
 {
     public $title = '短信';
 
@@ -19,60 +19,63 @@ class SmsController extends QuarkController
      */
     protected function table()
     {
-        $grid = Quark::grid(new Sms)->title($this->title);
-        $grid->column('id','ID');
-        $grid->column('phone','手机号');
-        $grid->column('code','验证码');
-        $grid->column('content','内容');
-        $grid->column('created_at','发送时间');
-        $grid->column('status','状态')->using(['1'=>'发送成功','0'=>'发送失败']);
+        $table = Quark::table(new Sms)->title($this->title);
+        $table->column('id','ID');
+        $table->column('phone','手机号');
+        $table->column('code','验证码');
+        $table->column('content','内容');
+        $table->column('created_at','发送时间');
+        $table->column('status','状态')->using(['1'=>'发送成功','0'=>'发送失败']);
 
-        $grid->column('actions','操作')->width(100)->rowActions(function($rowAction) {
-            $rowAction->menu('sendSms', '发送')
-            ->setAction('admin/sms/sendSms')
+        $table->column('actions','操作')->width(120)->actions(function($action,$row) {
+
+            $action->a('发送')
+            ->api(backend_url('api/admin/sms/sendSms?id='.$row['id']))
             ->withConfirm('确认要发送短信吗？','确认后将重新发送短信！');
 
-            $rowAction->menu('delete', '删除')->model(function($model) {
-                $model->delete();
-            })->withConfirm('确认要删除吗？','删除后数据将无法恢复，请谨慎操作！');
+            $action->a('删除')
+            ->withPopconfirm('确认要删除吗？')
+            ->model()
+            ->where('id','{id}')
+            ->delete();
+
+            return $action;
         });
 
         // 头部操作
-        $grid->actions(function($action) {
-            $action->button('sendSms', '发送短信')
-            ->icon('plus-circle')
+        $table->toolBar()->actions(function($action) {
+            $action->button('发送短信')
             ->type('primary')
-            ->link('#/admin/sms/send');
-            $action->button('refresh', '刷新');
+            ->link(frontend_url('/sms/send',false));
         });
 
-        // select样式的批量操作
-        $grid->batchActions(function($batch) {
-            $batch->option('', '批量操作');
-            $batch->option('sendSms', '发送')
-            ->setAction('admin/sms/sendSms')
-            ->withConfirm('确认要群发短信吗？','确认后将重新发送短信！');
-            $batch->option('delete', '删除')->model(function($model) {
-                $model->delete();
-            })->withConfirm('确认要删除吗？','删除后数据将无法恢复，请谨慎操作！');
-        })->style('select',['width'=>120]);
+        $table->batchActions(function($action) {
+            $action->a('批量删除')
+            ->withConfirm('确认要删除吗？','删除后数据将无法恢复，请谨慎操作！')
+            ->model()
+            ->whereIn('id','{ids}')
+            ->delete();
 
-        $grid->search(function($search) {
+            $action->a('批量发送')
+            ->withConfirm('确认要群发短信吗？','确认后将重新发送短信！')
+            ->api('admin/sms/sendSms?id={ids}');
+        });
+
+        $table->search(function($search) {
             $search->equal('status', '所选状态')
             ->select([''=>'全部',1=>'发送成功',0=>'发送失败'])
-            ->placeholder('选择状态')
-            ->width(110);
+            ->placeholder('选择状态');
 
             $search->where('phone', '搜索内容',function ($query) {
                 $query->where('phone', 'like', "%{input}%");
             })->placeholder('搜索内容');
 
-            $search->between('created_at', '发送时间')->datetime()->advanced();
-        })->expand(false);
+            $search->between('created_at', '发送时间')->datetime();
+        });
 
-        $grid->model()->paginate(10);
+        $table->model()->orderBy('id', 'desc')->paginate(request('pageSize',10));
 
-        return $grid;
+        return $table;
     }
 
     // 上传文件
@@ -103,8 +106,7 @@ class SmsController extends QuarkController
      */
     public function sendSms(Request $request)
     {
-        $id = $request->json('id');
-        $status = $request->json('status');
+        $id = $request->input('id');
 
         if(empty($id)) {
             return error('参数错误！');
