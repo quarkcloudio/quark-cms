@@ -158,10 +158,10 @@ class ArticleController extends Controller
                 2 => '单图（小）',
                 3 => '多图',
                 4 => '单图（大）'
-            ])->when(2,function($form) {
-                $form->image('cover_id','封面图')->mode('s');
+            ])->when('in',[2,4],function($form) {
+                $form->image('cover_ids','封面图')->mode('m')->limitNum(1);
             })->when(3,function($form) {
-                $form->image('cover_id','封面图')->mode('m');
+                $form->image('cover_ids','封面图')->mode('m');
             });
 
             $categorys = [];
