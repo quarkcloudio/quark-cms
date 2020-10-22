@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Models\Post;
-use QuarkCMS\QuarkAdmin\Http\Controllers\Controller;
 use Quark;
+use QuarkCMS\QuarkAdmin\Http\Controllers\Controller;
 
 class PageController extends Controller
 {
@@ -54,13 +54,11 @@ class PageController extends Controller
             ->model()
             ->where('id','{id}')
             ->delete();
-
-            return $action;
         });
 
         $table->toolBar()->actions(function($action) {
             // 跳转默认创建页面
-            return $action->button('创建'.$this->title)->type('primary')->icon('plus-circle')->createLink();
+            $action->button('创建'.$this->title)->type('primary')->icon('plus-circle')->createLink();
         });
 
         // 批量操作
@@ -85,8 +83,6 @@ class PageController extends Controller
                 ->model()
                 ->whereIn('id','{ids}')
                 ->update(['status'=>1]);
-
-                return $action;
             });
         });
 

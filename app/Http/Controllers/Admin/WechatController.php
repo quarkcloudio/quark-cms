@@ -2,16 +2,14 @@
 
 namespace App\Http\Controllers\Admin;
 
-use QuarkCMS\QuarkAdmin\Controllers\QuarkController;
 use Illuminate\Http\Request;
 use EasyWeChat\Factory;
 use App\Models\WechatUser;
 use QuarkCMS\QuarkAdmin\Models\Config;
-use App\Models\File;
-use App\User;
 use Quark;
+use QuarkCMS\QuarkAdmin\Http\Controllers\Controller;
 
-class WechatController extends QuarkController
+class WechatController extends Controller
 {
     public $title = '配置';
 

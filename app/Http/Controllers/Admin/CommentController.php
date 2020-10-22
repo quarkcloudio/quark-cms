@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Models\Comment;
-use QuarkCMS\QuarkAdmin\Http\Controllers\Controller;
 use Quark;
+use QuarkCMS\QuarkAdmin\Http\Controllers\Controller;
 
 class CommentController extends Controller
 {
@@ -48,14 +48,11 @@ class CommentController extends Controller
 
             // 跳转默认编辑页面
             $action->a('编辑')->editLink();
-
             $action->a('删除')
             ->withPopconfirm('确认要删除吗？')
             ->model()
             ->where('id','{id}')
             ->delete();
-
-            return $action;
         });
 
         // 批量操作
@@ -80,8 +77,6 @@ class CommentController extends Controller
                 ->model()
                 ->whereIn('id','{ids}')
                 ->update(['status'=>1]);
-
-                return $action;
             });
         });
 

@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
-use QuarkCMS\QuarkAdmin\Controllers\UpgradeController as Controller;
+use QuarkCMS\QuarkAdmin\Http\Controllers\UpgradeController as Controller;
 
 class UpgradeController extends Controller
 {

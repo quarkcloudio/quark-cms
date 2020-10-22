@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Models\Navigation;
-use QuarkCMS\QuarkAdmin\Http\Controllers\Controller;
 use Quark;
+use QuarkCMS\QuarkAdmin\Http\Controllers\Controller;
 
 class NavigationController extends Controller
 {
@@ -48,14 +48,11 @@ class NavigationController extends Controller
 
             // 跳转默认编辑页面
             $action->a('编辑')->drawerForm(backend_url('api/admin/navigation/edit?id='.$row['id']));
-
             $action->a('删除')
             ->withPopconfirm('确认要删除吗？')
             ->model()
             ->where('id','{id}')
             ->delete();
-
-            return $action;
         });
 
         // 头部操作
@@ -65,7 +62,6 @@ class NavigationController extends Controller
             ->type('primary')
             ->icon('plus-circle')
             ->drawerForm(backend_url('api/admin/navigation/create'));
-            return $action;
         });
 
         // 批量操作
@@ -90,8 +86,6 @@ class NavigationController extends Controller
                 ->model()
                 ->whereIn('id','{ids}')
                 ->update(['status'=>1]);
-
-                return $action;
             });
         });
 

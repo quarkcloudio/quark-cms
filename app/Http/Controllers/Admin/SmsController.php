@@ -3,9 +3,9 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Models\Sms;
-use QuarkCMS\QuarkAdmin\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Quark;
+use QuarkCMS\QuarkAdmin\Http\Controllers\Controller;
 
 class SmsController extends Controller
 {
@@ -28,18 +28,15 @@ class SmsController extends Controller
         $table->column('status','状态')->using(['1'=>'发送成功','0'=>'发送失败']);
 
         $table->column('actions','操作')->width(120)->actions(function($action,$row) {
-
             $action->a('发送')
             ->api(backend_url('api/admin/sms/sendSms?id='.$row['id']))
             ->withConfirm('确认要发送短信吗？','确认后将重新发送短信！');
-
+            
             $action->a('删除')
             ->withPopconfirm('确认要删除吗？')
             ->model()
             ->where('id','{id}')
             ->delete();
-
-            return $action;
         });
 
         // 头部操作

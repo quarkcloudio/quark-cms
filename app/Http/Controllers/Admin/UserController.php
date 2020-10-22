@@ -3,13 +3,10 @@
 namespace App\Http\Controllers\Admin;
 
 use App\User;
-use QuarkCMS\QuarkAdmin\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\DB;
-use App\Models\AccountLog;
 use Quark;
-use Validator;
+use QuarkCMS\QuarkAdmin\Http\Controllers\Controller;
 
 class UserController extends Controller
 {
@@ -66,15 +63,11 @@ class UserController extends Controller
             $action->dropdown('更多')->overlay(function($action) use($row) {
                 $action->item('详情')->showLink();
                 $action->item('充值')->modalForm(backend_url('api/admin/user/recharge?id='.$row['id']));
-                return $action;
             });
-
-            return $action;
         });
 
         $table->toolBar()->actions(function($action) {
-            // 跳转默认创建页面
-            return $action->button('创建'.$this->title)->type('primary')->icon('plus-circle')->createLink();
+            $action->button('创建'.$this->title)->type('primary')->icon('plus-circle')->createLink();
         });
 
         // 批量操作
@@ -99,8 +92,6 @@ class UserController extends Controller
                 ->model()
                 ->whereIn('id','{ids}')
                 ->update(['status'=>1]);
-
-                return $action;
             });
         });
 
@@ -243,10 +234,10 @@ class UserController extends Controller
     public function recharge(Request $request)
     {
         if($request->isMethod('post')) {
-            $id        =   $request->json('id');
-            $money     =   $request->json('money',0);
-            $score     =   $request->json('score',0);
-            $remark    =   $request->json('remark');
+            $id        =   $request->input('id');
+            $money     =   $request->input('money',0);
+            $score     =   $request->input('score',0);
+            $remark    =   $request->input('remark');
     
             if (empty($remark)) {
                 return $this->error('理由必需填写！');
@@ -264,16 +255,7 @@ class UserController extends Controller
                 if (!empty($score)) {
                     User::where('id',$id)->increment('score', $score);
                 }
-    
-                $data['adminid'] = ADMINID;
-                $data['uid'] = $id;
-                $data['money'] = $money;
-                $data['score'] = $score;
-                $data['type'] = 3;
-                $data['remark'] = $remark;
-    
-                AccountLog::create($data);
-                
+
                 DB::commit();
             } catch (\Exception $e) {
                 $result = false;
@@ -291,10 +273,7 @@ class UserController extends Controller
             $id = request('id');
             $user = User::where('id',$id)->first();
             $form = Quark::form();
-
-            $layout['labelCol']['span'] = 4;
-            $layout['wrapperCol']['span'] = 20;
-            $form->layout($layout)->title('账户充值')->api('admin/user/recharge');
+            $form->labelCol(['span' => 4])->title('账户充值')->api('admin/user/recharge');
             $form->hidden('id')->value($id);
             $form->display('充值用户')->value($user['username'].'（'.$user['nickname'].'）');
             $form->display('当前余额')->style(['color'=>'#f81d22'])->value($user['money']);

@@ -4,8 +4,8 @@ namespace App\Http\Controllers\Admin;
 
 use App\Models\Post;
 use App\Models\Category;
-use QuarkCMS\QuarkAdmin\Http\Controllers\Controller;
 use Quark;
+use QuarkCMS\QuarkAdmin\Http\Controllers\Controller;
 
 class ArticleController extends Controller
 {
@@ -24,7 +24,7 @@ class ArticleController extends Controller
         $table->column('title','标题')->editLink();
         $table->column('level','排序')->editable()->sorter()->width(100);
         $table->column('author','作者');
-        $table->column('category_title','分类');
+        $table->column('category.title','分类');
         $table->column('created_at','发布时间');
         $table->column('status','状态')->editable('switch',[
             'on'  => ['value' => 1, 'text' => '正常'],
@@ -56,13 +56,11 @@ class ArticleController extends Controller
             ->model()
             ->where('id','{id}')
             ->delete();
-
-            return $action;
         });
 
         $table->toolBar()->actions(function($action) {
             // 跳转默认创建页面
-            return $action->button('创建'.$this->title)->type('primary')->icon('plus-circle')->createLink();
+            $action->button('创建'.$this->title)->type('primary')->icon('plus-circle')->createLink();
         });
 
         // 批量操作
@@ -87,8 +85,6 @@ class ArticleController extends Controller
                 ->model()
                 ->whereIn('id','{ids}')
                 ->update(['status'=>1]);
-
-                return $action;
             });
         });
 
@@ -162,9 +158,11 @@ class ArticleController extends Controller
                 2 => '单图（小）',
                 3 => '多图',
                 4 => '单图（大）'
-            ]);
-
-            $form->image('cover_ids','封面图')->mode('multiple');
+            ])->when(2,function($form) {
+                $form->image('cover_id','封面图')->mode('s');
+            })->when(3,function($form) {
+                $form->image('cover_id','封面图')->mode('m');
+            });
 
             $categorys = [];
             $getCategorys = Category::where('type','ARTICLE')->where('status',1)->get()->toArray();
@@ -179,7 +177,7 @@ class ArticleController extends Controller
             ->options($categorys)
             ->rules(['required'],['required'=>'请选择分类']);
 
-            $form->editor('content','内容')->width(800);
+            $form->editor('content','内容');
 
             $form->switch('status','状态')->options([
                 'on'  => '是',

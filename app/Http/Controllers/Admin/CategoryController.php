@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Models\Category;
-use QuarkCMS\QuarkAdmin\Http\Controllers\Controller;
 use Quark;
+use QuarkCMS\QuarkAdmin\Http\Controllers\Controller;
 
 class CategoryController extends Controller
 {
@@ -56,14 +56,12 @@ class CategoryController extends Controller
             ->model()
             ->where('id','{id}')
             ->delete();
-
-            return $action;
         });
 
         // 头部操作
         $table->toolBar()->actions(function($action) {
             // 跳转默认创建页面
-            return $action->button('创建'.$this->title)->type('primary')->icon('plus-circle')->createLink();
+            $action->button('创建'.$this->title)->type('primary')->icon('plus-circle')->createLink();
         });
 
         // select样式的批量操作
@@ -88,8 +86,6 @@ class CategoryController extends Controller
                 ->model()
                 ->whereIn('id','{ids}')
                 ->update(['status'=>1]);
-
-                return $action;
             });
         });
 

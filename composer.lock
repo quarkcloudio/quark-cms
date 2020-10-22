@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "0df7fdda239e774b31e745108dded7b2",
+    "content-hash": "1ff673733edab18546c8482da3f6cc24",
     "packages": [
         {
             "name": "aliyuncs/oss-sdk-php",
@@ -4201,16 +4201,16 @@
         },
         {
             "name": "quarkcms/quark-admin",
-            "version": "v1.0.3",
+            "version": "v1.0.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/quarkcms/quark-admin.git",
-                "reference": "6a30219cf148bca4b1f5db825b617ecb8f081bc4"
+                "reference": "9098e4dc8376da9fe42701b441fcb1aaeedef175"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/quarkcms/quark-admin/zipball/6a30219cf148bca4b1f5db825b617ecb8f081bc4",
-                "reference": "6a30219cf148bca4b1f5db825b617ecb8f081bc4",
+                "url": "https://api.github.com/repos/quarkcms/quark-admin/zipball/9098e4dc8376da9fe42701b441fcb1aaeedef175",
+                "reference": "9098e4dc8376da9fe42701b441fcb1aaeedef175",
                 "shasum": "",
                 "mirrors": [
                     {
@@ -4262,7 +4262,7 @@
                 "quark-admin",
                 "sdk"
             ],
-            "time": "2020-10-20T09:56:38+00:00"
+            "time": "2020-10-22T03:48:44+00:00"
         },
         {
             "name": "ralouphie/getallheaders",
@@ -7910,16 +7910,16 @@
         },
         {
             "name": "facade/flare-client-php",
-            "version": "1.3.6",
+            "version": "1.3.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/facade/flare-client-php.git",
-                "reference": "451fadf38e9f635e7f8e1f5b3cf5c9eb82f11799"
+                "reference": "fd688d3c06658f2b3b5f7bb19f051ee4ddf02492"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/facade/flare-client-php/zipball/451fadf38e9f635e7f8e1f5b3cf5c9eb82f11799",
-                "reference": "451fadf38e9f635e7f8e1f5b3cf5c9eb82f11799",
+                "url": "https://api.github.com/repos/facade/flare-client-php/zipball/fd688d3c06658f2b3b5f7bb19f051ee4ddf02492",
+                "reference": "fd688d3c06658f2b3b5f7bb19f051ee4ddf02492",
                 "shasum": "",
                 "mirrors": [
                     {
@@ -7931,7 +7931,7 @@
             "require": {
                 "facade/ignition-contracts": "~1.0",
                 "illuminate/pipeline": "^5.5|^6.0|^7.0|^8.0",
-                "php": "^7.1",
+                "php": "^7.1|^8.0",
                 "symfony/http-foundation": "^3.3|^4.1|^5.0",
                 "symfony/mime": "^3.4|^4.0|^5.1",
                 "symfony/var-dumper": "^3.4|^4.0|^5.0"
@@ -7973,7 +7973,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2020-09-18T06:35:11+00:00"
+            "time": "2020-10-21T16:02:39+00:00"
         },
         {
             "name": "facade/ignition",

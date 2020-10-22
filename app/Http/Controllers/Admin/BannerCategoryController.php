@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Models\BannerCategory;
-use QuarkCMS\QuarkAdmin\Http\Controllers\Controller;
 use Quark;
+use QuarkCMS\QuarkAdmin\Http\Controllers\Controller;
 
 class BannerCategoryController extends Controller
 {
@@ -50,25 +50,19 @@ class BannerCategoryController extends Controller
 
             // 跳转默认编辑页面
             $action->a('编辑')->modalForm(backend_url('api/admin/bannerCategory/edit?id='.$row['id']));
-
             $action->a('删除')
             ->withPopconfirm('确认要删除吗？')
             ->model()
             ->where('id','{id}')
             ->delete();
-
-            return $action;
         });
 
         $table->toolBar()->actions(function($action) {
-
             // 跳转默认创建页面
             $action->button('创建'.$this->title)
             ->type('primary')
             ->icon('plus-circle')
             ->modalForm(backend_url('api/admin/bannerCategory/create'));
-
-            return $action;
         });
 
         // 批量操作
@@ -93,8 +87,6 @@ class BannerCategoryController extends Controller
                 ->model()
                 ->whereIn('id','{ids}')
                 ->update(['status'=>1]);
-
-                return $action;
             });
         });
 

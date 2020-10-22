@@ -4,8 +4,8 @@ namespace App\Http\Controllers\Admin;
 
 use App\Models\Banner;
 use App\Models\BannerCategory;
-use QuarkCMS\QuarkAdmin\Http\Controllers\Controller;
 use Quark;
+use QuarkCMS\QuarkAdmin\Http\Controllers\Controller;
 
 class BannerController extends Controller
 {
@@ -51,19 +51,16 @@ class BannerController extends Controller
 
             // 跳转默认编辑页面
             $action->a('编辑')->editLink();
-
             $action->a('删除')
             ->withPopconfirm('确认要删除吗？')
             ->model()
             ->where('id','{id}')
             ->delete();
-
-            return $action;
         });
 
         $table->toolBar()->actions(function($action) {
             // 跳转默认创建页面
-            return $action->button('创建'.$this->title)
+            $action->button('创建'.$this->title)
             ->type('primary')
             ->icon('plus-circle')
             ->createLink();
@@ -91,8 +88,6 @@ class BannerController extends Controller
                 ->model()
                 ->whereIn('id','{ids}')
                 ->update(['status'=>1]);
-
-                return $action;
             });
         });
 
