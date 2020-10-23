@@ -162,7 +162,7 @@ class ArticleController extends Controller
                 $form->image('cover_ids','封面图')->mode('m')->limitNum(1);
             })->when(3,function($form) {
                 $form->image('cover_ids','封面图')->mode('m');
-            });
+            })->default(1);
 
             $categorys = [];
             $getCategorys = Category::where('type','ARTICLE')->where('status',1)->get()->toArray();
