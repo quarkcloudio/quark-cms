@@ -149,7 +149,7 @@ class PageController extends Controller
         ])->default(true);
 
         $form->saving(function ($form) {
-            $form->request['type'] = 'PAGE';
+            $form->data['type'] = 'PAGE';
         });
 
         // 保存数据后回调

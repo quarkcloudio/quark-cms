@@ -201,7 +201,7 @@ class ArticleController extends Controller
         });
 
         $form->saving(function ($form) {
-            $form->request['adminid'] = ADMINID;
+            $form->data['adminid'] = ADMINID;
         });
 
         // 保存数据后回调
