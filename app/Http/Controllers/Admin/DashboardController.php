@@ -97,7 +97,7 @@ class DashboardController extends Controller
     protected function systemInfo()
     {
         $show = Show::make()->title('系统信息');
-        $show->field('QuarkAdmin版本')->value(config('quark.version'));
+        $show->field('系统版本')->value(config('quark.version'));
 
         if(strpos(PHP_OS,"Linux")!==false) {
             $os = "linux";
