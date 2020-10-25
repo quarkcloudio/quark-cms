@@ -21,7 +21,7 @@
 
 第二步：php -S 127.0.0.1:8080 -t ./public
 
-第三步：http://127.0.0.1:8080/admin
+第三步：http://127.0.0.1:8080/admin/index
 
 默认用户名：administrator 密码：123456
 
