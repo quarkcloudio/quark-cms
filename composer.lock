@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "e990c8afddd2339d5cc58c6eab5c9883",
+    "content-hash": "5ea59aa7de852a2db68769c49f65353f",
     "packages": [
         {
             "name": "aliyuncs/oss-sdk-php",
@@ -4150,16 +4150,16 @@
         },
         {
             "name": "quarkcms/quark-admin",
-            "version": "v1.0.11",
+            "version": "v1.0.12",
             "source": {
                 "type": "git",
                 "url": "https://github.com/quarkcms/quark-admin.git",
-                "reference": "13fefbd1f6a6390f619f1249dff8be755c1904d8"
+                "reference": "21bb50a299f71b0575d399598f5e9d04549ccc65"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/quarkcms/quark-admin/zipball/13fefbd1f6a6390f619f1249dff8be755c1904d8",
-                "reference": "13fefbd1f6a6390f619f1249dff8be755c1904d8",
+                "url": "https://api.github.com/repos/quarkcms/quark-admin/zipball/21bb50a299f71b0575d399598f5e9d04549ccc65",
+                "reference": "21bb50a299f71b0575d399598f5e9d04549ccc65",
                 "shasum": "",
                 "mirrors": [
                     {
@@ -4211,7 +4211,7 @@
                 "quark-admin",
                 "sdk"
             ],
-            "time": "2020-10-27T01:21:52+00:00"
+            "time": "2020-10-27T03:02:41+00:00"
         },
         {
             "name": "ralouphie/getallheaders",
