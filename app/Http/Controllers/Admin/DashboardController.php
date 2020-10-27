@@ -8,7 +8,7 @@ use QuarkCMS\QuarkAdmin\Card;
 use QuarkCMS\QuarkAdmin\Show;
 use QuarkCMS\QuarkAdmin\Components\Statistic;
 use QuarkCMS\QuarkAdmin\Components\Upgrade;
-use DB;
+use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
 {
