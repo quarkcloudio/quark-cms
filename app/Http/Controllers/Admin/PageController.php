@@ -139,7 +139,7 @@ class PageController extends Controller
 
         $form->select('pid','父节点')
         ->options($categorys)
-        ->rules(['required'],['required'=>'请选择分类']);
+        ->default(0);
 
         $form->editor('content','内容');
         $form->text('page_tpl','单页模板');
