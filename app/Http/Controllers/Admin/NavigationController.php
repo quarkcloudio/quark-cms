@@ -139,11 +139,11 @@ class NavigationController extends Controller
 
         $form->select('pid','父节点')
         ->options($navigations)
-        ->value(0);
+        ->default(0);
 
         $form->text('url','链接');
         $form->image('cover_id','图标')->mode('single');
-        $form->number('sort','排序')->value(0);
+        $form->number('sort','排序')->default(0);
 
         $form->switch('status','状态')->options([
             'on'  => '是',
