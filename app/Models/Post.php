@@ -49,7 +49,7 @@ class Post extends Model
         'comment',
         'view',
         'page_tpl',
-        'file_id',
+        'file_ids',
         'comment_status',
         'status'
     ];

@@ -192,7 +192,7 @@ class ArticleController extends Controller
             $form->number('comment','评论量')->value(0);
 
             $form->text('password','访问密码');
-            $form->file('file_id','附件');
+            $form->file('file_ids','附件');
 
             $form->switch('comment_status','允许评论')->options([
                 'on'  => '是',
