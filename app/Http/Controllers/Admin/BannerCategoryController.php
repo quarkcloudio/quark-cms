@@ -118,7 +118,7 @@ class BannerCategoryController extends Controller
         $title = $form->isCreating() ? '创建'.$this->title : '编辑'.$this->title;
         $form->labelCol(['span' => 4])->title($title);
 
-        $form->id('id','ID');
+        $form->hidden('id');
 
         $form->text('title','标题')
         ->rules(['required','max:190'],['required'=>'标题必须填写','max'=>'名称不能超过190个字符']);
