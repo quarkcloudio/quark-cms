@@ -145,7 +145,7 @@ class BannerController extends Controller
         ->options($categorys)
         ->rules(['required'],['required'=>'请选择分类']);
         
-        $form->text('url','链接');
+        $form->text('url','链接')->rules(['required'],['required'=>'请填写链接']);
 
         $form->image('cover_id','封面图')->mode('single');
 
