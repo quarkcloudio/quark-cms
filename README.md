@@ -1,5 +1,5 @@
 ## 介绍
-鉴于市面上CMS都已陈旧的情况，作者用更先进的laravel和ant-design重新设计、架构新时代的CMS。开源不易，请尊重版权！ 
+基于 QuarkAdmin 的CMS系统，简单、灵活、开源，欢迎使用！
 
 ## 系统特性
 
@@ -25,11 +25,13 @@
 
 2、编辑.env文件，配置数据库信息
 
+3、执行下面的命令完成安装：
 ``` bash
 # 第一步，安装依赖
 composer install
 
-# 第二步，然后运行下面的命令完成安装,注意: 您需要将php加入到环境变量，如果在执行迁移时发生「class not found」错误，试着先执行 composer dump-autoload 命令后再进行一次。
+# 第二步，然后运行下面的命令完成安装
+# 注意: 您需要将php加入到环境变量，如果在执行迁移时发生「class not found」错误，试着先执行 composer dump-autoload 命令后再进行一次。
 php artisan quark:install
 ```
 
@@ -59,4 +61,4 @@ php artisan serve
 相关教程，你可以查看 [在线文档](http://www.quarkcms.com/quark-cms/)
 
 ## License
-QuarkAdmin is licensed under The MIT License (MIT).
+QuarkCMS is not free,if you want to use this CMS, please buy a license.
