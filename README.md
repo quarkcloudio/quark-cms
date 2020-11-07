@@ -31,9 +31,9 @@
 composer install
 
 # 第二步，然后运行下面的命令完成安装
-# 注意: 您需要将php加入到环境变量，如果在执行迁移时发生「class not found」错误，试着先执行 composer dump-autoload 命令后再进行一次。
 php artisan quark:install
 ```
+注意: 您需要将php加入到环境变量，如果在执行迁移时发生 `「class not found」` 错误，试着先执行 `composer dump-autoload` 命令后再进行一次。
 
 运行命令的时候，如果遇到了下面的错误:
 
@@ -61,4 +61,4 @@ php artisan serve
 相关教程，你可以查看 [在线文档](http://www.quarkcms.com/quark-cms/)
 
 ## License
-QuarkCMS is not free,if you want to use this CMS, please buy a license.
+QUARKCMS IS NOT FREE,IF YOU WANT TO USE THIS SOFTWARE,PILEASE BUY A LICENSE.
