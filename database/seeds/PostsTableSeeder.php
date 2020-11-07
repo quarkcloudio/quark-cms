@@ -37,7 +37,7 @@ class PostsTableSeeder extends Seeder
                 'page_tpl' => '',
                 'comment_status' => 'open',
                 'status' => 1,
-                'file_id' => 0,
+                'file_ids' => '[]',
                 'created_at' => date('Y-m-d H:i:s',time()),
                 'updated_at' => date('Y-m-d H:i:s',time())
             ],
@@ -65,7 +65,7 @@ class PostsTableSeeder extends Seeder
                 'page_tpl' => '',
                 'comment_status' => 'open',
                 'status' => 1,
-                'file_id' => 0,
+                'file_ids' => '[]',
                 'created_at' => date('Y-m-d H:i:s',time()),
                 'updated_at' => date('Y-m-d H:i:s',time())
             ],
@@ -93,7 +93,7 @@ class PostsTableSeeder extends Seeder
                 'page_tpl' => '',
                 'comment_status' => 'open',
                 'status' => 1,
-                'file_id' => 0,
+                'file_ids' => '[]',
                 'created_at' => date('Y-m-d H:i:s',time()),
                 'updated_at' => date('Y-m-d H:i:s',time())
             ],
@@ -121,7 +121,7 @@ class PostsTableSeeder extends Seeder
                 'page_tpl' => 'page/index',
                 'comment_status' => 'open',
                 'status' => 1,
-                'file_id' => 0,
+                'file_ids' => '[]',
                 'created_at' => date('Y-m-d H:i:s',time()),
                 'updated_at' => date('Y-m-d H:i:s',time())
             ],
@@ -149,7 +149,7 @@ class PostsTableSeeder extends Seeder
                 'page_tpl' => 'page/index',
                 'comment_status' => 'open',
                 'status' => 1,
-                'file_id' => 0,
+                'file_ids' => '[]',
                 'created_at' => date('Y-m-d H:i:s',time()),
                 'updated_at' => date('Y-m-d H:i:s',time())
             ],
