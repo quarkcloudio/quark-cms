@@ -21,7 +21,7 @@
         "maatwebsite/excel": "^3.1",
         "nwidart/laravel-modules": "^7.1",
         "overtrue/wechat": "^4.2",
-        "quarkcms/quark-admin": "^1.0.17"
+        "quarkcms/quark-admin": "^1.0.27"
     },
     "require-dev": {
         "facade/ignition": "^2.0",
