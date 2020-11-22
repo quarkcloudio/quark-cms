@@ -30,11 +30,10 @@ class Install extends Command
         $this->call('migrate');
 
         if (\QuarkCMS\QuarkAdmin\Models\Admin::count() == 0) {
-            $this->call('db:seed', ['--class' => \QuarkAdminSeeder::class]);
-            $this->call('db:seed', ['--class' => \DatabaseSeeder::class]);
+            $this->call('db:seed');
         }
 
         $this->call('key:generate');
-        $this->call('storage:link');
+        $this->call('quarkadmin:install');
     }
 }
