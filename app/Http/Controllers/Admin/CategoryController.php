@@ -133,7 +133,7 @@ class CategoryController extends Controller
             $getCategorys = Category::where('status',1)->get()->toArray();
 
             $categoryTrees = list_to_tree($getCategorys,'id','pid','children',0);
-            $categoryTreeLists = tree_to_ordered_list($categoryTrees,0,'name','children');
+            $categoryTreeLists = tree_to_ordered_list($categoryTrees,0,'title','children');
 
             foreach ($categoryTreeLists as $key => $value) {
                 $categorys[$value['id']] = $value['title'];
