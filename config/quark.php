@@ -12,7 +12,7 @@ return [
     | or in other locations. Of course, you're free to change the value.
     |
     */
-    'version' => 'v1.1.0',
+    'version' => 'v1.1.1',
 
     /*
     |--------------------------------------------------------------------------
