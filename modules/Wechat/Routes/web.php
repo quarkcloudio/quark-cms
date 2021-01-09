@@ -11,14 +11,6 @@
 |
 */
 
-// 后台路由组
-Route::group([
-    'prefix' => 'api',
-    'middleware' => 'admin',
-], function ($router) {
-    $router->get('admin/wechatMenu/index', 'Admin\\WechatMenuController@index')->name('api/admin/wechatMenu/index');
-});
-
 // 不需要登录认证的路由组
 Route::group(['prefix' => 'wechat'], function ($router) {
     $router->any('login', 'Auth\\LoginController@login')->name('wechat/login');

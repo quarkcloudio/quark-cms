@@ -33,25 +33,28 @@ class RouteServiceProvider extends ServiceProvider
      */
     public function map()
     {
+        $this->mapAdminRoutes();
+
         $this->mapApiRoutes();
 
         $this->mapWebRoutes();
 
         $this->mapWithoutCsrfRoutes();
     }
-
+    
     /**
-     * Define the "web" routes for the application.
+     * Define the "admin" routes for the application.
      *
-     * These routes all receive session state, CSRF protection, etc.
+     * These routes are typically stateless.
      *
      * @return void
      */
-    protected function mapWebRoutes()
+    protected function mapAdminRoutes()
     {
-        Route::middleware('web')
+        Route::prefix('api')
+            ->middleware('api')
             ->namespace($this->moduleNamespace)
-            ->group(module_path('Wechat', '/Routes/web.php'));
+            ->group(module_path('Wechat', '/Routes/admin.php'));
     }
 
     /**
@@ -67,6 +70,20 @@ class RouteServiceProvider extends ServiceProvider
             ->middleware('api')
             ->namespace($this->moduleNamespace)
             ->group(module_path('Wechat', '/Routes/api.php'));
+    }
+
+    /**
+     * Define the "web" routes for the application.
+     *
+     * These routes all receive session state, CSRF protection, etc.
+     *
+     * @return void
+     */
+    protected function mapWebRoutes()
+    {
+        Route::middleware('web')
+            ->namespace($this->moduleNamespace)
+            ->group(module_path('Wechat', '/Routes/web.php'));
     }
 
     /**
