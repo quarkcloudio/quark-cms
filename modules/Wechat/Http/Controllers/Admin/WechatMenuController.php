@@ -2,12 +2,12 @@
 
 namespace Modules\Wechat\Http\Controllers\Admin;
 
-use QuarkCMS\QuarkAdmin\Controllers\QuarkController;
+use QuarkCMS\QuarkAdmin\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use EasyWeChat\Factory;
 use Quark;
 
-class WechatMenuController extends QuarkController
+class WechatMenuController extends Controller
 {
     public function index(Request $request)
     {
