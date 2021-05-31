@@ -1278,6 +1278,10 @@ if(!function_exists('download_picture_to_storage')) {
             $fileName = $fileInfo[0];
             $fileType = $fileInfo[1];
 
+            if (!in_array(strtolower($fileType), ['jpeg','jpg', 'png', 'gif'])) {
+                return error('文件格式非法！');
+            }
+
             $name = Str::random(40).'.'.$fileType;
         } else {
             $name = Str::random(40).'.png';

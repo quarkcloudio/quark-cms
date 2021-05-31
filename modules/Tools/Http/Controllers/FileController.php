@@ -57,7 +57,24 @@ class FileController extends Controller
         $uid  = $request->input('uid');
         $md5  = md5_file($file->getRealPath());
         $name = $file->getClientOriginalName();
-
+        $entension = $file->getClientOriginalExtension();
+        if (!in_array(strtolower($entension), [
+            'jpeg',
+            'jpg',
+            'png',
+            'gif',
+            'doc',
+            'docx',
+            'xls',
+            'xlsx',
+            'mp4',
+            'mp3',
+            'pdf',
+            'txt',
+            'ppt',
+            ])) {
+            return error('文件格式非法！');
+        }
         $hasFile = File::where('md5',$md5)->where('name',$name)->first();
 
         // 不存在文件，则插入数据库
@@ -115,7 +132,10 @@ class FileController extends Controller
     {
         $file = $request->file('file');
         $uid  = $request->input('uid');
-
+        $entension = $file->getClientOriginalExtension();
+        if (in_array(strtolower($entension), ['php'])) {
+            return error('文件格式非法！');
+        }
         $accessKeyId = web_config('OSS_ACCESS_KEY_ID');
         $accessKeySecret = web_config('OSS_ACCESS_KEY_SECRET');
         $endpoint = web_config('OSS_ENDPOINT');
