@@ -29,14 +29,14 @@ class ConfigsTableSeeder extends Seeder
             ['id' => 26,'title' => '开发者ID','type' => 'text','name' => 'WECHAT_PAY_APP_ID','group_name' => '微信支付','value' => '','remark' => 'AppID（JSAPI支付授权目录，例如：http://www.web.com/wechat/wechat/）','status' => 1],
             ['id' => 27,'title' => '商户号','type' => 'text','name' => 'WECHAT_PAY_MERCHANTID','group_name' => '微信支付','value' => '','remark' => '商户平台（商户号）','status' => 1],
             ['id' => 28,'title' => 'API密钥','type' => 'text','name' => 'WECHAT_PAY_KEY','group_name' => '微信支付','value' => '','remark' => '商户平台（API密钥）','status' => 1],
-            ['id' => 29,'title' => '商户证书','type' => 'file','name' => 'WECHAT_PAY_APICLIENT_CERT','group_name' => '微信支付','value' => '','remark' => 'apiclient_cert.pem','status' => 1],
-            ['id' => 30,'title' => '证书密钥','type' => 'file','name' => 'WECHAT_PAY_APICLIENT_KEY','group_name' => '微信支付','value' => '','remark' => 'apiclient_key.pem','status' => 1],
+            ['id' => 29,'title' => '商户证书','type' => 'file','name' => 'WECHAT_PAY_APICLIENT_CERT','group_name' => '微信支付','value' => null,'remark' => 'apiclient_cert.pem','status' => 1],
+            ['id' => 30,'title' => '证书密钥','type' => 'file','name' => 'WECHAT_PAY_APICLIENT_KEY','group_name' => '微信支付','value' => null,'remark' => 'apiclient_key.pem','status' => 1],
 
             ['id' => 31,'title' => '开发者ID','type' => 'text','name' => 'WECHAT_APP_PAY_APP_ID','group_name' => '微信APP支付','value' => '','remark' => 'AppID（需要在开放平台申请）','status' => 1],
             ['id' => 32,'title' => '商户号','type' => 'text','name' => 'WECHAT_APP_PAY_MERCHANTID','group_name' => '微信APP支付','value' => '','remark' => '商户平台（商户号）','status' => 1],
             ['id' => 33,'title' => 'API密钥','type' => 'text','name' => 'WECHAT_APP_PAY_KEY','group_name' => '微信APP支付','value' => '','remark' => '商户平台（API密钥）','status' => 1],
-            ['id' => 34,'title' => '商户证书','type' => 'file','name' => 'WECHAT_APP_PAY_APICLIENT_CERT','group_name' => '微信APP支付','value' => '','remark' => 'apiclient_cert.pem','status' => 1],
-            ['id' => 35,'title' => '证书密钥','type' => 'file','name' => 'WECHAT_APP_PAY_APICLIENT_KEY','group_name' => '微信APP支付','value' => '','remark' => 'apiclient_key.pem','status' => 1],
+            ['id' => 34,'title' => '商户证书','type' => 'file','name' => 'WECHAT_APP_PAY_APICLIENT_CERT','group_name' => '微信APP支付','value' => null,'remark' => 'apiclient_cert.pem','status' => 1],
+            ['id' => 35,'title' => '证书密钥','type' => 'file','name' => 'WECHAT_APP_PAY_APICLIENT_KEY','group_name' => '微信APP支付','value' => null,'remark' => 'apiclient_key.pem','status' => 1],
 
             ['id' => 36,'title' => '签名类型','type' => 'text','name' => 'ALIPAY_SIGN_TYPE','group_name' => '支付宝','value' => 'RSA2','remark' => '','status' => 1],
             ['id' => 37,'title' => '应用ID','type' => 'text','name' => 'ALIPAY_APP_ID','group_name' => '支付宝','value' => '','remark' => '','status' => 1],

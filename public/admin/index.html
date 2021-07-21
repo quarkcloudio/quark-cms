@@ -5,36 +5,28 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta
       name="keywords"
-      content="antd,umi,umijs,ant design,脚手架,布局, Ant Design,项目,Pro,admin,控制台,主页,开箱即用,中后台,解决方案,组件库"
+      content="Quark,项目,Pro,admin,控制台,主页,开箱即用,中后台,解决方案,组件库"
     />
-    <meta
-      name="description"
-      content="
-    An out-of-box UI solution for enterprise applications as a React boilerplate."
-    />
-    <meta
-      name="description"
-      content="
-      开箱即用的中台前端/设计解决方案。"
-    />
+    <meta name="description" content="开箱即用的中台前端/设计解决方案。" />
     <meta
       name="viewport"
       content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
     />
     <title>loading</title>
-    <link rel="icon" href="/admin/favicon.ico" type="image/x-icon" />
-    <script src="/admin/tinymce/tinymce.min.js"></script>
-    <link rel="stylesheet" href="/admin/umi.3a47363d.css" />
+    <link rel="icon" href="./favicon.ico" type="image/x-icon" />
+    <script src="./tinymce/tinymce.min.js"></script>
+    <noscript src="./config.json"></noscript>
+    <link rel="stylesheet" href="./umi.css" />
     <script>
       window.routerBase = "/";
     </script>
     <script>
-      //! umi version: 3.4.8
+      //! umi version: 3.5.13
     </script>
   </head>
   <body>
     <noscript>Out-of-the-box mid-stage front/design solution!</noscript>
-    <div id="root">
+    <div id="root-master">
       <style>
         html,
         body,
@@ -43,32 +35,29 @@
           margin: 0;
           padding: 0;
         }
-        #root {
-          background-image: url("/admin/home_bg.png");
-          background-repeat: no-repeat;
-          background-size: 100% auto;
-        }
         .page-loading-warp {
-          display: flex;
-          align-items: center;
-          justify-content: center;
           padding: 98px;
+          display: flex;
+          justify-content: center;
+          align-items: center;
         }
         .ant-spin {
-          position: absolute;
-          display: none;
           -webkit-box-sizing: border-box;
           box-sizing: border-box;
           margin: 0;
           padding: 0;
           color: rgba(0, 0, 0, 0.65);
-          color: #1890ff;
           font-size: 14px;
           font-variant: tabular-nums;
           line-height: 1.5;
+          list-style: none;
+          -webkit-font-feature-settings: "tnum";
+          font-feature-settings: "tnum";
+          position: absolute;
+          display: none;
+          color: #1890ff;
           text-align: center;
           vertical-align: middle;
-          list-style: none;
           opacity: 0;
           -webkit-transition: -webkit-transform 0.3s
             cubic-bezier(0.78, 0.14, 0.15, 0.86);
@@ -77,8 +66,6 @@
           transition: transform 0.3s cubic-bezier(0.78, 0.14, 0.15, 0.86);
           transition: transform 0.3s cubic-bezier(0.78, 0.14, 0.15, 0.86),
             -webkit-transform 0.3s cubic-bezier(0.78, 0.14, 0.15, 0.86);
-          -webkit-font-feature-settings: "tnum";
-          font-feature-settings: "tnum";
         }
 
         .ant-spin-spinning {
@@ -90,9 +77,9 @@
         .ant-spin-dot {
           position: relative;
           display: inline-block;
+          font-size: 20px;
           width: 20px;
           height: 20px;
-          font-size: 20px;
         }
 
         .ant-spin-dot-item {
@@ -148,9 +135,9 @@
         }
 
         .ant-spin-lg .ant-spin-dot {
+          font-size: 32px;
           width: 32px;
           height: 32px;
-          font-size: 32px;
         }
 
         .ant-spin-lg .ant-spin-dot i {
@@ -201,7 +188,6 @@
           height: 100%;
         "
       >
-        <img src="/admin/pro_icon.svg" alt="logo" width="256" />
         <div class="page-loading-warp">
           <div class="ant-spin ant-spin-lg ant-spin-spinning">
             <span class="ant-spin-dot ant-spin-dot-spin"
@@ -210,19 +196,9 @@
             ></span>
           </div>
         </div>
-        <div
-          style="display: flex; justify-content: center; align-items: center"
-        >
-          <img
-            src="https://gw.alipayobjects.com/zos/rmsportal/KDpgvguMpGfqaHPjicRK.svg"
-            width="32"
-            style="margin-right: 8px"
-          />
-          Ant Design
-        </div>
       </div>
     </div>
 
-    <script src="/admin/umi.b88602b4.js"></script>
+    <script src="./umi.js"></script>
   </body>
 </html>

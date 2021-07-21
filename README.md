@@ -30,8 +30,11 @@
 # 第一步，安装依赖
 composer install
 
-# 第二步，然后运行下面的命令完成安装
-php artisan quark:install
+# 第二步，运行下面的命令安装
+php artisan quarkadmin:install
+
+# 第三步，然后填充数据
+php artisan db:seed
 ```
 注意: 您需要将php加入到环境变量，如果在执行迁移时发生 `「class not found」` 错误，试着先执行 `composer dump-autoload` 命令后再进行一次。
 
