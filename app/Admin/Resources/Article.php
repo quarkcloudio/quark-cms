@@ -82,6 +82,10 @@ class Article extends Resource
 
             Field::text('author','作者'),
 
+            Field::number('level','排序')
+            ->editable()
+            ->onlyOnIndex(),
+
             Field::text('source','来源')
             ->onlyOnForms(),
             
@@ -94,8 +98,24 @@ class Article extends Resource
             ])
             ->onlyOnForms(),
 
-            Field::image('cover_ids','封面图')
-            ->onlyOnForms(),
+            Field::radio('show_type','展现形式')
+            ->options([
+                1 => '无图',
+                2 => '单图（小）',
+                3 => '多图',
+                4 => '单图（大）'
+            ])->when('in', [2, 4], function() {
+
+                return Field::image('cover_ids','封面图')
+                ->mode('m')
+                ->limitNum(1)
+                ->onlyOnForms();
+            })->when(3, function() {
+                
+                return Field::image('cover_ids','封面图')
+                ->mode('m')
+                ->onlyOnForms();
+            }),
 
             Field::select('category_id','分类目录')
             ->options(Category::orderedList('ARTICLE'))
@@ -108,7 +128,6 @@ class Article extends Resource
             ->editable()
             ->trueValue('正常')
             ->falseValue('禁用')
-            ->default(true)
             ->onlyOnForms(),
         ];
     }
@@ -125,13 +144,12 @@ class Article extends Resource
             ->onlyOnForms(),
 
             Field::number('level','排序')
-            ->value(0),
+            ->onlyOnForms(),
 
             Field::number('view','浏览量')
-            ->value(0),
+            ->onlyOnForms(),
 
             Field::number('comment','评论量')
-            ->value(0)
             ->onlyOnForms(),
 
             Field::text('password','访问密码')
@@ -144,7 +162,16 @@ class Article extends Resource
             ->editable()
             ->trueValue('是')
             ->falseValue('否')
-            ->default(true)
+            ->onlyOnForms(),
+
+            Field::datetime('created_at','发布时间')
+            ->onlyOnIndex(),
+
+            Field::switch('status','状态')
+            ->editable()
+            ->trueValue('正常')
+            ->falseValue('禁用')
+            ->onlyOnIndex()
         ];
     }
 
@@ -157,10 +184,10 @@ class Article extends Resource
     public function searches(Request $request)
     {
         return [
-            new \App\Admin\Searches\Input('username', '用户名'),
-            new \App\Admin\Searches\Input('nickname', '昵称'),
+            new \App\Admin\Searches\Input('title', '标题'),
+            new \App\Admin\Searches\Category,
             new \App\Admin\Searches\Status,
-            new \App\Admin\Searches\DateTimeRange('last_login_time', '登录时间')
+            new \App\Admin\Searches\DateTimeRange('created_at', '发布时间')
         ];
     }
 
@@ -181,5 +208,41 @@ class Article extends Resource
             (new \App\Admin\Actions\EditLink('编辑'))->onlyOnTableRow(),
             (new \App\Admin\Actions\Delete('删除'))->onlyOnTableRow(),
         ];
+    }
+
+    /**
+     * 表单显示前回调
+     * 
+     * @param Request $request
+     * @return array
+     */
+    public function beforeCreating(Request $request)
+    {
+        $admin = \QuarkCMS\QuarkAdmin\Models\Admin::where('id',ADMINID)->first();
+
+        // 初始化数据
+        return [
+            'author' => $admin['nickname'],
+            'level' => 0,
+            'view' => 0,
+            'show_type' => 1,
+            'comment' => 0,
+            'status' => true,
+            'comment_status' => true
+        ];
+    }
+
+    /**
+     * 保存前回调
+     *
+     * @param  Request  $request
+     * @param  array $submitData
+     * @return object
+     */
+    public function beforeSaving(Request $request, $submitData)
+    {
+        $submitData['adminid'] = ADMINID;
+
+        return $submitData;
     }
 }

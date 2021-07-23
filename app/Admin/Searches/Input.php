@@ -11,6 +11,7 @@ class Input extends Search
      * 初始化
      *
      * @param  string  $column
+     * @param  string  $name
      * @return void
      */
     public function __construct($column, $name)

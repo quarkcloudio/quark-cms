@@ -37,7 +37,7 @@ class CreatePostsTable extends Migration
             $table->integer('comment')->default(0)->nullable()->comment('评论数量');
             $table->integer('view')->default(0)->nullable()->comment('浏览数量');
             $table->string('page_tpl')->nullable()->comment('page类型时模板名称')->default('');
-            $table->string('comment_status')->default('open');
+            $table->boolean('comment_status')->default(1);
             $table->boolean('status')->default(1);
             $table->text('file_ids')->nullable()->default('');
             $table->timestamps();
