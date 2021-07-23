@@ -5,17 +5,16 @@ namespace App\Admin\Resources;
 use Illuminate\Http\Request;
 use QuarkCMS\QuarkAdmin\Field;
 use QuarkCMS\QuarkAdmin\Resource;
-use QuarkCMS\Quark\Facades\TabPane;
-use App\Models\Category;
+use App\Models\Post;
 
-class Article extends Resource
+class Page extends Resource
 {
     /**
      * 页面标题
      *
      * @var string
      */
-    public static $title = '文章';
+    public static $title = '单页';
 
     /**
      * 模型
@@ -25,13 +24,6 @@ class Article extends Resource
     public static $model = 'App\Models\Post';
 
     /**
-     * 分页
-     *
-     * @var int|bool
-     */
-    public static $perPage = 10;
-
-    /**
      * 列表查询
      *
      * @param  Request  $request
@@ -39,7 +31,7 @@ class Article extends Resource
      */
     public static function indexQuery(Request $request, $query)
     {
-        return $query->orderBy('id','desc')->where('type','ARTICLE');
+        return $query->where('type','Page');
     }
 
     /**
@@ -51,23 +43,13 @@ class Article extends Resource
     public function fields(Request $request)
     {
         return [
-            (TabPane::make('基本', $this->baseFields())),
-            (TabPane::make('扩展', $this->extendFields()))
-        ];
-    }
-
-    /**
-     * 基础标签页字段
-     *
-     * @return array
-     */
-    public function baseFields()
-    {
-        return [
             Field::hidden('id','ID')
             ->onlyOnForms(),
 
             Field::hidden('adminid','ADMINID')
+            ->onlyOnForms(),
+
+            Field::hidden('type','类型')
             ->onlyOnForms(),
 
             Field::text('title','标题')
@@ -76,6 +58,9 @@ class Article extends Resource
                 ['required' => '标题必须填写', 'max' => '标题不能超过200个字符']
             ),
 
+            Field::text('name','缩略名')
+            ->onlyOnForms(),
+
             Field::textArea('description','描述')
             ->rules(
                 ['max:200'],
@@ -83,90 +68,21 @@ class Article extends Resource
             )
             ->onlyOnForms(),
 
-            Field::text('author','作者'),
-
             Field::number('level','排序')
-            ->editable()
-            ->onlyOnIndex(),
+            ->editable(),
 
-            Field::text('source','来源')
-            ->onlyOnForms(),
-            
-            Field::checkbox('position','推荐位')
-            ->options([
-                1 => '首页推荐',
-                2 => '频道推荐',
-                3 => '列表推荐',
-                4 => '详情推荐'
-            ])
+            Field::image('cover_ids','封面图')
+            ->mode('m')
             ->onlyOnForms(),
 
-            Field::radio('show_type','展现形式')
-            ->options([
-                1 => '无图',
-                2 => '单图（小）',
-                3 => '多图',
-                4 => '单图（大）'
-            ])->when('in', [2, 4], function() {
-
-                return Field::image('cover_ids','封面图')
-                ->mode('m')
-                ->limitNum(1)
-                ->onlyOnForms();
-            })->when(3, function() {
-                
-                return Field::image('cover_ids','封面图')
-                ->mode('m')
-                ->onlyOnForms();
-            })
-            ->onlyOnForms(),
-
-            Field::select('category_id','分类目录')
-            ->options(Category::orderedList('ARTICLE'))
-            ->rules(['required'],['required'=>'请选择分类']),
+            Field::select('pid','父节点')
+            ->options(Post::orderedList())
+            ->rules(['required'],['required'=>'请选择父节点']),
 
             Field::editor('content','内容')
             ->onlyOnForms(),
 
-            Field::switch('status','状态')
-            ->editable()
-            ->trueValue('正常')
-            ->falseValue('禁用')
-            ->onlyOnForms(),
-        ];
-    }
-
-    /**
-     * 扩展标签页字段
-     *
-     * @return array
-     */
-    public function extendFields()
-    {
-        return [
-            Field::text('name','缩略名')
-            ->onlyOnForms(),
-
-            Field::number('level','排序')
-            ->onlyOnForms(),
-
-            Field::number('view','浏览量')
-            ->onlyOnForms(),
-
-            Field::number('comment','评论量')
-            ->onlyOnForms(),
-
-            Field::text('password','访问密码')
-            ->onlyOnForms(),
-
-            Field::file('file_ids','附件')
-            ->onlyOnForms(),
-
-            Field::switch('comment_status','允许评论')
-            ->editable()
-            ->trueValue('是')
-            ->falseValue('否')
-            ->onlyOnForms(),
+            Field::text('page_tpl','单页模板'),
 
             Field::datetime('created_at','发布时间')
             ->onlyOnIndex(),
@@ -175,7 +91,6 @@ class Article extends Resource
             ->editable()
             ->trueValue('正常')
             ->falseValue('禁用')
-            ->onlyOnIndex()
         ];
     }
 
@@ -189,7 +104,7 @@ class Article extends Resource
     {
         return [
             new \App\Admin\Searches\Input('title', '标题'),
-            new \App\Admin\Searches\Category,
+            new \App\Admin\Searches\PageCategory,
             new \App\Admin\Searches\Status,
             new \App\Admin\Searches\DateTimeRange('created_at', '发布时间')
         ];
@@ -215,6 +130,19 @@ class Article extends Resource
     }
 
     /**
+     * 列表页面显示前回调
+     * 
+     * @param Request $request
+     * @param mixed $list
+     * @return array
+     */
+    public function beforeIndexShowing(Request $request, $list)
+    {
+        // 转换成树形表格
+        return !isset($request->search) ? list_to_tree($list,'id','pid','children', 0) : $list;
+    }
+
+    /**
      * 表单显示前回调
      * 
      * @param Request $request
@@ -222,17 +150,10 @@ class Article extends Resource
      */
     public function beforeCreating(Request $request)
     {
-        $admin = \QuarkCMS\QuarkAdmin\Models\Admin::where('id',ADMINID)->first();
-
-        // 初始化数据
         return [
-            'author' => $admin['nickname'],
+            'type' => 'PAGE',
             'level' => 0,
-            'view' => 0,
-            'show_type' => 1,
-            'comment' => 0,
-            'status' => true,
-            'comment_status' => true
+            'status' => true
         ];
     }
 

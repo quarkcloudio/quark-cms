@@ -8,28 +8,21 @@ use QuarkCMS\QuarkAdmin\Resource;
 use QuarkCMS\Quark\Facades\TabPane;
 use App\Models\Category;
 
-class Article extends Resource
+class ArticleCategory extends Resource
 {
     /**
      * 页面标题
      *
      * @var string
      */
-    public static $title = '文章';
+    public static $title = '文章分类';
 
     /**
      * 模型
      *
      * @var string
      */
-    public static $model = 'App\Models\Post';
-
-    /**
-     * 分页
-     *
-     * @var int|bool
-     */
-    public static $perPage = 10;
+    public static $model = 'App\Models\Category';
 
     /**
      * 列表查询
@@ -39,7 +32,7 @@ class Article extends Resource
      */
     public static function indexQuery(Request $request, $query)
     {
-        return $query->orderBy('id','desc')->where('type','ARTICLE');
+        return $query->orderBy('sort', 'asc')->where('type','ARTICLE');
     }
 
     /**
@@ -67,66 +60,29 @@ class Article extends Resource
             Field::hidden('id','ID')
             ->onlyOnForms(),
 
-            Field::hidden('adminid','ADMINID')
-            ->onlyOnForms(),
-
             Field::text('title','标题')
             ->rules(
                 ['required','max:200'],
                 ['required' => '标题必须填写', 'max' => '标题不能超过200个字符']
             ),
 
-            Field::textArea('description','描述')
+            Field::text('name','缩略名')
+            ->editable()
             ->rules(
                 ['max:200'],
-                ['max'=>'描述不能超过200个字符']
-            )
-            ->onlyOnForms(),
+                ['max'=>'缩略名不能超过200个字符']
+            ),
 
-            Field::text('author','作者'),
-
-            Field::number('level','排序')
-            ->editable()
-            ->onlyOnIndex(),
-
-            Field::text('source','来源')
-            ->onlyOnForms(),
-            
-            Field::checkbox('position','推荐位')
-            ->options([
-                1 => '首页推荐',
-                2 => '频道推荐',
-                3 => '列表推荐',
-                4 => '详情推荐'
-            ])
-            ->onlyOnForms(),
-
-            Field::radio('show_type','展现形式')
-            ->options([
-                1 => '无图',
-                2 => '单图（小）',
-                3 => '多图',
-                4 => '单图（大）'
-            ])->when('in', [2, 4], function() {
-
-                return Field::image('cover_ids','封面图')
-                ->mode('m')
-                ->limitNum(1)
-                ->onlyOnForms();
-            })->when(3, function() {
-                
-                return Field::image('cover_ids','封面图')
-                ->mode('m')
-                ->onlyOnForms();
-            })
-            ->onlyOnForms(),
-
-            Field::select('category_id','分类目录')
+            Field::select('category_id','父节点')
             ->options(Category::orderedList('ARTICLE'))
             ->rules(['required'],['required'=>'请选择分类']),
 
-            Field::editor('content','内容')
+            Field::textArea('description','描述')
+            ->rules(['max:200'],['max'=>'名称不能超过200个字符'])
             ->onlyOnForms(),
+
+            Field::number('sort','排序')
+            ->editable(),
 
             Field::switch('status','状态')
             ->editable()
@@ -144,32 +100,21 @@ class Article extends Resource
     public function extendFields()
     {
         return [
-            Field::text('name','缩略名')
+            Field::image('cover_id','封面图')
+            ->mode('single')
             ->onlyOnForms(),
 
-            Field::number('level','排序')
+            Field::text('index_tpl','频道模板')
             ->onlyOnForms(),
 
-            Field::number('view','浏览量')
+            Field::text('lists_tpl','列表模板')
             ->onlyOnForms(),
 
-            Field::number('comment','评论量')
+            Field::text('detail_tpl','详情模板')
             ->onlyOnForms(),
 
-            Field::text('password','访问密码')
-            ->onlyOnForms(),
-
-            Field::file('file_ids','附件')
-            ->onlyOnForms(),
-
-            Field::switch('comment_status','允许评论')
-            ->editable()
-            ->trueValue('是')
-            ->falseValue('否')
-            ->onlyOnForms(),
-
-            Field::datetime('created_at','发布时间')
-            ->onlyOnIndex(),
+            Field::number('page_num','分页数量')
+            ->editable(),
 
             Field::switch('status','状态')
             ->editable()
@@ -191,7 +136,7 @@ class Article extends Resource
             new \App\Admin\Searches\Input('title', '标题'),
             new \App\Admin\Searches\Category,
             new \App\Admin\Searches\Status,
-            new \App\Admin\Searches\DateTimeRange('created_at', '发布时间')
+            new \App\Admin\Searches\DateTimeRange('created_at', '创建时间')
         ];
     }
 
@@ -215,6 +160,19 @@ class Article extends Resource
     }
 
     /**
+     * 列表页面显示前回调
+     * 
+     * @param Request $request
+     * @param mixed $list
+     * @return array
+     */
+    public function beforeIndexShowing(Request $request, $list)
+    {
+        // 转换成树形表格
+        return !isset($request->search) ? list_to_tree($list,'id','pid','children', 0) : $list;
+    }
+
+    /**
      * 表单显示前回调
      * 
      * @param Request $request
@@ -222,31 +180,10 @@ class Article extends Resource
      */
     public function beforeCreating(Request $request)
     {
-        $admin = \QuarkCMS\QuarkAdmin\Models\Admin::where('id',ADMINID)->first();
-
-        // 初始化数据
         return [
-            'author' => $admin['nickname'],
-            'level' => 0,
-            'view' => 0,
-            'show_type' => 1,
-            'comment' => 0,
-            'status' => true,
-            'comment_status' => true
+            'sort' => 0,
+            'page_num' => 10,
+            'status' => true
         ];
-    }
-
-    /**
-     * 保存前回调
-     *
-     * @param  Request  $request
-     * @param  array $submitData
-     * @return object
-     */
-    public function beforeSaving(Request $request, $submitData)
-    {
-        $submitData['adminid'] = ADMINID;
-
-        return $submitData;
     }
 }

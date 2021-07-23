@@ -144,7 +144,7 @@ class Menu extends Resource
     public function beforeIndexShowing(Request $request, $list)
     {
         // 转换成树形表格
-        return list_to_tree($list,'id','pid','children', 0);
+        return !isset($request->search) ? list_to_tree($list,'id','pid','children', 0) : $list;
     }
 
     /**
