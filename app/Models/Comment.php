@@ -15,29 +15,11 @@ class Comment extends Model
     public $timestamps = true;
 
     /**
-     * The attributes that are mass assignable.
+     * 属性黑名单
      *
      * @var array
      */
-    protected $fillable = [
-        'pid', 
-        'uid',
-        'object_id',
-        'title',
-        'cover_ids',
-        'type',
-        'content',
-        'ding',
-        'cai',
-        'report',
-        'status',
-        'rate'
-    ];
-
-    protected $casts = [
-        'created_at' => 'datetime:Y-m-d H:i:s',
-        'updated_at' => 'datetime:Y-m-d H:i:s',
-    ];
+    protected $guarded = [];
 
     /**
      * 为数组 / JSON 序列化准备日期。
@@ -50,16 +32,31 @@ class Comment extends Model
         return $date->format($this->dateFormat ?: 'Y-m-d H:i:s');
     }
 
+    /**
+     * 文章
+     *
+     * @return object
+     */
     public function article()
     {
         return $this->hasOne('App\Models\Post', 'id', 'object_id');
     }
 
+    /**
+     * 商品
+     *
+     * @return object
+     */
     public function goods()
     {
         return $this->hasOne('App\Models\Goods', 'id', 'object_id');
     }
 
+    /**
+     * 用户
+     *
+     * @return object
+     */
     public function user()
     {
         return $this->hasOne('App\User', 'id', 'uid');

@@ -14,11 +14,9 @@ class Area extends Model
      public $timestamps = false;
      
     /**
-     * The attributes that are mass assignable.
+     * 属性黑名单
      *
      * @var array
      */
-    protected $fillable = [
-        'id','area_name','pid','short_name','lng','lat','level','position','sort'
-    ];
+    protected $guarded = [];
 }

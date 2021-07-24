@@ -4,31 +4,48 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use DateTimeInterface;
 
 class BannerCategory extends Model
 {
     use SoftDeletes;
 
     /**
-     * 该模型是否被自动维护时间戳
-     *
-     * @var bool
-     */
-    public $timestamps = true;
-
-    /**
-     * The attributes that are mass assignable.
+     * 属性黑名单
      *
      * @var array
      */
-    protected $fillable = [
-        'title', 'name','width','height','status'
-    ];
+    protected $guarded = [];
 
-    protected $casts = [
-        'created_at' => 'datetime:Y-m-d H:i:s',
-        'updated_at' => 'datetime:Y-m-d H:i:s',
-    ];
+    /**
+     * 为数组 / JSON 序列化准备日期。
+     *
+     * @param  \DateTimeInterface  $date
+     * @return string
+     */
+    protected function serializeDate(DateTimeInterface $date)
+    {
+        return $date->format($this->dateFormat ?: 'Y-m-d H:i:s');
+    }
 
-    protected $dates = ['delete_at'];
+    /**
+     * 获取菜单的有序列表
+     *
+     * @param  void
+     * @return object
+     */
+    public static function list()
+    {
+        $lists = static::query()->where('status', 1)
+        ->select('id','title')
+        ->get()
+        ->toArray();
+
+        $result[0] = '根节点';
+        foreach ($lists as $list) {
+            $result[$list['id']] = $list['title'];
+        }
+
+        return $result;
+    }
 }

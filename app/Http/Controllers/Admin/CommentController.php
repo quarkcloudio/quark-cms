@@ -22,7 +22,7 @@ class CommentController extends Controller
         $table->column('id','ID');
         $table->column('article.title','评论对象')->editLink();
         $table->column('user.username','用户');
-        $table->column('title','评论标题');
+        $table->column('title','标题');
         $table->column('content','内容');
         $table->column('created_at','评论时间');
         $table->column('status','状态')->using(['1'=>'已审核','0'=>'已禁用','2'=>'待审核'])->width(80);

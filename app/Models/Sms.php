@@ -8,29 +8,11 @@ use DateTimeInterface;
 class Sms extends Model
 {
     /**
-     * 该模型是否被自动维护时间戳
-     *
-     * @var bool
-     */
-    public $timestamps = true;
-    
-    /**
-     * The attributes that are mass assignable.
+     * 属性黑名单
      *
      * @var array
      */
-    protected $fillable = [
-        'phone',
-        'code',
-        'content',
-        'error_times',
-        'status'
-    ];
-
-    protected $casts = [
-        'created_at' => 'datetime:Y-m-d H:i:s',
-        'updated_at' => 'datetime:Y-m-d H:i:s',
-    ];
+    protected $guarded = [];
 
     /**
      * 为数组 / JSON 序列化准备日期。

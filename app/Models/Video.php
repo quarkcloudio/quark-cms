@@ -9,47 +9,13 @@ use DateTimeInterface;
 class Video extends Model
 {
     use SoftDeletes;
-    /**
-     * 该模型是否被自动维护时间戳
-     *
-     * @var bool
-     */
-    public $timestamps = true;
-    
-    protected $casts = [
-        'created_at' => 'datetime:Y-m-d H:i:s',
-        'updated_at' => 'datetime:Y-m-d H:i:s',
-    ];
 
     /**
-     * The attributes that are mass assignable.
+     * 属性黑名单
      *
      * @var array
      */
-     protected $fillable = [
-        'adminid',
-        'uid',
-        'category_id',
-        'tags',        
-        'title',
-        'name',
-        'author',
-        'source',
-        'description',
-        'password',
-        'cover_ids',
-        'pid',
-        'level',        
-        'position',
-        'path',
-        'duration',
-        'comment',
-        'view',        
-        'comment_status',
-        'status'
-    ];
-
-    protected $dates = ['delete_at'];
+    protected $guarded = [];
 
     /**
      * 为数组 / JSON 序列化准备日期。
@@ -62,6 +28,12 @@ class Video extends Model
         return $date->format($this->dateFormat ?: 'Y-m-d H:i:s');
     }
 
+    /**
+     * 分类
+     *
+     * @param  void
+     * @return object
+     */
     public function category()
     {
         return $this->hasOne('App\Models\Category', 'id', 'category_id');

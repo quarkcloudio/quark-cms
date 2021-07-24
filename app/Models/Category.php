@@ -9,43 +9,13 @@ use DateTimeInterface;
 class Category extends Model
 {
     use SoftDeletes;
-    
+
     /**
-     * 该模型是否被自动维护时间戳
-     *
-     * @var bool
-     */
-    public $timestamps = true;
-    
-    /**
-     * The attributes that are mass assignable.
+     * 属性黑名单
      *
      * @var array
      */
-    protected $fillable = [
-        'uuid', 
-        'shop_id',
-        'pid',
-        'title',
-        'sort',
-        'cover_id',
-        'name',
-        'description',
-        'count',
-        'index_tpl',
-        'lists_tpl',
-        'detail_tpl',
-        'page_num',
-        'status',
-        'type',
-    ];
-
-    protected $casts = [
-        'created_at' => 'datetime:Y-m-d H:i:s',
-        'updated_at' => 'datetime:Y-m-d H:i:s',
-    ];
-     
-    protected $dates = ['delete_at'];
+    protected $guarded = [];
 
     /**
      * 为数组 / JSON 序列化准备日期。
@@ -66,9 +36,12 @@ class Category extends Model
      */
     public static function orderedList($type)
     {
-        $lists = static::query()->where('type',$type)
+        $lists = static::query()
+        ->where('status', 1)
+        ->where('type', $type)
         ->orderBy('sort', 'asc')
         ->orderBy('id', 'asc')
+        ->select('id', 'pid', 'title')
         ->get()
         ->toArray();
 

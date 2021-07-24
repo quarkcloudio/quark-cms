@@ -11,20 +11,11 @@ class Navigation extends Model
     use SoftDeletes;
 
     /**
-     * 该模型是否被自动维护时间戳
+     * 属性黑名单
      *
-     * @var bool
+     * @var array
      */
-    public $timestamps = true;
-    
-    protected $casts = [
-        'created_at' => 'datetime:Y-m-d H:i:s',
-        'updated_at' => 'datetime:Y-m-d H:i:s',
-    ];
-
-    protected $fillable=['title','pid','uid','sort','cover_id','url_type','url','status'];   //允许批量赋值的字段
-
-    protected $dates = ['delete_at'];
+    protected $guarded = [];
 
     /**
      * 为数组 / JSON 序列化准备日期。

@@ -11,18 +11,6 @@ class Post extends Model
     use SoftDeletes;
 
     /**
-     * 该模型是否被自动维护时间戳
-     *
-     * @var bool
-     */
-    public $timestamps = true;
-    
-    protected $casts = [
-        'created_at' => 'datetime:Y-m-d H:i:s',
-        'updated_at' => 'datetime:Y-m-d H:i:s',
-    ];
-
-    /**
      * The attributes that are mass assignable.
      *
      * @var array
@@ -53,8 +41,6 @@ class Post extends Model
         'comment_status',
         'status'
     ];
-    
-    protected $dates = ['delete_at'];
 
     /**
      * 为数组 / JSON 序列化准备日期。
@@ -85,8 +71,11 @@ class Post extends Model
      */
     public static function orderedList()
     {
-        $lists = static::query()->where('type', 'PAGE')
+        $lists = static::query()
+        ->where('status', 1)
+        ->where('type', 'PAGE')
         ->orderBy('level', 'desc')
+        ->select('id', 'pid', 'title')
         ->get()
         ->toArray();
 
