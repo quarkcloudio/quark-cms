@@ -5,7 +5,6 @@ namespace App\Admin\Resources;
 use Illuminate\Http\Request;
 use QuarkCMS\QuarkAdmin\Field;
 use QuarkCMS\QuarkAdmin\Resource;
-use Spatie\Permission\Models\Role;
 
 class User extends Resource
 {
@@ -49,74 +48,45 @@ class User extends Resource
      */
     public function fields(Request $request)
     {
-        $getRoles = Role::where('guard_name','admin')->get()->toArray();
-        $roles = [];
-
-        foreach ($getRoles as $role) {
-            $roles[$role['id']] = $role['name'];
-        }
-
         return [
             Field::hidden('id','ID')
             ->onlyOnForms(),
 
-            Field::image('avatar','头像')
-            ->onlyOnForms(),
+            Field::image('avatar','头像', function() {
+                $avatar = \json_decode($this->avatar,true);
 
-            Field::text('username','用户名', function() {
-                return "<a href='#/index?api=admin/admin/edit&id=" . $this->id . "'>" . $this->username . "</a>";
-            })
-            ->rules(
-                ['required','min:6','max:20'],
-                ['required' => '用户名必须填写','min' => '用户名不能少于6个字符','max' => '用户名不能超过20个字符']
-            )->creationRules(
-                ['unique:admins,username'],
-                ['unique'=>'用户名已存在']
-            )->updateRules(
-                ['unique:admins,username,{id}'],
-                ['unique'=>'用户名已存在']
-            ),
+                return $avatar ? get_picture($avatar['id']) : null;
+            })->button('上传头像'),
 
-            Field::checkbox('role_ids','角色')
-            ->options($roles)
-            ->onlyOnForms(),
-
+            Field::text('username','用户名')
+            ->rules(['required','min:6','max:20'],['required'=>'用户名必须填写','min'=>'用户名不能少于6个字符','max'=>'用户名不能超过20个字符'])
+            ->creationRules(["unique:users"],['unique'=>'用户名已经存在'])
+            ->updateRules(["unique:users,username,{id}"],['unique'=>'用户名已经存在']),
+    
             Field::text('nickname','昵称')
-            ->editable()
-            ->rules(['required'], ['required' => '昵称必须填写']),
-            
-            Field::text('email','邮箱')
-            ->rules(
-                ['required'],
-                ['required'=>'邮箱必须填写']
-            )->creationRules(
-                ['unique:admins,email'],
-                ['unique'=>'邮箱已存在']
-            )->updateRules(
-                ['unique:admins,email,{id}'],
-                ['unique'=>'邮箱已存在']
-            ),
-
-            Field::text('phone','手机号')
-            ->rules(
-                ['required'],
-                ['required' => '手机号必须填写']
-            )->creationRules(
-                ['unique:admins,phone'],
-                ['unique'=>'手机号已存在']
-            )->updateRules(
-                ['unique:admins,phone,{id}'],
-                ['unique'=>'手机号已存在']
-            ),
-
+            ->rules(['required','max:20'],['required'=>'昵称必须填写','max'=>'昵称不能超过20个字符']),
+    
             Field::radio('sex','性别')
-            ->options([1 => '男', 2 => '女'])
+            ->options(['1' => '男', '2'=> '女'])
             ->default(1),
+    
+            Field::text('email','邮箱')
+            ->rules(['required','email','max:255'],['required'=>'邮箱必须填写','email'=>'邮箱格式错误','max'=>'邮箱不能超过255个字符'])
+            ->creationRules(["unique:users"],['unique'=>'邮箱已经存在'])
+            ->updateRules(["unique:users,email,{id}"],['unique'=>'邮箱已经存在']),
+    
+            Field::text('phone','手机号')
+            ->rules(['required','max:11'],['required'=>'手机号必须填写','max'=>'手机号不能超过11个字符'])
+            ->creationRules(["unique:users"],['unique'=>'手机号已经存在'])
+            ->updateRules(["unique:users,phone,{id}"],['unique'=>'手机号已经存在']),
 
             Field::password('password','密码')
             ->creationRules(['required'], ['required'=>'密码必须填写'])
             ->onlyOnForms(),
             
+            Field::datetime('created_at','注册时间')
+            ->onlyOnIndex(),
+
             Field::datetime('last_login_time','最后登录时间')
             ->onlyOnIndex(),
 
@@ -160,6 +130,7 @@ class User extends Resource
             (new \App\Admin\Actions\ChangeStatus)->onlyOnTableRow(),
             (new \App\Admin\Actions\EditLink('编辑'))->onlyOnTableRow(),
             (new \App\Admin\Actions\Delete('删除'))->onlyOnTableRow(),
+            (new \App\Admin\Actions\AccountRecharge)->onlyOnTableRow(),
         ];
     }
 
@@ -172,19 +143,6 @@ class User extends Resource
      */
     public function beforeEditing(Request $request, $data)
     {
-        // 查询角色
-        $roles = Role::where('guard_name','admin')->get()->toArray();
-        $admin = static::newModel()->find($request->id);
-
-        foreach ($roles as $role) {
-            $hasRole = $admin->hasRole($role['name']);
-            if($hasRole) {
-                $roleIds[] = $role['id'];
-            }
-        }
-
-        $data['role_ids'] = $roleIds ?? [];
-
         // 编辑的时候，不显示密码
         unset($data['password']);
 
@@ -200,23 +158,10 @@ class User extends Resource
      */
     public function beforeSaving(Request $request, $submitData)
     {
-        unset($submitData['role_ids']);
-
         if(isset($submitData['password'])) {
             $submitData['password'] = bcrypt($submitData['password']);
         }
 
         return $submitData;
-    }
-
-    /**
-     * 保存后回调
-     *
-     * @param  Request  $request
-     * @return object
-     */
-    public function afterSaved(Request $request, $model)
-    {
-        return $model->syncRoles($request->role_ids);
     }
 }
