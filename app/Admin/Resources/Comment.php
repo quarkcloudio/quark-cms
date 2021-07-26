@@ -52,8 +52,7 @@ class Comment extends Resource
             $comment = $this->newModel()->where('id', $request->id)->first();
 
             $fields = [
-                Field::hidden('id','ID')
-                ->onlyOnForms(),
+                Field::hidden('id','ID'),
     
                 Field::display('文章')
                 ->value($comment->article()->first()->title),
@@ -65,33 +64,27 @@ class Comment extends Resource
                 ->value($comment->user()->first()->username),
 
                 Field::image('cover_ids','晒图')
-                ->mode('multiple')
-                ->onlyOnForms(),
+                ->mode('multiple'),
 
                 Field::display('内容')
-                ->value($comment['content'])
-                ->onlyOnForms(),
+                ->value($comment['content']),
 
                 Field::display('顶')
-                ->value($comment['ding'])
-                ->onlyOnForms(),
+                ->value($comment['ding']),
 
                 Field::display('踩')
-                ->value($comment['cai'])
-                ->onlyOnForms(),
+                ->value($comment['cai']),
 
                 Field::display('评分')
-                ->value($comment['rate'])
-                ->onlyOnForms(),
+                ->value($comment['rate']),
     
                 Field::display('评论时间')
-                ->value($comment['created_at'])
-                ->onlyOnForms(),
+                ->value($comment['created_at']),
     
                 Field::radio('status','状态')->options([
-                    0=>'禁用',
-                    1=>'启用',
-                    2=>'待审核'
+                    0 => '禁用',
+                    1 => '启用',
+                    2 => '待审核'
                 ])
             ];
         } else {
@@ -102,22 +95,18 @@ class Comment extends Resource
                 Field::text('user.username','用户')
                 ->onlyOnIndex(),
     
-                Field::text('title','评论标题')
-                ->onlyOnIndex(),
+                Field::text('title','评论标题'),
     
-                Field::text('content','内容')
-                ->onlyOnIndex(),
+                Field::text('content','内容'),
     
-                Field::datetime('created_at','评论时间')
-                ->onlyOnIndex(),
+                Field::datetime('created_at','评论时间'),
     
                 Field::radio('status','状态')
                 ->options([
-                    0=>'禁用',
-                    1=>'启用',
-                    2=>'待审核'
+                    0 => '禁用',
+                    1 => '启用',
+                    2 => '待审核'
                 ])
-                ->onlyOnIndex()
             ];
         }
 

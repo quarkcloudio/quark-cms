@@ -354,7 +354,7 @@ if(!function_exists('get_category')) {
  * return string
  */
 if(!function_exists('msubstr')) {
-	function msubstr($str, $start=0, $length, $charset="utf-8")
+	function msubstr($str, $start, $length, $charset="utf-8")
     {
         if(function_exists("mb_substr")) {
             $slice = mb_substr($str, $start, $length, $charset);

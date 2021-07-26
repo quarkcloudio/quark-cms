@@ -27,4 +27,31 @@ class Navigation extends Model
     {
         return $date->format($this->dateFormat ?: 'Y-m-d H:i:s');
     }
+
+    /**
+     * 获取菜单的有序列表
+     *
+     * @param  string $type
+     * @return object
+     */
+    public static function orderedList()
+    {
+        $lists = static::query()
+        ->where('status', 1)
+        ->orderBy('sort', 'asc')
+        ->orderBy('id', 'asc')
+        ->select('id', 'pid', 'title')
+        ->get()
+        ->toArray();
+
+        $trees = list_to_tree($lists,'id','pid','children',0);
+        $treeLists = tree_to_ordered_list($trees,0,'title','children');
+
+        $list[0] = '根节点';
+        foreach ($treeLists as $key => $treeList) {
+            $list[$treeList['id']] = $treeList['title'];
+        }
+
+        return $list;
+    }
 }

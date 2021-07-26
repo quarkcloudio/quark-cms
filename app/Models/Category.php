@@ -34,11 +34,13 @@ class Category extends Model
      * @param  string $type
      * @return object
      */
-    public static function orderedList($type)
+    public static function orderedList($type = null)
     {
-        $lists = static::query()
-        ->where('status', 1)
-        ->where('type', $type)
+        $query = static::query();
+
+        $query = $type ? $query->where('type', $type) : $query;
+
+        $lists = $query->where('status', 1)
         ->orderBy('sort', 'asc')
         ->orderBy('id', 'asc')
         ->select('id', 'pid', 'title')
