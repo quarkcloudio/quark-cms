@@ -15,8 +15,7 @@ class SmsController extends Controller
      */
     public function import(Request $request)
     {
-        $fileId = $request->input('fileId');
-        $results = import($fileId);
+        $results = import($request->input('fileId'));
 
         foreach ($results as $key => $value) {
             $phones[] = $value[0];
