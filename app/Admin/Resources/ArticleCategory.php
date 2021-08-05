@@ -73,9 +73,8 @@ class ArticleCategory extends Resource
                 ['max'=>'缩略名不能超过200个字符']
             ),
 
-            Field::select('category_id','父节点')
-            ->options(Category::orderedList('ARTICLE'))
-            ->rules(['required'],['required'=>'请选择分类']),
+            Field::select('pid','父节点')
+            ->options(Category::orderedList('ARTICLE')),
 
             Field::textArea('description','描述')
             ->rules(['max:200'],['max'=>'名称不能超过200个字符'])

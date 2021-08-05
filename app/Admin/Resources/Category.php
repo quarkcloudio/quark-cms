@@ -80,9 +80,8 @@ class Category extends Resource
             )
             ->help('例如：ARTICLE'),
 
-            Field::select('category_id','父节点')
-            ->options(CategoryModel::orderedList(''))
-            ->rules(['required'],['required'=>'请选择分类']),
+            Field::select('pid','父节点')
+            ->options(CategoryModel::orderedList('')),
 
             Field::textArea('description','描述')
             ->rules(['max:200'],['max'=>'名称不能超过200个字符'])
