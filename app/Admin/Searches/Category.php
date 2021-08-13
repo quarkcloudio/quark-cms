@@ -15,6 +15,7 @@ class Category extends Select
      */
     public function __construct($type = 'ARTICLE')
     {
+        $this->column = 'category_id';
         $this->type = $type;
     }
 
