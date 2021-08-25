@@ -5,7 +5,7 @@ namespace Modules\Wechat\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Modules\Wechat\Models\WechatUser;
+use App\User;
 use EasyWeChat\Factory;
 
 class LoginController extends Controller
@@ -62,35 +62,39 @@ class LoginController extends Controller
             return error('授权错误！');
         }
 
-        session(['wechat_user' => $wechatUser]);
-
         // 定义对象
-        $query = WechatUser::query()
-        ->where('openid', $wechatUser['original']['openid'])
-        ->where('type','FWH');
+        $query = User::where('wechat_fwh_openid', $wechatUser['original']['openid']);
 
         if(isset($wechatUser['original']['unionid'])) {
-            $query->orWhere('unionid', $wechatUser['original']['unionid']);
+            $query->orWhere('wechat_unionid', $wechatUser['original']['unionid']);
         }
 
         $getWechatUser = $query->first();
 
         if(empty($getWechatUser)) {
 
+            // 将微信头像保存到服务器
+            $avatarInfo = download_picture_to_storage($wechatUser['avatar']);
+
+            if($avatarInfo['status'] == 'error') {
+                return $avatarInfo;
+            }
+
+            $wechatUser['nickname'] = filter_emoji($wechatUser['nickname']);
+            $wechatUser['avatar'] = $avatarInfo['data']['id'];
+            
+            if(!isset($wechatUser['original']['unionid'])) {
+                $wechatUser['original']['unionid'] = null;
+            }
+
+            session(['wechat_user' => $wechatUser]);
+            
             // 没有用户跳转到注册流程
             return redirect(url('wechat/register'));
         }
 
-        if(empty($getWechatUser['uid'])) {
-            // 记录微信用户id
-            session(['wechat_user_id' => $getWechatUser['id']]);
-
-            // 跳转到绑定用户信息页面，完善用户名、手机号、密码等信息
-            return redirect(url('wechat/bindAccount'));
-        }
-
         // 快捷登录
-        Auth::loginUsingId($getWechatUser['uid']);
+        Auth::loginUsingId($getWechatUser['id']);
 
         $targetUrl = session('target_url');
 

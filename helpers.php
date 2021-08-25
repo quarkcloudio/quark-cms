@@ -6,6 +6,7 @@ use App\Models\Category;
 use App\Models\Sms;
 use App\Models\Printer;
 use App\User;
+use Modules\Wechat\Models\WechatConfig;
 use App\Excels\Export;
 use App\Excels\Import;
 use Flc\Alidayu\Client;
@@ -396,39 +397,54 @@ if(!function_exists('filter_emoji')) {
 }
 
 /**
+* 获取微信配置信息
+* @author tangtanglove <dai_hang_love@126.com>
+*/
+if(!function_exists('get_wechat_config')) {
+    function get_wechat_config($name) {
+        $config = WechatConfig::where('name',$name)->first();
+        $value = '';
+        if(!empty($config)) {
+            $value = $config->value;
+        }
+        return $value;
+    }
+}
+
+/**
  * 返回公众号配置
  * @author tangtanglove <dai_hang_love@126.com>
  */
 if(!function_exists('wechat_config')) {
     function wechat_config($type = 'fwh')
     {
-        switch ($type) {
+        switch (strtolower($type)) {
             case 'dyh':
 
                 // 订阅号
-                $appid  = web_config('WECHAT_DYH_APPID');
-                $secret = web_config('WECHAT_DYH_APPSECRET');
-                $token  = web_config('WECHAT_DYH_TOKEN');
-                $aesKey = web_config('WECHAT_DYH_ENCODINGAESKEY');
+                $appid  = get_wechat_config('WECHAT_DYH_APPID');
+                $secret = get_wechat_config('WECHAT_DYH_APPSECRET');
+                $token  = get_wechat_config('WECHAT_DYH_TOKEN');
+                $aesKey = get_wechat_config('WECHAT_DYH_ENCODINGAESKEY');
                 break;
             case 'fwh':
 
                 // 服务号
-                $appid  = web_config('WECHAT_FWH_APPID');
-                $secret = web_config('WECHAT_FWH_APPSECRET');
-                $token  = web_config('WECHAT_FWH_TOKEN');
-                $aesKey = web_config('WECHAT_FWH_ENCODINGAESKEY');
+                $appid  = get_wechat_config('WECHAT_FWH_APPID');
+                $secret = get_wechat_config('WECHAT_FWH_APPSECRET');
+                $token  = get_wechat_config('WECHAT_FWH_TOKEN');
+                $aesKey = get_wechat_config('WECHAT_FWH_ENCODINGAESKEY');
                 break;
             case 'mp':
             
                 // 小程序
-                $appid  = web_config('WECHAT_MP_APPID');
-                $secret = web_config('WECHAT_MP_APPSECRET');
-                $token  = web_config('WECHAT_MP_TOKEN');
-                $aesKey = web_config('WECHAT_MP_ENCODINGAESKEY');
+                $appid  = get_wechat_config('WECHAT_MP_APPID');
+                $secret = get_wechat_config('WECHAT_MP_APPSECRET');
+                $token  = get_wechat_config('WECHAT_MP_TOKEN');
+                $aesKey = get_wechat_config('WECHAT_MP_ENCODINGAESKEY');
                 break;
             default:
-                return error('请指定公众号类型！');
+                return false;
                 break;
         }
 
@@ -466,8 +482,8 @@ if(!function_exists('wechat_pay_config')) {
         $getApiclientCertPath = '';
         $getApiclientKeyPath = '';
 
-        $getApiclientCert = web_config('WECHAT_PAY_APICLIENT_CERT');
-        $getApiclientKey  = web_config('WECHAT_PAY_APICLIENT_KEY');
+        $getApiclientCert = get_wechat_config('WECHAT_PAY_APICLIENT_CERT');
+        $getApiclientKey  = get_wechat_config('WECHAT_PAY_APICLIENT_KEY');
 
         if(!empty($getApiclientCert) && !empty($getApiclientKey)) {
             $apiclientCertInfo = File::where('id',$getApiclientCert)->first();
@@ -478,13 +494,13 @@ if(!function_exists('wechat_pay_config')) {
 
         $config = [
             'debug'     => true,
-            'app_id'    => web_config('WECHAT_PAY_APP_ID'),
+            'app_id'    => get_wechat_config('WECHAT_PAY_APP_ID'),
             'log' => [
                 'level' => 'debug',
                 'file'  => storage_path('/logs/easywechat/easywechat_'.date('Ymd').'.log'),
             ],
-            'mch_id'             => web_config('WECHAT_PAY_MERCHANTID'),
-            'key'                => web_config('WECHAT_PAY_KEY'),
+            'mch_id'             => get_wechat_config('WECHAT_PAY_MERCHANTID'),
+            'key'                => get_wechat_config('WECHAT_PAY_KEY'),
             'cert_path'          => $getApiclientCertPath, // XXX: 绝对路径！！！！
             'key_path'           => $getApiclientKeyPath // XXX: 绝对路径！！！！
         ];
@@ -503,8 +519,8 @@ if(!function_exists('wechat_app_pay_config')) {
         $getApiclientCertPath = '';
         $getApiclientKeyPath = '';
 
-        $getApiclientCert = web_config('WECHAT_APP_PAY_APICLIENT_CERT');
-        $getApiclientKey  = web_config('WECHAT_APP_PAY_APICLIENT_KEY');
+        $getApiclientCert = get_wechat_config('WECHAT_APP_PAY_APICLIENT_CERT');
+        $getApiclientKey  = get_wechat_config('WECHAT_APP_PAY_APICLIENT_KEY');
 
         if(!empty($getApiclientCert) && !empty($getApiclientKey)) {
             $apiclientCertInfo = File::where('id',$getApiclientCert)->first();
@@ -515,13 +531,13 @@ if(!function_exists('wechat_app_pay_config')) {
 
         $config = [
             'debug'     => true,
-            'app_id'    => web_config('WECHAT_APP_PAY_APP_ID'),
+            'app_id'    => get_wechat_config('WECHAT_APP_PAY_APP_ID'),
             'log' => [
                 'level' => 'debug',
                 'file'  => storage_path('/logs/easywechat/easywechat_'.date('Ymd').'.log'),
             ],
-            'mch_id'             => web_config('WECHAT_APP_PAY_MERCHANTID'),
-            'key'                => web_config('WECHAT_APP_PAY_KEY'),
+            'mch_id'             => get_wechat_config('WECHAT_APP_PAY_MERCHANTID'),
+            'key'                => get_wechat_config('WECHAT_APP_PAY_KEY'),
             'cert_path'          => $getApiclientCertPath, // XXX: 绝对路径！！！！
             'key_path'           => $getApiclientKeyPath // XXX: 绝对路径！！！！
         ];
@@ -540,8 +556,8 @@ if(!function_exists('wechat_mp_pay_config')) {
         $getApiclientCertPath = '';
         $getApiclientKeyPath = '';
 
-        $getApiclientCert = web_config('WECHAT_MINIPROGRAMPAY_APICLIENT_CERT');
-        $getApiclientKey  = web_config('WECHAT_MINIPROGRAMPAY_APICLIENT_KEY');
+        $getApiclientCert = get_wechat_config('WECHAT_MINIPROGRAMPAY_APICLIENT_CERT');
+        $getApiclientKey  = get_wechat_config('WECHAT_MINIPROGRAMPAY_APICLIENT_KEY');
 
         if(!empty($getApiclientCert) && !empty($getApiclientKey)) {
             $apiclientCertInfo = File::where('id',$getApiclientCert)->first();
@@ -552,14 +568,14 @@ if(!function_exists('wechat_mp_pay_config')) {
 
         $config = [
             'debug'     => true,
-            'app_id'    => web_config('WECHAT_MINIPROGRAMPAY_APP_ID'),
+            'app_id'    => get_wechat_config('WECHAT_MINIPROGRAMPAY_APP_ID'),
             'log' => [
                 'level' => 'debug',
                 'file'  => storage_path('/logs/easywechat/easywechat_'.date('Ymd').'.log'),
             ],
-            'mch_id'             => web_config('WECHAT_MINIPROGRAMPAY_MERCHANTID'),
-            'key'                => web_config('WECHAT_MINIPROGRAMPAY_KEY'),
-            'secret'             => web_config('WECHAT_MINIPROGRAMPAY_SECRET'),
+            'mch_id'             => get_wechat_config('WECHAT_MINIPROGRAMPAY_MERCHANTID'),
+            'key'                => get_wechat_config('WECHAT_MINIPROGRAMPAY_KEY'),
+            'secret'             => get_wechat_config('WECHAT_MINIPROGRAMPAY_SECRET'),
             'cert_path'          => $getApiclientCertPath, // XXX: 绝对路径！！！！
             'key_path'           => $getApiclientKeyPath // XXX: 绝对路径！！！！
         ];

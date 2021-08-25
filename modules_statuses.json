@@ -2,5 +2,5 @@
     "Tools": true,
     "Cashier": true,
     "Mall": false,
-    "Wechat": false
+    "Wechat": true
 }

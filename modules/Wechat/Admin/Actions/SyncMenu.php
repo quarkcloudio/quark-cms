@@ -8,11 +8,40 @@ use EasyWeChat\Factory;
 class SyncMenu extends Action
 {
     /**
+     * 设置图标
+     *
+     * @var string
+     */
+    public $icon = 'sync';
+
+    /**
      * 行为名称
      *
      * @var string
      */
-    public $name = '同步菜单';
+    public $name = '同步线上菜单';
+
+    /**
+     * 公众号类型
+     *
+     * @var string
+     */
+    public $wechatType = 'DYH';
+
+    /**
+     * 初始化
+     *
+     * @param  string  $name
+     * @param  string  $wechatType
+     * 
+     * @return void
+     */
+    public function __construct($name, $wechatType)
+    {
+        $this->name = $name;
+        $this->wechatType = $wechatType;
+        $this->withConfirm('确定要同步线上菜单吗？', '此操作将会先清空【本地已添加的菜单】，请谨慎操作！');
+    }
 
     /**
      * 执行行为
@@ -23,9 +52,13 @@ class SyncMenu extends Action
      */
     public function handle($fields, $models)
     {
-        $type = $fields->input('type','dyh');
+        $wechatConfig = wechat_config($this->wechatType);
 
-        $app = Factory::officialAccount(wechat_config($type));
+        if(empty($wechatConfig)) {
+            return error('请先完善公众号配置！');
+        }
+
+        $app = Factory::officialAccount($wechatConfig);
         
         $menus = $app->menu->current();
 

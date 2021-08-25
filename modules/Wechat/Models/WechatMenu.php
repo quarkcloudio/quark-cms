@@ -23,6 +23,7 @@ class WechatMenu extends Model
     protected $fillable = [
         'id',
         'pid',
+        'wechat_type',
         'name',
         'type',
         'value',
@@ -53,13 +54,16 @@ class WechatMenu extends Model
     /**
      * 获取菜单的有序列表
      *
+     * @param string $wechatType
+     * 
      * @return object
      */
-    public static function orderedList()
+    public static function orderedList($wechatType)
     {
         $query = static::query();
 
         $lists = $query->where('status', 1)
+        ->where('wechat_type', $wechatType)
         ->orderBy('id', 'asc')
         ->select('id', 'pid', 'name')
         ->get()

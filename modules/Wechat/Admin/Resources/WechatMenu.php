@@ -6,8 +6,15 @@ use Illuminate\Http\Request;
 use QuarkCMS\QuarkAdmin\Field;
 use QuarkCMS\QuarkAdmin\Resource;
 
-class WechatMenu extends Resource
+abstract class WechatMenu extends Resource
 {
+    /**
+     * 公众号类型
+     *
+     * @var string
+     */
+    public static $wechatType = 'DYH';
+
     /**
      * 页面标题
      *
@@ -30,7 +37,7 @@ class WechatMenu extends Resource
      */
     public static function indexQuery(Request $request, $query)
     {
-        return $query->orderBy('id', 'asc');
+        return $query->orderBy('id', 'asc')->where('wechat_type', self::$wechatType);
     }
 
     /**
@@ -45,11 +52,14 @@ class WechatMenu extends Resource
             Field::hidden('id','ID')
             ->onlyOnForms(),
 
+            Field::hidden('wechat_type','公众号类型')
+            ->onlyOnForms(),
+
             Field::text('name','名称')
             ->rules(['required','max:6'],['required'=>'名称必须填写','max'=>'名称不能超过6个字符']),
     
             Field::select('pid','父节点')
-            ->options(\Modules\Wechat\Models\WechatMenu::orderedList())
+            ->options(\Modules\Wechat\Models\WechatMenu::orderedList(self::$wechatType))
             ->default(0),
     
             Field::select('type','类型')
@@ -95,9 +105,9 @@ class WechatMenu extends Resource
     public function actions(Request $request)
     {
         return [
-            (new \Modules\Wechat\Admin\Actions\SyncMenu)->onlyOnIndex(),
-            (new \Modules\Wechat\Admin\Actions\PublishMenu)->onlyOnIndex(),
-            (new \App\Admin\Actions\CreateLink($this->title()))->onlyOnIndex(),
+            (new \Modules\Wechat\Admin\Actions\SyncMenu('同步线上菜单',self::$wechatType))->onlyOnIndex(),
+            (new \App\Admin\Actions\CreateLink('菜单'))->onlyOnIndex(),
+            (new \Modules\Wechat\Admin\Actions\PublishMenu('发布菜单',self::$wechatType))->onlyOnIndex(),
             (new \App\Admin\Actions\Delete('批量删除'))->onlyOnTableAlert(),
             (new \App\Admin\Actions\Disable('批量禁用'))->onlyOnTableAlert(),
             (new \App\Admin\Actions\Enable('批量启用'))->onlyOnTableAlert(),
@@ -118,5 +128,19 @@ class WechatMenu extends Resource
     {
         // 转换成树形表格
         return !isset($request->search) ? list_to_tree($list,'id','pid','children', 0) : $list;
+    }
+
+    /**
+     * 保存前回调
+     *
+     * @param  Request  $request
+     * @param  array $submitData
+     * @return object
+     */
+    public function beforeSaving(Request $request, $submitData)
+    {
+        $submitData['wechat_type'] = self::$wechatType;
+
+        return $submitData;
     }
 }

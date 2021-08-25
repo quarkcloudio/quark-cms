@@ -25,37 +25,7 @@ class RegisterController extends Controller
             return error('未获取到微信用户信息！');
         }
 
-        // 将微信头像保存到服务器
-        $avatarInfo = download_picture_to_storage($wechatUser['avatar']);
-
-        if($avatarInfo['status'] == 'error') {
-            return $avatarInfo;
-        }
-
-        $wechatUser['nickname'] = filter_emoji($wechatUser['nickname']);
-        $wechatUser['avatar'] = $avatarInfo['data']['id'];
-        
-        if(!isset($wechatUser['original']['unionid'])) {
-            $wechatUser['original']['unionid'] = null;
-        }
-
-        $wechatUserData['nickname'] = $wechatUser['nickname'];
-        $wechatUserData['sex'] = $wechatUser['original']['sex'];
-        $wechatUserData['avatar'] = $wechatUser['avatar'];
-        $wechatUserData['openid'] = $wechatUser['original']['openid'];
-        $wechatUserData['unionid'] = $wechatUser['original']['unionid'];
-        $wechatUserData['type'] = 'FWH';
-
         if(session('need_bind_account')) {
-
-            // 需要绑定用户信息
-            $wechatUserData['uid'] = 0;
-
-            // 插入微信用户表
-            $wechatUserId = WechatUser::insertGetId($wechatUserData);
-
-            // 记录微信用户id
-            session(['wechat_user_id' => $wechatUserId]);
 
             // 跳转到绑定用户信息页面，完善用户名、手机号、密码等信息
             return redirect(url('wechat/bindAccount'));
@@ -67,11 +37,6 @@ class RegisterController extends Controller
             if(empty($uid)) {
                 return error('创建用户失败！');
             }
-
-            $wechatUserData['uid'] = $uid;
-
-            // 插入微信用户表
-            $wechatUserId = WechatUser::insertGetId($wechatUserData);
 
             // 快捷登录
             Auth::loginUsingId($uid);
@@ -91,7 +56,6 @@ class RegisterController extends Controller
         DB::beginTransaction();
 
         try {
-
             $data['username'] = Str::random(8) . '-' . time(); // 临时用户名
             $data['email'] = Str::random(8) . '-' . time(); // 临时邮箱
             $data['phone'] = Str::random(8) . '-' . time(); // 临时手机号
@@ -99,6 +63,8 @@ class RegisterController extends Controller
             $data['sex'] = $wechatUser['original']['sex'];
             $data['password'] = bcrypt(env('APP_KEY'));
             $data['avatar'] = $wechatUser['avatar'];
+            $data['wechat_fwh_openid'] = $wechatUser['original']['openid'];
+            $data['wechat_unionid'] = $wechatUser['original']['unionid'];
             $data['last_login_ip'] = request()->ip();
             $data['last_login_time'] = date('Y-m-d H:i:s');
 
@@ -133,7 +99,7 @@ class RegisterController extends Controller
      */
     public function bindAccount(Request $request)
     {
-        $wechatUserId = session('wechat_user_id');
+        $wechatUser = session('wechat_user');
         // todo
     }
 }

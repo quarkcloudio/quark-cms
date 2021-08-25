@@ -14,15 +14,15 @@ class MenusTableSeeder extends Seeder
     {
         DB::table('menus')->insert([
 
-            ['id' => 3,'name' => '文章管理','guard_name' => 'admin','icon' => 'icon-article','type'=>'default','pid' => 0,'sort' => 0,'path' => '/article','show'  => 1,'status' => 1],
+            ['id' => 3,'name' => '文章管理','guard_name' => 'admin','icon' => 'icon-article','type'=>'default','pid' => 0,'sort' => -1,'path' => '/article','show'  => 1,'status' => 1],
             ['id' => 4,'name' => '文章列表','guard_name' => 'admin','icon' => '','type'=>'engine','pid' => 3,'sort' => 0,'path' => 'admin/article/index','show'  => 1,'status' => 1],
             ['id' => 5,'name' => '发布文章','guard_name' => 'admin','icon' => '','type'=>'engine','pid' => 3,'sort' => 0,'path' => 'admin/article/create','show'  => 1,'status' => 1],
             
-            ['id' => 7,'name' => '单页管理','guard_name' => 'admin','icon' => 'icon-page','type'=>'default','pid' => 0,'sort' => 0,'path' => '/page','show'  => 1,'status' => 1],
+            ['id' => 7,'name' => '单页管理','guard_name' => 'admin','icon' => 'icon-page','type'=>'default','pid' => 0,'sort' => -1,'path' => '/page','show'  => 1,'status' => 1],
             ['id' => 8,'name' => '单页列表','guard_name' => 'admin','icon' => '','type'=>'engine','pid' => 7,'sort' => 0,'path' => 'admin/page/index','show'  => 1,'status' => 1],
             ['id' => 9,'name' => '添加单页','guard_name' => 'admin','icon' => '','type'=>'engine','pid' => 7,'sort' => 0,'path' => 'admin/page/create','show'  => 1,'status' => 1],
             
-            ['id' => 10,'name' => '会员管理','guard_name' => 'admin','icon' => 'icon-user','type'=>'default','pid' => 0,'sort' => 0,'path' => '/user','show'  => 1,'status' => 1],
+            ['id' => 10,'name' => '会员管理','guard_name' => 'admin','icon' => 'icon-user','type'=>'default','pid' => 0,'sort' => -1,'path' => '/user','show'  => 1,'status' => 1],
             ['id' => 11,'name' => '会员列表','guard_name' => 'admin','icon' => '','type'=>'engine','pid' => 10,'sort' => 0,'path' => 'admin/user/index','show'  => 1,'status' => 1],
             ['id' => 12,'name' => '添加会员','guard_name' => 'admin','icon' => '','type'=>'engine','pid' => 10,'sort' => 0,'path' => 'admin/user/create','show'  => 1,'status' => 1],
             

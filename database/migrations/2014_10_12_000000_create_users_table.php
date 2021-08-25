@@ -28,10 +28,14 @@ class CreateUsersTable extends Migration
             $table->integer('score')->nullable()->default(0);
             $table->string('qq_openid')->nullable()->default('');
             $table->string('weibo_uid')->nullable()->default('');
+            $table->string('wechat_dyh_openid')->nullable()->default('');
+            $table->string('wechat_fwh_openid')->nullable()->default('');
+            $table->string('wechat_mp_openid')->nullable()->default('');
+            $table->string('wechat_unionid')->nullable()->default('');
             $table->string('last_login_ip')->nullable()->default('');
             $table->timestamp('last_login_time')->nullable();
             $table->tinyInteger('status')->default(1);
-            $table->timestamp('email_verified_at')->nullable();            
+            $table->timestamp('email_verified_at')->nullable();
             $table->rememberToken();
             $table->timestamps();
             $table->softDeletes();

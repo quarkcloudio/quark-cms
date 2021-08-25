@@ -5,7 +5,7 @@ namespace Modules\Wechat\Models;
 use Illuminate\Database\Eloquent\Model;
 use DateTimeInterface;
 
-class WechatUser extends Model
+class WechatConfig extends Model
 {
     /**
      * 该模型是否被自动维护时间戳

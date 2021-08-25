@@ -8,11 +8,46 @@ use EasyWeChat\Factory;
 class PublishMenu extends Action
 {
     /**
+     * 设置按钮类型,primary | ghost | dashed | link | text | default
+     *
+     * @var string
+     */
+    public $type = 'primary';
+
+    /**
+     * 设置图标
+     *
+     * @var string
+     */
+    public $icon = 'cloud-sync';
+
+    /**
      * 行为名称
      *
      * @var string
      */
     public $name = '发布菜单';
+
+    /**
+     * 公众号类型
+     *
+     * @var string
+     */
+    public $wechatType = 'DYH';
+
+    /**
+     * 初始化
+     *
+     * @param  string  $name
+     * @param  string  $wechatType
+     * 
+     * @return void
+     */
+    public function __construct($name, $wechatType)
+    {
+        $this->name = $name;
+        $this->wechatType = $wechatType;
+    }
 
     /**
      * 执行行为
@@ -23,9 +58,7 @@ class PublishMenu extends Action
      */
     public function handle($fields, $models)
     {
-        $type = $fields->input('type','dyh');
-
-        $app = Factory::officialAccount(wechat_config($type));
+        $app = Factory::officialAccount(wechat_config($this->wechatType));
 
         // 查询列表
         $menus = $models->orderBy('id', 'asc')
@@ -74,6 +107,7 @@ class PublishMenu extends Action
     {
         unset($value['id']);
         unset($value['pid']);
+        unset($value['wechat_type']);
         unset($value['status']);
         unset($value['created_at']);
         unset($value['updated_at']);

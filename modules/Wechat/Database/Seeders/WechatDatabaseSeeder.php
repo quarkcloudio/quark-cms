@@ -16,6 +16,7 @@ class WechatDatabaseSeeder extends Seeder
     {
         Model::unguard();
 
-        // $this->call("OthersTableSeeder");
+        $this->call("Modules\Wechat\Database\Seeders\MenusTableSeeder");
+        $this->call("Modules\Wechat\Database\Seeders\WechatConfigsTableSeeder");
     }
 }

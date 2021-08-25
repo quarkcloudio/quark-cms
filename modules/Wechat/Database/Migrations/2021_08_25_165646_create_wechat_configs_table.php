@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateWechatMenusTable extends Migration
+class CreateWechatConfigsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,15 +13,17 @@ class CreateWechatMenusTable extends Migration
      */
     public function up()
     {
-        Schema::create('wechat_menus', function (Blueprint $table) {
-            $table->id();
-            $table->integer('pid');
-            $table->string('wechat_type')->comment('DYH,FWH');
+        Schema::create('wechat_configs', function (Blueprint $table) {
+            $table->increments('id')->unsigned();
+            $table->string('title');
+            $table->string('type');
             $table->string('name');
-            $table->string('type')->comment('view等');
-            $table->string('value');
+            $table->string('group_name');
+            $table->longText('value')->nullable();
+            $table->longText('remark')->nullable();
             $table->boolean('status')->default(1);
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
@@ -32,6 +34,6 @@ class CreateWechatMenusTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('wechat_menus');
+        Schema::dropIfExists('wechat_configs');
     }
 }
