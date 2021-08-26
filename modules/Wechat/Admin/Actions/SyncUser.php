@@ -83,12 +83,14 @@ class SyncUser extends Action
         $app = Factory::officialAccount(wechat_config($type));
         $users = $app->user->list($nextOpenid);
 
-        if($users['data']['openid']) {
+        if(isset($users['data']['openid'])) {
             foreach ($users['data']['openid'] as $key => $value) {
                 $payload['wechat_type'] = $type;
                 $payload['openid'] = $value;
                 SyncUserJob::dispatch($payload)->onConnection('redis');
             }
+        } else {
+            return true;
         }
 
         if($users['next_openid']) {
