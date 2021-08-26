@@ -5,10 +5,9 @@ namespace Modules\Wechat\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use App\User;
-use Modules\Wechat\Models\WechatUser;
-use Str;
-use DB;
 
 class RegisterController extends Controller
 {

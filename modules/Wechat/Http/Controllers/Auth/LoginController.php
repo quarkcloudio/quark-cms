@@ -81,7 +81,7 @@ class LoginController extends Controller
             }
 
             $wechatUser['nickname'] = filter_emoji($wechatUser['nickname']);
-            $wechatUser['avatar'] = $avatarInfo['data']['id'];
+            $wechatUser['avatar'] = json_encode($avatarInfo['data']);
             
             if(!isset($wechatUser['original']['unionid'])) {
                 $wechatUser['original']['unionid'] = null;
