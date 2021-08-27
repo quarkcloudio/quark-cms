@@ -123,7 +123,6 @@ class User extends Resource
     public function actions(Request $request)
     {
         return [
-            (new \Modules\Wechat\Admin\Actions\SyncUser('同步订阅号用户','dyh'))->onlyOnIndex(),
             (new \App\Admin\Actions\CreateLink($this->title()))->onlyOnIndex(),
             (new \App\Admin\Actions\Delete('批量删除'))->onlyOnTableAlert(),
             (new \App\Admin\Actions\Disable('批量禁用'))->onlyOnTableAlert(),

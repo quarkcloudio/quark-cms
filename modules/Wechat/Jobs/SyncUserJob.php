@@ -10,6 +10,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Support\Str;
 use EasyWeChat\Factory;
 use App\User;
+use Modules\Wechat\Models\WechatSyncUserTask;
 
 class SyncUserJob implements ShouldQueue
 {
@@ -40,6 +41,19 @@ class SyncUserJob implements ShouldQueue
     public function handle()
     {
         $payload = $this->payload;
+
+        $wechatSyncUserTask = WechatSyncUserTask::where('id',$payload['task_id'])->first();
+
+        // 任务被删除后不执行操作
+        if(empty($wechatSyncUserTask)) {
+            return false;
+        }
+
+        // 已完成任务不执行操作
+        if(!empty($wechatSyncUserTask['finished_at'])) {
+            return false;
+        }
+
         $app = Factory::officialAccount(wechat_config($payload['wechat_type']));
         $user = $app->user->get($payload['openid']);
 
@@ -106,5 +120,14 @@ class SyncUserJob implements ShouldQueue
         } else {
             User::where('id',$hasUser['id'])->update($data);
         }
+
+        if($wechatSyncUserTask['total_num'] <= ($wechatSyncUserTask['num']+1)) {
+            $wechatSyncUserTaskData['finished_at'] = date('Y-m-d H:i:s');
+        }
+
+        $wechatSyncUserTaskData['num'] = $wechatSyncUserTask['num']+1;
+        $wechatSyncUserTaskData['last_openid'] = $payload['openid'];
+
+        WechatSyncUserTask::where('id',$payload['task_id'])->update($wechatSyncUserTaskData);
     }
 }

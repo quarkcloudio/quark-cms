@@ -2,49 +2,78 @@
 
 namespace  Modules\Wechat\Admin\Actions;
 
-use QuarkCMS\QuarkAdmin\Actions\Action;
+use QuarkCMS\QuarkAdmin\Actions\Link;
 use Modules\Wechat\Jobs\SyncUserJob;
 use EasyWeChat\Factory;
 use App\User;
+use Modules\Wechat\Models\WechatSyncUserTask;
+use Illuminate\Support\Str;
 
-class SyncUser extends Action
+class SyncUser extends Link
 {
     /**
-     * 公众号类型
+     * 行为名称，当行为在表格行展示时，支持js表达式
      *
      * @var string
      */
-    public $wechatType = 'DYH';
+    public $name = '创建任务';
 
     /**
-     * 初始化
+     * 设置按钮类型,primary | ghost | dashed | link | text | default
      *
-     * @param  string  $name
-     * @param  string  $wechatType
-     * 
-     * @return void
+     * @var string
      */
-    public function __construct($name, $wechatType)
+    public $type = 'primary';
+
+    /**
+     * 设置图标
+     *
+     * @var string
+     */
+    public $icon = 'plus-circle';
+
+    /**
+     * 任务id
+     *
+     * @var int
+     */
+    public $taskId = null;
+
+    /**
+     * 跳转链接
+     *
+     * @return string
+     */
+    public function href()
     {
-        $this->name = $name;
-        $this->wechatType = $wechatType;
+        return '#/index?api=' . Str::replaceLast('/index', '/create', 
+            Str::replaceFirst('api/','',\request()->path())
+        );
     }
 
     /**
      * 执行行为
      *
      * @param  Fields  $fields
-     * @param  Collection  $models
+     * @param  Collection  $model
      * @return mixed
      */
-    public function handle($fields, $models)
+    public function handle($fields, $model)
     {
         set_time_limit(0);
         ini_set('memory_limit','1024M');
 
+        $hasTasking = WechatSyncUserTask::where('finished_at',NULL)
+        ->where('type',$fields->type)
+        ->first();
+
+        if($hasTasking) {
+            return error('请等队列中正在执行的任务完成！');
+        }
+
         $getLastUser = User::orderBy('id','desc')->first();
 
-        switch (strtolower($this->wechatType)) {
+        switch (strtolower($fields->type)) {
             case 'dyh':
                 $nextOpenid = $getLastUser['wechat_dyh_openid'];
                 break;
@@ -62,10 +91,28 @@ class SyncUser extends Action
                 break;
         }
 
-        $result = $this->addToQueue($this->wechatType, $nextOpenid);
+        if(wechat_config($fields->type) === false) {
+            return error('请先配置公众号！');
+        }
+
+        $app = Factory::officialAccount(wechat_config($fields->type));
+        $users = $app->user->list($nextOpenid);
+
+        if($users['count']<=0) {
+            return error('您的用户数据已经是最新的了！');
+        }
+
+        $data['name'] = $fields->name;
+        $data['type'] = $fields->type;
+        $data['start_openid'] = $nextOpenid;
+        $data['created_at'] = date('Y-m-d H:i:s');
+
+        $this->taskId = $model->insertGetId($data);
+
+        $result = $this->addToQueue($fields->type, $nextOpenid);
 
         if($result) {
-            return success('任务创建成功！');
+            return success('创建成功！','/#/index?api=admin/wechatSyncUserTask/index');
         } else {
             return error('操作失败！');
         }
@@ -84,9 +131,13 @@ class SyncUser extends Action
         $users = $app->user->list($nextOpenid);
 
         if(isset($users['data']['openid'])) {
+            WechatSyncUserTask::where('id',$this->taskId)->increment('total_num', $users['count']);
+
             foreach ($users['data']['openid'] as $key => $value) {
+
                 $payload['wechat_type'] = $type;
                 $payload['openid'] = $value;
+                $payload['task_id'] = $this->taskId;
                 SyncUserJob::dispatch($payload)->onConnection('redis');
             }
         } else {
