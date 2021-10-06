@@ -10,7 +10,19 @@
     <div id="carouselExampleControls" class="carousel slide" data-ride="carousel">
         <div class="carousel-inner">
             @banners($banner,'IndexBanner')
-                <a href="{{$banner['url']}}">
+                <a 
+                    @if($banner['url_type'] == 1)
+                        href="/article/detail?id={{ $banner['url'] }}"
+                    @elseif($banner['url_type'] == 2)
+                        href="/page/index?id={{ $banner['url'] }}"
+                    @elseif($banner['url_type'] == 3)
+                        href="/article/list?id={{ $banner['url'] }}"
+                    @elseif($banner['url_type'] == 4)
+                        href="{{ $banner['url'] }}"
+                    @else
+                        href="{{ $banner['url'] }}"
+                    @endif
+                >
                     <div class="carousel-item active">
                         <img class="d-block w-100" src="{{ get_picture($banner['cover_id']) }}" alt="First slide">
                     </div>
@@ -28,7 +40,7 @@
     </div>
   </div> 
   <div class="row mb-2">
-    @articles($article,'default',2,0,1)
+    @articles($article,'Journal',2,0,1)
     <div class="col-md-6"> 
         <div class="row no-gutters border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative"> 
             <div class="col p-4 d-flex flex-column position-static"> 

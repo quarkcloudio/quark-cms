@@ -19,7 +19,7 @@ class CreateNavigationsTable extends Migration
             $table->integer('uid');
             $table->string('title');
             $table->integer('cover_id');
-            $table->string('url_type')->comment('url类型1：自定义链接，2：常用链接（首页、用户中心），3：文章分类（新闻、音乐），4：文章详情');
+            $table->tinyInteger('url_type')->comment('url类型1：文章，2：单页，3：分类目录，4：外部链接')->default(3);
             $table->string('url')->comment('例如：https://www.baidu.com，/article/1.html');
             $table->integer('sort');
             $table->boolean('status')->default(1);

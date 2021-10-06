@@ -56,7 +56,22 @@
                             <div class="dropdown-m
                             enu" aria-labelledby="dropdown01">
                                 @foreach($nav['_child'] as $childKey=>$childValue)
-                                    <a class="dropdown-item text-dark" href="{{ $childValue['url'] }}">{{ $childValue['title'] }}</a>
+                                    <a
+                                        class="dropdown-item text-dark"
+                                        @if($childValue['url_type'] == 1)
+                                            href="/article/detail?id={{ $childValue['url'] }}"
+                                        @elseif($childValue['url_type'] == 2)
+                                            href="/page/index?id={{ $childValue['url'] }}"
+                                        @elseif($childValue['url_type'] == 3)
+                                            href="/article/list?id={{ $childValue['url'] }}"
+                                        @elseif($childValue['url_type'] == 4)
+                                            href="{{ $childValue['url'] }}"
+                                        @else
+                                            href="{{ $childValue['url'] }}"
+                                        @endif
+                                    >
+                                        {{ $childValue['title'] }}
+                                    </a>
                                 @endforeach
                             </div>
                         </li>

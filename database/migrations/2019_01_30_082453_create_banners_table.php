@@ -17,7 +17,7 @@ class CreateBannersTable extends Migration
             $table->increments('id')->unsigned();
             $table->integer('category_id')->default(0)->nullable();
             $table->string('title');
-            $table->string('url_type')->comment('url类型1：自定义链接，2：常用链接（首页、用户中心），3：文章分类（新闻、音乐），4：文章详情');
+            $table->tinyInteger('url_type')->comment('url类型1：文章，2：单页，3：分类目录，4：外部链接')->default(1);
             $table->string('url')->comment('例如：https://www.baidu.com，/article/1.html');
             $table->string('cover_id');
             $table->integer('sort')->default(0)->nullable();

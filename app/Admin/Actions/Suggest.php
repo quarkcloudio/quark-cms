@@ -47,6 +47,20 @@ class Suggest extends Action
                     }
                 }
                 break;
+
+            case 'category':
+
+                // 分类目录
+                $query = \App\Models\Category::query()
+                ->select('title as label','id as value')
+                ->where('type','ARTICLE');
+
+                if($type === 'label') {
+                    if(!empty($search)) {
+                        $query->where('title','like','%'.$search.'%');
+                    }
+                }
+                break;
             default:
             
                 // 文章
