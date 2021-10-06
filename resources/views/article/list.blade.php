@@ -6,76 +6,94 @@
 @section('description', $category->description)
 
 @section('content')
-  <div class="banner rounded"> 
-    <div id="carouselExampleControls" class="carousel slide" data-ride="carousel">
+  <div class="mb-4 text-white rounded">
+    <div class="carousel slide" data-ride="carousel">
         <div class="carousel-inner">
             @banners($banner,'IndexBanner')
-                <a href="{{$banner['url']}}">
+                <a 
+                    @if($banner['url_type'] == 1)
+                        href="/article/detail?id={{ $banner['url'] }}"
+                    @elseif($banner['url_type'] == 2)
+                        href="/page/index?id={{ $banner['url'] }}"
+                    @elseif($banner['url_type'] == 3)
+                        href="/article/list?id={{ $banner['url'] }}"
+                    @elseif($banner['url_type'] == 4)
+                        href="{{ $banner['url'] }}"
+                    @else
+                        href="{{ $banner['url'] }}"
+                    @endif
+                >
                     <div class="carousel-item active">
-                        <img class="d-block w-100" src="{{ get_picture($banner['cover_id']) }}" alt="First slide">
+                        <img class="d-block w-100 rounded" src="{{ get_picture($banner['cover_id']) }}" alt="First slide">
                     </div>
                 </a>
             @endbanners
         </div>
-        <a class="carousel-control-prev" href="#carouselExampleControls" role="button" data-slide="prev">
+        <a class="carousel-control-prev" role="button" data-slide="prev">
             <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-            <span class="sr-only">上一个</span>
         </a>
-        <a class="carousel-control-next" href="#carouselExampleControls" role="button" data-slide="next">
+        <a class="carousel-control-next" role="button" data-slide="next">
             <span class="carousel-control-next-icon" aria-hidden="true"></span>
-            <span class="sr-only">下一个</span>
         </a>
     </div>
-  </div> 
-  <main role="main" class="container"> 
-   <div class="row"> 
-    <div class="col-md-8 blog-main"> 
-     <h3 class="pb-4 mb-4 font-italic border-bottom"> {{$category->title}} </h3>
-     @foreach($articles as $key => $article)
-     <div class="blog-post"> 
-      <h2 class="blog-post-title"><a href="/article/detail?id={{$article['id']}}">{{ msubstr($article['title'],0,30) }}</a></h2> 
-      <p class="blog-post-meta">{{date('Y-m-d',strtotime($article['created_at']))}}</p> 
-        <p>
-            {!!strip_tags($article['description'])!!}
-        </p>
-     </div>
-     <!-- /.blog-post -->
+  </div>
+
+  <div class="row g-5">
+    <div class="col-md-8">
+      <h3 class="pb-4 mb-4 fst-italic border-bottom">
+        {{$category->title}}
+      </h3>
+      
+    @foreach($articles as $key => $article)
+      <article class="blog-post">
+        <h2 class="blog-post-title"><a style="color:#212529;text-decoration:none" href="/article/detail?id={{$article['id']}}">{{ msubstr($article['title'],0,30) }}</a></h2>
+        <p class="blog-post-meta">{{date('Y-m-d',strtotime($article['created_at']))}}</p>
+
+        <p>{!!strip_tags($article['description'])!!}</p>
+      </article>
      @endforeach
-     <nav class="blog-pagination">
-        {{ $articles->appends(['name'=>$category->name])->links() }}
-     </nav>
+
+      <nav class="blog-pagination" aria-label="Pagination">
+        @if($category)
+            {{ $articles->appends(['name'=>$category->name])->links() }}
+        @else
+            {{ $articles->links() }}
+        @endif
+      </nav>
+
     </div>
-    <!-- /.blog-main --> 
-    <aside class="col-md-4 blog-sidebar"> 
-     <div class="p-4 mb-3 bg-light rounded"> 
-      <h4 class="font-italic">关于我们</h4> 
-      <p class="mb-0">
-        @page($page,'aboutus')
-            {!!strip_tags($page['content'])!!}
-        @endpage
-       </p> 
-     </div> 
-     <div class="p-4"> 
-      <h4 class="font-italic">文章归档</h4> 
-      <ol class="list-unstyled mb-0">
+
+    <div class="col-md-4">
+      <div class="position-sticky" style="top: 2rem;">
+        <div class="p-4 mb-3 bg-light rounded">
+          <h4 class="fst-italic">关于我们</h4>
+            <p class="mb-0">
+                @page($page,'aboutus')
+                    {!!strip_tags($page['content'])!!}
+                @endpage
+            </p>
+        </div>
+
+        <div class="p-4">
+          <h4 class="fst-italic">文章归档</h4>
+          <ol class="list-unstyled mb-0">
             @archives($archive,'posts')
-                <li><a href="#">{{$archive['created_date']}}</a></li> 
+            <li><a href="#">{{$archive['created_date']}}</a></li> 
             @endarchives
-      </ol> 
-     </div> 
-     <div class="p-4"> 
-      <h4 class="font-italic">友情链接</h4> 
-      <ol class="list-unstyled">
-        @links($link)
+          </ol>
+        </div>
+
+        <div class="p-4">
+          <h4 class="fst-italic">友情链接</h4>
+          <ol class="list-unstyled">
+            @links($link)
             <li><a href="{{$link['url']}}">{{$link['title']}}</a></li> 
-        @endlinks
-      </ol> 
-     </div> 
-    </aside>
-    <!-- /.blog-sidebar --> 
-   </div>
-   <!-- /.row --> 
-  </main>
+            @endlinks
+          </ol>
+        </div>
+      </div>
+    </div>
+  </div>
   <!-- /.container -->
 @endsection
 
