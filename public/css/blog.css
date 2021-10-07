@@ -29,17 +29,17 @@ h1, h2, h3, h4, h5, h6 {
 
 .nav-scroller {
   position: relative;
-  z-index: 2;
+  /* z-index: 2;
   height: 2.75rem;
-  overflow-y: hidden;
+  /* overflow-y: hidden; */
 }
 
 .nav-scroller .nav {
   display: flex;
   flex-wrap: nowrap;
-  padding-bottom: 1rem;
-  margin-top: -1px;
-  overflow-x: auto;
+  /* padding-bottom: 1rem; */
+  /* margin-top: -1px; */
+  /* overflow-x: auto; */
   text-align: center;
   white-space: nowrap;
   -webkit-overflow-scrolling: touch;
@@ -100,4 +100,9 @@ h1, h2, h3, h4, h5, h6 {
 }
 .blog-footer p:last-child {
   margin-bottom: 0;
+}
+
+.dropdown {
+  padding: 0px; margin: 0px;
+  line-height: 40px;
 }

@@ -36,7 +36,7 @@
     <!-- Custom styles for this template -->
     <link href="https://fonts.googleapis.com/css?family=Playfair&#43;Display:700,900&amp;display=swap" rel="stylesheet">
     <!-- Custom styles for this template -->
-    <link href="{{ asset('css/blog.css') }}" rel="stylesheet">
+    <link href="{{ asset('css/blog.css') }}?v=1" rel="stylesheet">
   </head>
   <body>
     
@@ -77,8 +77,8 @@
   </header>
 
   <div class="nav-scroller py-1 mb-2">
-    <nav class="nav d-flex">
-        @navs($nav,0)
+    <nav class="nav d-flex justify-content-between">
+        @navs($nav, 1)
             @if (isset($nav['_child']))
             <div class="dropdown">
                 <a class="p-2 link-secondary dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">
@@ -128,4 +128,5 @@
     </footer>
 
   </body>
+  <script src="{{ asset('js/bootstrap.bundle.min.js') }}"></script>
 </html>
