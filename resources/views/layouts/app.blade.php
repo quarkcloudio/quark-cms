@@ -109,7 +109,22 @@
                 </ul>
             </div>
             @else
-            <a class="p-2 link-secondary {{ get_url_activated($nav['url'],'active') }}" href="{{ $nav['url'] }}">{!! $nav['title'] !!}</a>
+            <a 
+              class="p-2 link-secondary {{ get_url_activated($nav['url'],'active') }}"
+              @if($nav['url_type'] == 1)
+                  href="/article/detail?id={{ $nav['url'] }}"
+              @elseif($nav['url_type'] == 2)
+                  href="/page/index?id={{ $nav['url'] }}"
+              @elseif($nav['url_type'] == 3)
+                  href="/article/list?id={{ $nav['url'] }}"
+              @elseif($nav['url_type'] == 4)
+                  href="{{ $nav['url'] }}"
+              @else
+                  href="{{ $nav['url'] }}"
+              @endif
+            >
+              {!! $nav['title'] !!}
+            </a>
             @endif
         @endnavs
     </nav>
