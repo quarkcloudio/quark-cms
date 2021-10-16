@@ -155,7 +155,7 @@ class Banner extends Resource
             (new \App\Admin\Actions\ChangeStatus)->onlyOnTableRow(),
             (new \App\Admin\Actions\EditLink('编辑'))->onlyOnTableRow(),
             (new \App\Admin\Actions\Delete('删除'))->onlyOnTableRow(),
-            new \App\Admin\Actions\Suggest
+            (new \App\Admin\Actions\Suggest)->onlyOnDetail(),
         ];
     }
 

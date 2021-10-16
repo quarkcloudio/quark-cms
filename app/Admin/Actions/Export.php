@@ -53,7 +53,11 @@ class Export extends Link
      */
     public function href()
     {
-        return '/api/'.$this->api().'export_ids=${id}&token='.get_token();
+        if($this->name === '批量导出') {
+            return '/api/'.$this->api().'export_ids=${id}&token='.get_token();
+        } else {
+            return '/api/'.$this->api().'token='.get_token();
+        }
     }
 
     /**
