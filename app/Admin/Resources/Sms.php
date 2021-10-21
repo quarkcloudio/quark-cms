@@ -85,10 +85,10 @@ class Sms extends Resource
     {
         return [
             (new \App\Admin\Actions\ImportSmsLink())->onlyOnIndex(),
-            (new \App\Admin\Actions\SendSms('批量发送'))->onlyOnTableAlert(),
-            (new \App\Admin\Actions\Delete('批量删除'))->onlyOnTableAlert(),
-            (new \App\Admin\Actions\Delete('删除'))->onlyOnTableRow(),
-            (new \App\Admin\Actions\SendSms('发送'))->onlyOnTableRow(),
+            (new \App\Admin\Actions\SendSms('批量发送'))->onlyOnIndexTableAlert(),
+            (new \App\Admin\Actions\Delete('批量删除'))->onlyOnIndexTableAlert(),
+            (new \App\Admin\Actions\Delete('删除'))->onlyOnIndexTableRow(),
+            (new \App\Admin\Actions\SendSms('发送'))->onlyOnIndexTableRow(),
         ];
     }
 }

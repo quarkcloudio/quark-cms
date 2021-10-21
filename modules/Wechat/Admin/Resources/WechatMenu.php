@@ -108,12 +108,16 @@ abstract class WechatMenu extends Resource
             (new \Modules\Wechat\Admin\Actions\SyncMenu('同步线上菜单',self::$wechatType))->onlyOnIndex(),
             (new \App\Admin\Actions\CreateLink('菜单'))->onlyOnIndex(),
             (new \Modules\Wechat\Admin\Actions\PublishMenu('发布菜单',self::$wechatType))->onlyOnIndex(),
-            (new \App\Admin\Actions\Delete('批量删除'))->onlyOnTableAlert(),
-            (new \App\Admin\Actions\Disable('批量禁用'))->onlyOnTableAlert(),
-            (new \App\Admin\Actions\Enable('批量启用'))->onlyOnTableAlert(),
-            (new \App\Admin\Actions\ChangeStatus)->onlyOnTableRow(),
-            (new \App\Admin\Actions\EditLink('编辑'))->onlyOnTableRow(),
-            (new \App\Admin\Actions\Delete('删除'))->onlyOnTableRow(),
+            (new \App\Admin\Actions\Delete('批量删除'))->onlyOnIndexTableAlert(),
+            (new \App\Admin\Actions\Disable('批量禁用'))->onlyOnIndexTableAlert(),
+            (new \App\Admin\Actions\Enable('批量启用'))->onlyOnIndexTableAlert(),
+            (new \App\Admin\Actions\ChangeStatus)->onlyOnIndexTableRow(),
+            (new \App\Admin\Actions\EditLink('编辑'))->onlyOnIndexTableRow(),
+            (new \App\Admin\Actions\Delete('删除'))->onlyOnIndexTableRow(),
+            new \App\Admin\Actions\FormSubmit,
+            new \App\Admin\Actions\FormReset,
+            new \App\Admin\Actions\FormBack,
+            new \App\Admin\Actions\FormExtraBack
         ];
     }
 
