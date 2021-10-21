@@ -77,6 +77,10 @@ class Config extends Resource
             ->updateRules(["unique:configs,name,{id}"],['unique'=>'名称已经存在']),
             
             Field::text('group_name','分组名称')
+            ->rules(
+                ['required'],
+                ['required' => '分组名称必须填写']
+            )
             ->onlyOnForms(),
 
             Field::textArea('remark','备注')
@@ -115,12 +119,16 @@ class Config extends Resource
     {
         return [
             (new \App\Admin\Actions\CreateModal($this->title()))->onlyOnIndex(),
-            (new \App\Admin\Actions\Delete('批量删除'))->onlyOnTableAlert(),
-            (new \App\Admin\Actions\Disable('批量禁用'))->onlyOnTableAlert(),
-            (new \App\Admin\Actions\Enable('批量启用'))->onlyOnTableAlert(),
-            (new \App\Admin\Actions\ChangeStatus)->onlyOnTableRow(),
-            (new \App\Admin\Actions\EditModal('编辑'))->onlyOnTableRow(),
-            (new \App\Admin\Actions\Delete('删除'))->onlyOnTableRow(),
+            (new \App\Admin\Actions\Delete('批量删除'))->onlyOnIndexTableAlert(),
+            (new \App\Admin\Actions\Disable('批量禁用'))->onlyOnIndexTableAlert(),
+            (new \App\Admin\Actions\Enable('批量启用'))->onlyOnIndexTableAlert(),
+            (new \App\Admin\Actions\ChangeStatus)->onlyOnIndexTableRow(),
+            (new \App\Admin\Actions\EditModal('编辑'))->onlyOnIndexTableRow(),
+            (new \App\Admin\Actions\Delete('删除'))->onlyOnIndexTableRow(),
+            new \App\Admin\Actions\FormSubmit,
+            new \App\Admin\Actions\FormReset,
+            new \App\Admin\Actions\FormBack,
+            new \App\Admin\Actions\FormExtraBack
         ];
     }
 }

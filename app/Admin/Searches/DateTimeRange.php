@@ -11,7 +11,6 @@ class DateTimeRange extends BaseDateTimeRange
      * 初始化
      *
      * @param  string  $column
-     * @param  string  $name
      * @return void
      */
     public function __construct($column, $name)

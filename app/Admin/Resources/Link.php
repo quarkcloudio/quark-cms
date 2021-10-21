@@ -115,6 +115,10 @@ class Link extends Resource
             (new \App\Admin\Actions\ChangeStatus)->onlyOnTableRow(),
             (new \App\Admin\Actions\EditLink('编辑'))->onlyOnTableRow(),
             (new \App\Admin\Actions\Delete('删除'))->onlyOnTableRow(),
+            new \App\Admin\Actions\FormSubmit,
+            new \App\Admin\Actions\FormReset,
+            new \App\Admin\Actions\FormBack,
+            new \App\Admin\Actions\FormExtraBack
         ];
     }
 }
