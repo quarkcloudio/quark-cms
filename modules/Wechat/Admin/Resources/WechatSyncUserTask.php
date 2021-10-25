@@ -122,6 +122,10 @@ class WechatSyncUserTask extends Resource
             (new \Modules\Wechat\Admin\Actions\SyncUser)->onlyOnIndex(),
             (new \App\Admin\Actions\Delete('批量删除'))->onlyOnIndexTableAlert(),
             (new \App\Admin\Actions\Delete('删除'))->onlyOnIndexTableRow(),
+            (new \App\Admin\Actions\FormSubmit),
+            (new \App\Admin\Actions\FormReset),
+            (new \App\Admin\Actions\FormBack),
+            (new \App\Admin\Actions\FormExtraBack)
         ];
     }
 }
