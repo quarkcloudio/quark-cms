@@ -130,7 +130,11 @@ class Menu extends Resource
             (new \App\Admin\Actions\Enable('批量启用'))->onlyOnIndexTableAlert(),
             (new \App\Admin\Actions\ChangeStatus)->onlyOnIndexTableRow(),
             (new \App\Admin\Actions\EditDrawer('编辑'))->onlyOnIndexTableRow(),
-            (new \App\Admin\Actions\Delete('删除'))->onlyOnIndexTableRow()
+            (new \App\Admin\Actions\Delete('删除'))->onlyOnIndexTableRow(),
+            new \App\Admin\Actions\FormSubmit,
+            new \App\Admin\Actions\FormReset,
+            new \App\Admin\Actions\FormBack,
+            new \App\Admin\Actions\FormExtraBack
         ];
     }
 

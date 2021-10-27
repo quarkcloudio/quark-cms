@@ -34,6 +34,13 @@ class AccountRecharge extends Modal
     public $size = 'small';
 
     /**
+     * 执行成功后刷新的组件
+     *
+     * @var string
+     */
+    public $reload = 'table';
+
+    /**
      * 接口接收的参数
      *
      * @return string
