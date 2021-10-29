@@ -731,12 +731,14 @@ if(!function_exists('send_email')) {
     function send_email($subject,$toEmail,$content)
     {
         config([
-            'mail.host' => web_config('EMAIL_HOST'),
-            'mail.port' => web_config('EMAIL_PORT'),
-            'mail.from' => ['address' => web_config('EMAIL_USERNAME'),'name' => web_config('WEB_SITE_NAME')],
-            'mail.username' => web_config('EMAIL_USERNAME'),
-            'mail.password' => web_config('EMAIL_PASSWORD'),
-            ]);
+            'mail.mailers.smtp.host' => web_config('EMAIL_HOST'),
+            'mail.mailers.smtp.port' => web_config('EMAIL_PORT'),
+            'mail.mailers.smtp.encryption' => web_config('MAIL_ENCRYPTION'),
+            'mail.mailers.smtp.from' => ['address' => web_config('EMAIL_USERNAME'),'name' => web_config('WEB_SITE_NAME')],
+            'mail.mailers.smtp.username' => web_config('EMAIL_USERNAME'),
+            'mail.mailers.smtp.password' => web_config('EMAIL_PASSWORD')
+        ]);
+
         \Mail::raw($content, function ($message) use($toEmail, $subject) {
             $message ->to($toEmail)->subject($subject);
         });
