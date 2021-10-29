@@ -78,7 +78,11 @@ class Suggest extends Action
 
         if($type === 'value') {
             if(!empty($search)) {
-                $query->where('id', $search);
+                if(is_array($search)) {
+                    $query->whereIn('id', $search);
+                } else {
+                    $query->where('id', $search);
+                }
             }
         }
 
