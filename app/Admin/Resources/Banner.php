@@ -99,7 +99,7 @@ class Banner extends Resource
             })
             ->when(3, function() use ($api) {
                 
-                return Field::search('category_id','分类目录')
+                return Field::search('url_category_id','分类目录')
                 ->api($api.'model=category')
                 ->onlyOnForms();
             })
@@ -155,11 +155,11 @@ class Banner extends Resource
             (new \App\Admin\Actions\ChangeStatus)->onlyOnIndexTableRow(),
             (new \App\Admin\Actions\EditLink('编辑'))->onlyOnIndexTableRow(),
             (new \App\Admin\Actions\Delete('删除'))->onlyOnIndexTableRow(),
-            (new \App\Admin\Actions\Suggest)->onlyOnDetail(),
-            new \App\Admin\Actions\FormSubmit,
-            new \App\Admin\Actions\FormReset,
-            new \App\Admin\Actions\FormBack,
-            new \App\Admin\Actions\FormExtraBack
+            (new \App\Admin\Actions\FormSubmit),
+            (new \App\Admin\Actions\FormReset),
+            (new \App\Admin\Actions\FormBack),
+            (new \App\Admin\Actions\FormExtraBack),
+            new \App\Admin\Actions\Suggest
         ];
     }
 
@@ -183,7 +183,7 @@ class Banner extends Resource
                 break;
             case 3:
                 // 分类目录
-                $data['category_id'] = $data['url'];
+                $data['url_category_id'] = $data['url'];
                 break;
             case 4:
                 // 其他链接
@@ -221,9 +221,9 @@ class Banner extends Resource
             unset($submitData['page_id']);
         }
 
-        if(isset($submitData['category_id'])) {
-            $submitData['url'] = $submitData['category_id'];
-            unset($submitData['category_id']);
+        if(isset($submitData['url_category_id'])) {
+            $submitData['url'] = $submitData['url_category_id'];
+            unset($submitData['url_category_id']);
         }
 
         return $submitData;
