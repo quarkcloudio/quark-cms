@@ -53,16 +53,6 @@ class Navigation extends Resource
                 ['required' => '标题必须填写']
             ),
 
-            Field::text('english_title','英文标题')
-            ->rules(
-                ['required'],
-                ['required' => '标题必须填写']
-            ),
-
-            Field::text('sort','排序')
-            ->default(0)
-            ->editable(),
-
             Field::select('pid','父节点')
             ->options(\App\Models\Navigation::orderedList())
             ->default(0)

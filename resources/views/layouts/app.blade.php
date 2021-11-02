@@ -78,7 +78,7 @@
 
   <div class="nav-scroller py-1 mb-2">
     <nav class="nav d-flex justify-content-between">
-        @navs($nav, 1)
+        @navs($nav, 0)
             @if (isset($nav['_child']))
             <div class="dropdown">
                 <a class="p-2 link-secondary dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">
