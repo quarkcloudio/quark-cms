@@ -30,6 +30,13 @@ class User extends Resource
     public static $perPage = 10;
 
     /**
+     * 具有导出功能
+     *
+     * @var bool
+     */
+    public static $withExport = true;
+
+    /**
      * 列表查询
      *
      * @param  Request  $request
@@ -67,7 +74,7 @@ class User extends Resource
             ->rules(['required','max:20'],['required'=>'昵称必须填写','max'=>'昵称不能超过20个字符']),
     
             Field::radio('sex','性别')
-            ->options(['1' => '男', '2'=> '女'])
+            ->options([1 => '男', 2=> '女'])
             ->default(1),
     
             Field::text('email','邮箱')
@@ -84,11 +91,19 @@ class User extends Resource
             ->creationRules(['required'], ['required'=>'密码必须填写'])
             ->onlyOnForms(),
             
+            Field::number('money','账户余额')
+            ->onlyOnDetail(),
+
+            Field::number('score','账户积分')
+            ->onlyOnDetail(),
+
             Field::datetime('created_at','注册时间')
-            ->onlyOnIndex(),
+            ->onlyOnIndex()
+            ->showOnDetail(),
 
             Field::datetime('last_login_time','最后登录时间')
-            ->onlyOnIndex(),
+            ->onlyOnIndex()
+            ->showOnDetail(),
 
             Field::switch('status','状态')
             ->editable()
@@ -127,10 +142,11 @@ class User extends Resource
             (new \App\Admin\Actions\Delete('批量删除'))->onlyOnIndexTableAlert(),
             (new \App\Admin\Actions\Disable('批量禁用'))->onlyOnIndexTableAlert(),
             (new \App\Admin\Actions\Enable('批量启用'))->onlyOnIndexTableAlert(),
+            (new \App\Admin\Actions\AccountRecharge)->onlyOnIndexTableRow(),
             (new \App\Admin\Actions\ChangeStatus)->onlyOnIndexTableRow(),
             (new \App\Admin\Actions\EditLink('编辑'))->onlyOnIndexTableRow(),
             (new \App\Admin\Actions\Delete('删除'))->onlyOnIndexTableRow(),
-            (new \App\Admin\Actions\AccountRecharge)->onlyOnIndexTableRow(),
+            (new \App\Admin\Actions\DetailLink('详情'))->onlyOnIndexTableRow(),
             new \App\Admin\Actions\FormSubmit,
             new \App\Admin\Actions\FormReset,
             new \App\Admin\Actions\FormBack,
