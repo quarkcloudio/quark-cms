@@ -4488,16 +4488,16 @@
         },
         {
             "name": "quarkcms/quark",
-            "version": "v1.0.14",
+            "version": "v1.0.15",
             "source": {
                 "type": "git",
                 "url": "https://github.com/quarkcms/quark.git",
-                "reference": "ab8347648e39483bdd35138ef6f3a8f6f8539655"
+                "reference": "3ba9faa4ce07178b53c1b1ac289193dcb8729d9a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/quarkcms/quark/zipball/ab8347648e39483bdd35138ef6f3a8f6f8539655",
-                "reference": "ab8347648e39483bdd35138ef6f3a8f6f8539655",
+                "url": "https://api.github.com/repos/quarkcms/quark/zipball/3ba9faa4ce07178b53c1b1ac289193dcb8729d9a",
+                "reference": "3ba9faa4ce07178b53c1b1ac289193dcb8729d9a",
                 "shasum": "",
                 "mirrors": [
                     {
@@ -4537,22 +4537,22 @@
             ],
             "support": {
                 "issues": "https://github.com/quarkcms/quark/issues",
-                "source": "https://github.com/quarkcms/quark/tree/v1.0.14"
+                "source": "https://github.com/quarkcms/quark/tree/v1.0.15"
             },
-            "time": "2021-11-02T07:25:15+00:00"
+            "time": "2021-11-05T09:13:59+00:00"
         },
         {
             "name": "quarkcms/quark-admin",
-            "version": "v2.1.6",
+            "version": "v2.1.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/quarkcms/quark-admin.git",
-                "reference": "26e11d2a25a2a0c31d3b5b79e80670583b62c75f"
+                "reference": "b99d1699ea7e3fc79b2e956b0d303752a0a4b712"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/quarkcms/quark-admin/zipball/26e11d2a25a2a0c31d3b5b79e80670583b62c75f",
-                "reference": "26e11d2a25a2a0c31d3b5b79e80670583b62c75f",
+                "url": "https://api.github.com/repos/quarkcms/quark-admin/zipball/b99d1699ea7e3fc79b2e956b0d303752a0a4b712",
+                "reference": "b99d1699ea7e3fc79b2e956b0d303752a0a4b712",
                 "shasum": "",
                 "mirrors": [
                     {
@@ -4607,9 +4607,9 @@
             ],
             "support": {
                 "issues": "https://github.com/quarkcms/quark-admin/issues",
-                "source": "https://github.com/quarkcms/quark-admin/tree/v2.1.6"
+                "source": "https://github.com/quarkcms/quark-admin/tree/v2.1.7"
             },
-            "time": "2021-11-04T06:18:38+00:00"
+            "time": "2021-11-05T09:18:43+00:00"
         },
         {
             "name": "ralouphie/getallheaders",
@@ -7337,16 +7337,16 @@
         },
         {
             "name": "symfony/psr-http-message-bridge",
-            "version": "v2.1.1",
+            "version": "v2.1.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/psr-http-message-bridge.git",
-                "reference": "c9012994c4b4fb23e7c57dd86b763a417a04feba"
+                "reference": "22b37c8a3f6b5d94e9cdbd88e1270d96e2f97b34"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/psr-http-message-bridge/zipball/c9012994c4b4fb23e7c57dd86b763a417a04feba",
-                "reference": "c9012994c4b4fb23e7c57dd86b763a417a04feba",
+                "url": "https://api.github.com/repos/symfony/psr-http-message-bridge/zipball/22b37c8a3f6b5d94e9cdbd88e1270d96e2f97b34",
+                "reference": "22b37c8a3f6b5d94e9cdbd88e1270d96e2f97b34",
                 "shasum": "",
                 "mirrors": [
                     {
@@ -7358,17 +7358,17 @@
             "require": {
                 "php": ">=7.1",
                 "psr/http-message": "^1.0",
-                "symfony/http-foundation": "^4.4 || ^5.0"
+                "symfony/http-foundation": "^4.4 || ^5.0 || ^6.0"
             },
             "require-dev": {
                 "nyholm/psr7": "^1.1",
                 "psr/log": "^1.1 || ^2 || ^3",
-                "symfony/browser-kit": "^4.4 || ^5.0",
-                "symfony/config": "^4.4 || ^5.0",
-                "symfony/event-dispatcher": "^4.4 || ^5.0",
-                "symfony/framework-bundle": "^4.4 || ^5.0",
-                "symfony/http-kernel": "^4.4 || ^5.0",
-                "symfony/phpunit-bridge": "^4.4.19 || ^5.2"
+                "symfony/browser-kit": "^4.4 || ^5.0 || ^6.0",
+                "symfony/config": "^4.4 || ^5.0 || ^6.0",
+                "symfony/event-dispatcher": "^4.4 || ^5.0 || ^6.0",
+                "symfony/framework-bundle": "^4.4 || ^5.0 || ^6.0",
+                "symfony/http-kernel": "^4.4 || ^5.0 || ^6.0",
+                "symfony/phpunit-bridge": "^5.4@dev || ^6.0"
             },
             "suggest": {
                 "nyholm/psr7": "For a super lightweight PSR-7/17 implementation"
@@ -7411,7 +7411,7 @@
             ],
             "support": {
                 "issues": "https://github.com/symfony/psr-http-message-bridge/issues",
-                "source": "https://github.com/symfony/psr-http-message-bridge/tree/v2.1.1"
+                "source": "https://github.com/symfony/psr-http-message-bridge/tree/v2.1.2"
             },
             "funding": [
                 {
@@ -7427,7 +7427,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2021-07-27T17:25:39+00:00"
+            "time": "2021-11-05T13:13:39+00:00"
         },
         {
             "name": "symfony/routing",
