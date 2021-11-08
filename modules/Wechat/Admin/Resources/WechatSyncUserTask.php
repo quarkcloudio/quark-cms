@@ -30,6 +30,13 @@ class WechatSyncUserTask extends Resource
     public static $model = 'Modules\Wechat\Models\WechatSyncUserTask';
 
     /**
+     * 列表页轮询
+     *
+     * @var null|number
+     */
+    public static $indexPolling = 2000;
+
+    /**
      * 表单接口
      *
      * @param  Request  $request
