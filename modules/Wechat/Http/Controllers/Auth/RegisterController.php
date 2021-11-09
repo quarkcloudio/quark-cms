@@ -51,6 +51,19 @@ class RegisterController extends Controller
 
     protected function createUser($wechatUser)
     {
+        // 定义对象
+        $query = User::where('wechat_fwh_openid', $wechatUser['original']['openid']);
+
+        if(isset($wechatUser['original']['unionid'])) {
+            $query->orWhere('wechat_unionid', $wechatUser['original']['unionid']);
+        }
+
+        $getWechatUser = $query->first();
+
+        if($getWechatUser) {
+            return $getWechatUser['id'];
+        }
+
         // 启动事务
         DB::beginTransaction();
 
@@ -58,7 +71,7 @@ class RegisterController extends Controller
             $data['username'] = Str::random(8) . '-' . time(); // 临时用户名
             $data['email'] = Str::random(8) . '-' . time(); // 临时邮箱
             $data['phone'] = Str::random(8) . '-' . time(); // 临时手机号
-            $data['nickname'] = $wechatUser['nickname'];
+            // $data['nickname'] = $wechatUser['nickname'];
             $data['sex'] = $wechatUser['original']['sex'];
             $data['password'] = bcrypt(env('APP_KEY'));
             $data['avatar'] = $wechatUser['avatar'];
