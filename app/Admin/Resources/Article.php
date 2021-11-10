@@ -123,7 +123,11 @@ class Article extends Resource
 
             Field::select('category_id','分类目录')
             ->options(Category::orderedList('ARTICLE'))
-            ->rules(['required'],['required'=>'请选择分类']),
+            ->rules(['required'],['required'=>'请选择分类'])
+            ->onlyOnForms(),
+
+            Field::text('category.title','分类目录')
+            ->onlyOnIndex(),
 
             Field::editor('content','内容')
             ->onlyOnForms(),
@@ -211,10 +215,10 @@ class Article extends Resource
             (new \App\Admin\Actions\ChangeStatus)->onlyOnIndexTableRow(),
             (new \App\Admin\Actions\EditLink('编辑'))->onlyOnIndexTableRow(),
             (new \App\Admin\Actions\Delete('删除'))->onlyOnIndexTableRow(),
-            new \App\Admin\Actions\FormSubmit,
-            new \App\Admin\Actions\FormReset,
-            new \App\Admin\Actions\FormBack,
-            new \App\Admin\Actions\FormExtraBack
+            (new \App\Admin\Actions\FormSubmit),
+            (new \App\Admin\Actions\FormReset),
+            (new \App\Admin\Actions\FormBack),
+            (new \App\Admin\Actions\FormExtraBack)
         ];
     }
 
