@@ -31,7 +31,7 @@ class Page extends Resource
      */
     public static function indexQuery(Request $request, $query)
     {
-        return $query->where('type','Page');
+        return $query->orderBy('id','asc')->where('type','PAGE');
     }
 
     /**

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "9c303ae77ab3a2d21b1c6efcc38f8e2b",
+    "content-hash": "e9687840eb9f2b83e157db2e5a17b531",
     "packages": [
         {
             "name": "aliyuncs/oss-sdk-php",
@@ -4488,16 +4488,16 @@
         },
         {
             "name": "quarkcms/quark",
-            "version": "v1.0.15",
+            "version": "v1.0.24",
             "source": {
                 "type": "git",
                 "url": "https://github.com/quarkcms/quark.git",
-                "reference": "3ba9faa4ce07178b53c1b1ac289193dcb8729d9a"
+                "reference": "f28baf4bd42ce78915072a4889e54312be0ed250"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/quarkcms/quark/zipball/3ba9faa4ce07178b53c1b1ac289193dcb8729d9a",
-                "reference": "3ba9faa4ce07178b53c1b1ac289193dcb8729d9a",
+                "url": "https://api.github.com/repos/quarkcms/quark/zipball/f28baf4bd42ce78915072a4889e54312be0ed250",
+                "reference": "f28baf4bd42ce78915072a4889e54312be0ed250",
                 "shasum": "",
                 "mirrors": [
                     {
@@ -4537,22 +4537,22 @@
             ],
             "support": {
                 "issues": "https://github.com/quarkcms/quark/issues",
-                "source": "https://github.com/quarkcms/quark/tree/v1.0.15"
+                "source": "https://github.com/quarkcms/quark/tree/v1.0.24"
             },
-            "time": "2021-11-05T09:13:59+00:00"
+            "time": "2021-11-13T09:13:25+00:00"
         },
         {
             "name": "quarkcms/quark-admin",
-            "version": "v2.1.7",
+            "version": "v2.2.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/quarkcms/quark-admin.git",
-                "reference": "b99d1699ea7e3fc79b2e956b0d303752a0a4b712"
+                "reference": "419e173ec3d490a656a8d7159efc59336f3cd22e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/quarkcms/quark-admin/zipball/b99d1699ea7e3fc79b2e956b0d303752a0a4b712",
-                "reference": "b99d1699ea7e3fc79b2e956b0d303752a0a4b712",
+                "url": "https://api.github.com/repos/quarkcms/quark-admin/zipball/419e173ec3d490a656a8d7159efc59336f3cd22e",
+                "reference": "419e173ec3d490a656a8d7159efc59336f3cd22e",
                 "shasum": "",
                 "mirrors": [
                     {
@@ -4565,6 +4565,7 @@
                 "aliyuncs/oss-sdk-php": "^2.0",
                 "gregwar/captcha": "^1.0",
                 "guzzlehttp/guzzle": "^6.2|^7.0",
+                "maatwebsite/excel": "^3.1",
                 "php": ">=7.2",
                 "quarkcms/quark": "^1.0.0",
                 "spatie/laravel-permission": "^3.0"
@@ -4607,9 +4608,9 @@
             ],
             "support": {
                 "issues": "https://github.com/quarkcms/quark-admin/issues",
-                "source": "https://github.com/quarkcms/quark-admin/tree/v2.1.7"
+                "source": "https://github.com/quarkcms/quark-admin/tree/v2.2.4"
             },
-            "time": "2021-11-05T09:18:43+00:00"
+            "time": "2021-11-13T15:18:47+00:00"
         },
         {
             "name": "ralouphie/getallheaders",

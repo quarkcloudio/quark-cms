@@ -48,17 +48,6 @@ class WechatSyncUserTask extends Resource
     }
 
     /**
-     * 列表查询
-     *
-     * @param  Request  $request
-     * @return object
-     */
-    public static function indexQuery(Request $request, $query)
-    {
-        return $query->orderBy('id', 'desc');
-    }
-
-    /**
      * 字段
      *
      * @param  Request  $request
