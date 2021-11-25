@@ -68,19 +68,19 @@ class Navigation extends Resource
             ->when(1, function() use ($api) {
 
                 return Field::search('article_id','选择文章')
-                ->api($api.'model=article')
+                ->api($api.'?model=article')
                 ->onlyOnForms();
             })
             ->when(2, function() use ($api) {
                 
                 return Field::search('page_id','选择单页')
-                ->api($api.'model=page')
+                ->api($api.'?model=page')
                 ->onlyOnForms();
             })
             ->when(3, function() use ($api) {
                 
                 return Field::search('category_id','分类目录')
-                ->api($api.'model=category')
+                ->api($api.'?model=category')
                 ->onlyOnForms();
             })
             ->when(4, function() use ($api) {
