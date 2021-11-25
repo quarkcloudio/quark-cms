@@ -162,15 +162,15 @@ class Navigation extends Resource
         switch ($data['url_type']) {
             case 1:
                 // 文章
-                $data['article_id'] = $data['url'];
+                $data['article_id'] = intval($data['url']);
                 break;
             case 2:
                 // 单页
-                $data['page_id'] = $data['url'];
+                $data['page_id'] = intval($data['url']);
                 break;
             case 3:
                 // 分类目录
-                $data['category_id'] = $data['url'];
+                $data['category_id'] = intval($data['url']);
                 break;
             case 4:
                 // 其他链接
@@ -178,7 +178,7 @@ class Navigation extends Resource
                 break;
             default:
                 // 文章
-                $data['article_id'] = $data['url'];
+                $data['article_id'] = intval($data['url']);
                 break;
         }
 
