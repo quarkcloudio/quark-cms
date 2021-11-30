@@ -53,6 +53,11 @@ class Navigation extends Resource
                 ['required' => '标题必须填写']
             ),
 
+            Field::number('sort','排序')
+            ->editable()
+            ->default(0)
+            ->help('数值越小越靠前'),
+
             Field::select('pid','父节点')
             ->options(\App\Models\Navigation::orderedList())
             ->default(0)
