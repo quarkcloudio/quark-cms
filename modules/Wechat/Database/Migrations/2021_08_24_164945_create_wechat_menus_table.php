@@ -18,8 +18,8 @@ class CreateWechatMenusTable extends Migration
             $table->integer('pid');
             $table->string('wechat_type')->comment('DYH,FWH');
             $table->string('name');
-            $table->string('type')->comment('view等');
-            $table->string('value');
+            $table->string('type')->nullable()->comment('view等');
+            $table->string('value')->nullable();
             $table->boolean('status')->default(1);
             $table->timestamps();
         });

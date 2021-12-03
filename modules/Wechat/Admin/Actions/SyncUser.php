@@ -40,6 +40,13 @@ class SyncUser extends Link
     public $taskId = null;
 
     /**
+     * 执行成功后刷新的组件
+     *
+     * @var string
+     */
+    public $reload = 'table';
+
+    /**
      * 跳转链接
      *
      * @return string

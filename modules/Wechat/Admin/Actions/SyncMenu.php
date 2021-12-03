@@ -29,6 +29,13 @@ class SyncMenu extends Action
     public $wechatType = 'DYH';
 
     /**
+     * 执行成功后刷新的组件
+     *
+     * @var string
+     */
+    public $reload = 'table';
+
+    /**
      * 初始化
      *
      * @param  string  $name
@@ -66,26 +73,44 @@ class SyncMenu extends Action
             $models->where('status',1)->delete();
         }
 
-        foreach ($menus['selfmenu_info']['button'] as $key => $value) {
+        if (isset($menus['selfmenu_info'])) {
+            foreach ($menus['selfmenu_info']['button'] as $key => $value) {
 
-            $data['name'] = $value['name'];
-            $data['type'] = isset($value['type']) ? $value['type'] : null;
-            $data['value'] = isset($value['url']) ? $value['url'] : null;
+                $data['name'] = $value['name'];
+                $data['wechat_type'] = $this->wechatType;
+                $data['type'] = isset($value['type']) ? $value['type'] : null;
 
-            $result = $models->create($data);
+                if ($data['type'] === 'view') {
+                    $data['value'] = isset($value['url']) ? $value['url'] : null;
+                } else {
+                    $data['value'] = isset($value['value']) ? $value['value'] : null;
+                }
+    
+                $result = $models->create($data);
+    
+                if(isset($value['sub_button']['list'])) {
+                    foreach ($value['sub_button']['list'] as $subKey => $subValue) {
+    
+                        $subData['pid'] = $result->id;
+                        $subData['name'] = $subValue['name'];
+                        $subData['wechat_type'] = $this->wechatType;
+                        $subData['type'] = isset($subValue['type']) ? $subValue['type'] : null;
 
-            if(isset($value['sub_button']['list'])) {
-                foreach ($value['sub_button']['list'] as $subKey => $subValue) {
+                        if ($subData['type'] === 'view') {
+                            $subData['value'] = isset($subValue['url']) ? $subValue['url'] : null;
+                        } else {
+                            $subData['value'] = isset($subValue['value']) ? $subValue['value'] : null;
+                        }
 
-                    $subData['pid'] = $result->id;
-                    $subData['name'] = $subValue['name'];
-                    $subData['type'] = isset($subValue['type']) ? $subValue['type'] : null;
-                    $subData['value'] = isset($subValue['url']) ? $subValue['url'] : null;
-
-                    if($subValue['type'] !== 'news') {
-                        $models->create($subData);
+                        if($subValue['type'] !== 'news') {
+                            $models->create($subData);
+                        }
                     }
                 }
+            }
+        } else {
+            if (!$menus['is_menu_open']) {
+                return error('公众号自定义菜单权限没有开启！');
             }
         }
 
