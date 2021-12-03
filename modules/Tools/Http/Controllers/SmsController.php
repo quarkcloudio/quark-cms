@@ -81,7 +81,7 @@ class SmsController extends Controller
 
             return success('短信已发送，请注意查收！');
         } else {
-            $data['status'] = 2;
+            $data['status'] = 0;
             Sms::create($data);
             return error('短信发送失败！');
         }
