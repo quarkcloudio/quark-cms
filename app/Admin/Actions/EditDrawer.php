@@ -55,7 +55,7 @@ class EditDrawer extends Drawer
         return Form::key('editDrawerForm')
         ->api($request->newResource()->updateApi($request))
         ->initApi($request->newResource()->editValueApi($request))
-        ->items($request->newResource()->updateFields($request))
+        ->items($request->newResource()->updateFieldsWithinComponents($request))
         ->labelCol([
             'span' => 6
         ])
