@@ -190,7 +190,7 @@ class BladeExtendServiceProvider extends ServiceProvider
 
             // 定义查询对象
             $parseStr .= '$__QUERY__ = App\Models\Post::query();';
-            $parseStr .= '$__QUERY__->where(\'position\',\'like\', %'.$position.'%);';
+            $parseStr .= '$__QUERY__->where(\'position\',\'like\', \'%'.$position.'%\');';
 
             if(!empty($offset)) {
                 $parseStr .= '$__QUERY__->offset('.$offset.');';
