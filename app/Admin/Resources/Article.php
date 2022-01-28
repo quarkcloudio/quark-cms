@@ -132,6 +132,10 @@ class Article extends Resource
             Field::editor('content','内容')
             ->onlyOnForms(),
 
+            Field::datetime('created_at','发布时间')
+            ->rules(['required'],['required'=>'请选择发布时间'])
+            ->onlyOnForms(),
+
             Field::switch('status','状态')
             ->editable()
             ->trueValue('正常')
@@ -240,7 +244,8 @@ class Article extends Resource
             'show_type' => 1,
             'comment' => 0,
             'status' => true,
-            'comment_status' => true
+            'comment_status' => true,
+            'created_at' => date('Y-m-d H:i:s')
         ];
     }
 

@@ -39,7 +39,8 @@ class Post extends Model
         'page_tpl',
         'file_ids',
         'comment_status',
-        'status'
+        'status',
+        'created_at'
     ];
 
     /**
