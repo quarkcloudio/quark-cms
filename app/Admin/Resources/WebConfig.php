@@ -141,6 +141,14 @@ class WebConfig extends Resource
                 }
                 $data[$value->name] = $files;
             }
+
+            if($value->type === 'switch') {
+                if ($value->value == '1') {
+                    $data[$value->name] = true;
+                } else {
+                    $data[$value->name] = false;
+                }
+            }
         }
 
         return $data ?? [];
