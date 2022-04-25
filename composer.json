@@ -22,8 +22,8 @@
         "nwidart/laravel-modules": "^7.1",
         "overtrue/wechat": "^4.2",
         "predis/predis": "~1.0",
-        "quarkcms/quark": "1.0.26",
-        "quarkcms/quark-admin": "2.2.9"
+        "quarkcms/quark": "1.0.41",
+        "quarkcms/quark-admin": "2.2.21"
     },
     "require-dev": {
         "facade/ignition": "^2.0",
@@ -36,7 +36,10 @@
     "config": {
         "optimize-autoloader": true,
         "preferred-install": "dist",
-        "sort-packages": true
+        "sort-packages": true,
+        "allow-plugins": {
+            "easywechat-composer/easywechat-composer": true
+        }
     },
     "extra": {
         "laravel": {

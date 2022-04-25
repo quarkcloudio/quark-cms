@@ -70,6 +70,9 @@ class Article extends Resource
             Field::hidden('adminid','ADMINID')
             ->onlyOnForms(),
 
+            Field::hidden('cover_ids','封面图')
+            ->onlyOnForms(),
+
             Field::text('title','标题')
             ->rules(
                 ['required','max:200'],
@@ -107,16 +110,24 @@ class Article extends Resource
                 2 => '单图（小）',
                 3 => '多图',
                 4 => '单图（大）'
-            ])->when('in', [2, 4], function() {
+            ])
+            ->when(2, function() {
 
-                return Field::image('cover_ids','封面图')
+                return Field::image('small_cover_ids','封面图')
                 ->mode('m')
                 ->limitNum(1)
                 ->onlyOnForms();
-            })->when(3, function() {
-                
-                return Field::image('cover_ids','封面图')
+            })
+            ->when(3, function() {
+
+                return Field::image('multiple_cover_ids','封面图')
                 ->mode('m')
+                ->onlyOnForms();
+            })->when(4, function() {
+                
+                return Field::image('large_cover_ids','封面图')
+                ->mode('m')
+                ->limitNum(1)
                 ->onlyOnForms();
             })
             ->onlyOnForms(),
@@ -253,12 +264,53 @@ class Article extends Resource
      * 保存前回调
      *
      * @param  Request  $request
+     * @param  array $data
+     * @return object
+     */
+    public function beforeEditing(Request $request, $data)
+    {
+        switch ($data['show_type']) {
+            case 2:
+                $data['small_cover_ids'] = $data['cover_ids'];
+                break;
+            case 3:
+                $data['multiple_cover_ids'] = $data['cover_ids'];
+                break;
+            case 4:
+                $data['large_cover_ids'] = $data['cover_ids'];
+                break;
+        }
+
+        unset($data['cover_ids']);
+
+        return $data;
+    }
+
+    /**
+     * 保存前回调
+     *
+     * @param  Request  $request
      * @param  array $submitData
      * @return object
      */
     public function beforeSaving(Request $request, $submitData)
     {
         $submitData['adminid'] = ADMINID;
+
+        switch ($submitData['show_type']) {
+            case 2:
+                $submitData['cover_ids'] = $submitData['small_cover_ids'];
+                unset($submitData['small_cover_ids']);
+                break;
+            case 3:
+                $submitData['cover_ids'] = $submitData['multiple_cover_ids'];
+                unset($submitData['multiple_cover_ids']);
+                break;
+            case 4:
+                $submitData['cover_ids'] = $submitData['large_cover_ids'];
+                unset($submitData['large_cover_ids']);
+                break;
+        }
 
         return $submitData;
     }
