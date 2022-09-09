@@ -51,10 +51,14 @@ class Role extends Resource
                 ['unique:roles,name'],
                 ['unique'=>'名称已存在']
             ),
-            Field::text('guard_name','GuardName')->default('admin'),
-            Field::tree('menu_ids','权限')->data($menus),
-            Field::datetime('created_at','创建时间')->onlyOnIndex(),
-            Field::datetime('updated_at','更新时间')->onlyOnIndex(),
+            Field::text('guard_name','GuardName')->default('admin')->onlyOnForms(),
+            Field::tree('menu_ids','权限')->data($menus)->onlyOnForms(),
+            Field::datetime('created_date','创建时间',function () {
+                return \Carbon\Carbon::parse($this->created_at)->format('Y-m-d H:i:s');
+            })->onlyOnIndex(),
+            Field::datetime('updated_date','更新时间',function () {
+                return \Carbon\Carbon::parse($this->updated_at)->format('Y-m-d H:i:s');
+            })->onlyOnIndex(),
         ];
     }
 
@@ -166,7 +170,7 @@ class Role extends Resource
             // 同步权限
             return $model->syncPermissions(array_filter(array_unique($permissions)));
         } else {
-            
+
             // 同步权限
             return Role::where('id',$request->input('id'))->first()->syncPermissions(array_filter(array_unique($permissions)));
         }
